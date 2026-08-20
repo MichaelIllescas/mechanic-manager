@@ -21,8 +21,6 @@ Documentación técnica y arquitectónica del sistema.
 - Frontend Angular 21 + TypeScript + RxJS.
 - Docker + Docker Compose.
 
-No se adopta Arquitectura Hexagonal ni una infraestructura genérica de multi-tenancy para el MVP.
-
 ## Contenido
 
 - [Technical Design](01-technical-design.md)

@@ -48,8 +48,7 @@ docs/
 
 **Monolito Modular + Arquitectura en Capas + SOLID con criterio + KISS/YAGNI**
 
-No se adopta Arquitectura Hexagonal para el MVP. Tampoco se aplicará DDD táctico como requisito arquitectónico. Se utilizará un modelo de negocio simple y explícito, agregando patrones únicamente cuando una necesidad real lo justifique.
-
+Se utilizará un modelo de negocio simple y explícito, agregando patrones únicamente cuando una necesidad real lo justifique.
 
 ## Stack tecnológico definido
 

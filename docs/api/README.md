@@ -6,7 +6,7 @@
 
 ## Estrategia de documentación
 
-La API del backend **Spring Boot 3.3.13** se implementará con **Spring Web** y se documentará utilizando **OpenAPI**, con **Swagger UI** para su inspección.
+La API del backend **Spring Boot 4.1.0** se implementará con **Spring Web** y se documentará utilizando **OpenAPI**, con **Swagger UI** para su inspección.
 
 El contrato principal se encuentra en:
 

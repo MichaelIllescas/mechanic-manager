@@ -5,7 +5,7 @@
 
 ---
 
-El MVP se empaquetará y ejecutará mediante **Docker** y **Docker Compose**. El backend será una aplicación **Java 21 / Spring Boot 3.3.13** y la persistencia utilizará **MySQL 8**, con migraciones gestionadas mediante **Flyway**.
+El MVP se empaquetará y ejecutará mediante **Docker** y **Docker Compose**. El backend será una aplicación **Java 21 / Spring Boot 4.1.0** y la persistencia utilizará **MySQL 8**, con migraciones gestionadas mediante **Flyway**.
 
 El proveedor de hosting no se fija en esta versión porque todavía no es una decisión necesaria para implementar y validar el producto.
 

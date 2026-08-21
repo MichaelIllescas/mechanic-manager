@@ -11,7 +11,7 @@ La arquitectura debe favorecer velocidad de desarrollo, bajo costo operativo y f
 
 ## Decisión
 
-Implementar el backend como un **Monolito Modular con Arquitectura en Capas**, sobre **Java 21 y Spring Boot 3.3.13**, utilizando **Maven**.
+Implementar el backend como un **Monolito Modular con Arquitectura en Capas**, sobre **Java 21 y Spring Boot 4.1.0**, utilizando **Maven**.
 
 Las responsabilidades principales serán:
 

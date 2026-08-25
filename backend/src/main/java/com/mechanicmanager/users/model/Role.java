@@ -1,4 +1,6 @@
 package com.mechanicmanager.users.model;
 
-public class Role {
+public enum Role {
+    SYSTEM_ADMIN,
+    USER
 }

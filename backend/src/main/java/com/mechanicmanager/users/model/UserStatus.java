@@ -1,4 +1,6 @@
 package com.mechanicmanager.users.model;
 
-public class UserStatus {
+public enum UserStatus {
+    ENABLED,
+    DISABLED
 }

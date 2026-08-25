@@ -1,0 +1,58 @@
+<main class="login-page">
+  <section class="brand-panel" aria-label="Mechanic Manager">
+    <div class="brand-panel__content">
+      <img class="brand-panel__logo" src="/brand/logo-mechanic.jpeg" alt="Mechanic Manager" />
+      <p class="brand-panel__eyebrow">Workshop gestion de taller</p>
+      <h1>Operacion del taller en un solo panel.</h1>
+      <p class="brand-panel__copy">
+        Agenda, clientes, vehiculos y servicios preparados para una gestion clara desde el primer
+        ingreso.
+      </p>
+    </div>
+  </section>
+
+  <section class="login-card" aria-labelledby="login-title">
+    <div class="login-card__header">
+      <p class="login-card__kicker">Acceso seguro</p>
+      <h2 id="login-title">Iniciar sesion</h2>
+      <p>Ingresa con tu cuenta para continuar.</p>
+    </div>
+
+    <form class="login-form" [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div class="field">
+        <label for="email">Email</label>
+        <input
+          id="email"
+          type="email"
+          formControlName="email"
+          placeholder="usuario@taller.com"
+          autocomplete="email"
+        />
+        @if (form.controls.email.touched && form.controls.email.invalid) {
+          <span class="field__error">Ingresa un email valido.</span>
+        }
+      </div>
+
+      <div class="field">
+        <label for="password">Contrasena</label>
+        <input
+          id="password"
+          type="password"
+          formControlName="password"
+          placeholder="Tu contrasena"
+          autocomplete="current-password"
+        />
+        @if (form.controls.password.touched && form.controls.password.invalid) {
+          <span class="field__error">La contrasena es obligatoria.</span>
+        }
+      </div>
+      @if (errorMessage()) {
+        <p class="login-form__error" role="alert">{{ errorMessage() }}</p>
+      }
+
+      <button class="login-form__submit" type="submit" [disabled]="form.invalid || loading()">
+        {{ loading() ? 'Ingresando...' : 'Ingresar' }}
+      </button>
+    </form>
+  </section>
+</main>

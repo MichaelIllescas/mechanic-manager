@@ -1,0 +1,121 @@
+<header class="navbar">
+  <a
+    class="navbar__brand"
+    routerLink="/dashboard"
+    aria-label="Ir al inicio"
+    (click)="closeMenus()"
+  >
+    <img
+      class="navbar__logo"
+      src="/assets/Logo-mechanic.jpeg"
+      alt="Logo de Mechanic Manager"
+    />
+    <span>Mechanic Manager</span>
+  </a>
+
+  <button
+    class="navbar__toggle"
+    type="button"
+    aria-label="Abrir o cerrar el menú"
+    aria-controls="main-navigation"
+    [attr.aria-expanded]="isMenuOpen"
+    (click)="toggleMenu()"
+  >
+    <span></span>
+    <span></span>
+    <span></span>
+  </button>
+
+  <div
+    id="main-navigation"
+    class="navbar__navigation"
+    [class.navbar__navigation--open]="isMenuOpen"
+  >
+    <nav class="navbar__menu" aria-label="Navegación principal">
+      <a
+        routerLink="/dashboard"
+        routerLinkActive="navbar__link--active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        (click)="closeMenus()"
+      >
+        Inicio
+      </a>
+      <a
+        routerLink="/workshop"
+        routerLinkActive="navbar__link--active"
+        (click)="closeMenus()"
+      >
+        Taller
+      </a>
+      <a
+        routerLink="/customers"
+        routerLinkActive="navbar__link--active"
+        (click)="closeMenus()"
+      >
+        Clientes
+      </a>
+      <a
+        routerLink="/vehicles"
+        routerLinkActive="navbar__link--active"
+        (click)="closeMenus()"
+      >
+        Vehículos
+      </a>
+      <a
+        routerLink="/appointments"
+        routerLinkActive="navbar__link--active"
+        (click)="closeMenus()"
+      >
+        Turnos
+      </a>
+      <a
+        routerLink="/quotes"
+        routerLinkActive="navbar__link--active"
+        (click)="closeMenus()"
+      >
+        Presupuestos
+      </a>
+      <a
+        routerLink="/services"
+        routerLinkActive="navbar__link--active"
+        (click)="closeMenus()"
+      >
+        Servicios
+      </a>
+      <a
+        routerLink="/history"
+        routerLinkActive="navbar__link--active"
+        (click)="closeMenus()"
+      >
+        Historial
+      </a>
+    </nav>
+
+    <div class="navbar__profile-menu">
+      <button
+        class="navbar__profile"
+        type="button"
+        aria-haspopup="menu"
+        [attr.aria-expanded]="isProfileMenuOpen"
+        (click)="toggleProfileMenu()"
+      >
+        <span class="navbar__avatar" aria-hidden="true">U</span>
+        <span class="navbar__profile-label">Mi Perfil</span>
+        <span class="navbar__chevron" aria-hidden="true">⌄</span>
+      </button>
+
+      <div
+        class="navbar__profile-dropdown"
+        [class.navbar__profile-dropdown--open]="isProfileMenuOpen"
+        role="menu"
+      >
+        <button type="button" role="menuitem">Datos de la cuenta</button>
+        <button type="button" role="menuitem">Cambiar contraseña</button>
+        <div class="navbar__profile-divider"></div>
+        <button class="navbar__logout" type="button" role="menuitem">
+          Cerrar sesión
+        </button>
+      </div>
+    </div>
+  </div>
+</header>

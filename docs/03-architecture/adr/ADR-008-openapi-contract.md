@@ -16,7 +16,7 @@ Utilizar **OpenAPI** como contrato HTTP de la aplicación y **Swagger UI** para 
 El contrato se mantendrá dentro del repositorio en:
 
 ```text
-docs/api/openapi.yaml
+docs/04-api/openapi.yaml
 ```
 
 La documentación deberá actualizarse junto con los cambios de endpoints.
@@ -50,4 +50,4 @@ Un endpoint nuevo o modificado no se considerará completamente documentado si e
 
 ## Integración con el stack
 
-El contrato OpenAPI forma parte del stack definido del backend Spring Boot. El archivo `docs/api/openapi.yaml` permanece versionado como referencia del contrato y Swagger UI se utilizará para inspeccionar la API durante desarrollo.
+El contrato OpenAPI forma parte del stack definido del backend Spring Boot. El archivo `docs/04-api/openapi.yaml` permanece versionado como referencia del contrato y Swagger UI se utilizará para inspeccionar la API durante desarrollo.

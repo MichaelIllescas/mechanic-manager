@@ -39,6 +39,9 @@ public class User {
     @Column(name = "status", nullable = false, length = 32)
     private UserStatus status;
     
+    @Column(name = "must_change_password", nullable = false)
+    private boolean mustChangePassword;
+    
     @Column(name = "created_at", nullable = false, insertable = false, updatable = false)
     private LocalDateTime createdAt;
     

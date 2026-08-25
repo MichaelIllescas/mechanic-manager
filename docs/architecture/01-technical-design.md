@@ -56,7 +56,7 @@ El stack del MVP queda definido de la siguiente manera:
 
 | Área | Tecnología |
 |---|---|
-| Backend | Java 21 + Spring Boot 3.3.13 |
+| Backend | Java 21 + Spring Boot 4.1.0 |
 | Build | Maven |
 | HTTP | Spring Web |
 | Seguridad | Spring Security + JWT |
@@ -104,7 +104,7 @@ com.mechanicmanager
     └── config
 ```
 
-El backend se implementará con **Java 21 y Spring Boot 3.3.13**, utilizando **Maven** como herramienta de build. La organización anterior es la estructura base del proyecto y se mantendrá alineada con las responsabilidades de cada módulo.
+El backend se implementará con **Java 21 y Spring Boot 4.1.0**, utilizando **Maven** como herramienta de build. La organización anterior es la estructura base del proyecto y se mantendrá alineada con las responsabilidades de cada módulo.
 
 ---
 

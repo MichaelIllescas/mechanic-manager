@@ -11,7 +11,7 @@ Documentación técnica y arquitectónica del sistema.
 - KISS y YAGNI.
 - API REST.
 - Ownership simple `USER -> Workshop`.
-- Java 21 + Spring Boot 3.3.13.
+- Java 21 + Spring Boot 4.1.0
 - Maven.
 - Spring Web + Spring Security + JWT.
 - Spring Data JPA + Hibernate.

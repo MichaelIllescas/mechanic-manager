@@ -1,0 +1,80 @@
+<section class="dashboard">
+  <header class="dashboard__header">
+    <div>
+      <p class="dashboard__eyebrow">Panel del taller</p>
+      <h1>Resumen de la operación</h1>
+      <p>Consultá el estado actual y accedé rápidamente a las tareas principales.</p>
+    </div>
+
+    <a class="dashboard__primary-action" routerLink="/appointments/new">
+      Nuevo turno
+    </a>
+  </header>
+
+  <section class="dashboard__summary" aria-label="Resumen del taller">
+    <article class="summary-card">
+      <span class="summary-card__label">Turnos de hoy</span>
+      <strong class="summary-card__value">0</strong>
+      <a routerLink="/appointments">Ver agenda</a>
+    </article>
+
+    <article class="summary-card">
+      <span class="summary-card__label">Servicios abiertos</span>
+      <strong class="summary-card__value">0</strong>
+      <a routerLink="/services">Ver servicios</a>
+    </article>
+
+    <article class="summary-card">
+      <span class="summary-card__label">Presupuestos pendientes</span>
+      <strong class="summary-card__value">0</strong>
+      <a routerLink="/quotes">Ver presupuestos</a>
+    </article>
+  </section>
+
+  <section class="dashboard__section">
+    <div class="dashboard__section-header">
+      <div>
+        <p class="dashboard__eyebrow">Accesos directos</p>
+        <h2>Acciones rápidas</h2>
+      </div>
+    </div>
+
+    <div class="quick-actions">
+      <a class="quick-action" routerLink="/customers/new">
+        <strong>Nuevo cliente</strong>
+        <span>Registrar los datos de un cliente.</span>
+      </a>
+
+      <a class="quick-action" routerLink="/vehicles/new">
+        <strong>Nuevo vehículo</strong>
+        <span>Asociar un vehículo a un cliente.</span>
+      </a>
+
+      <a class="quick-action" routerLink="/quotes/new">
+        <strong>Nuevo presupuesto</strong>
+        <span>Crear un presupuesto para un vehículo.</span>
+      </a>
+
+      <a class="quick-action" routerLink="/services/new">
+        <strong>Registrar ingreso</strong>
+        <span>Iniciar un nuevo servicio mecánico.</span>
+      </a>
+    </div>
+  </section>
+
+  <section class="dashboard__section">
+    <div class="dashboard__section-header">
+      <div>
+        <p class="dashboard__eyebrow">Agenda</p>
+        <h2>Actividad de hoy</h2>
+      </div>
+
+      <a routerLink="/appointments">Ver agenda completa</a>
+    </div>
+
+    <div class="dashboard__empty-state">
+      <h3>No hay turnos programados para hoy</h3>
+      <p>Los próximos turnos aparecerán en esta sección.</p>
+    </div>
+  </section>
+</section>

@@ -129,7 +129,7 @@ Responsabilidades:
 
 - implementar y coordinar los casos de uso;
 - aplicar reglas de negocio;
-- verificar ownership/acceso al taller cuando corresponda;
+- verificar ownership/acceso del usuario autenticado cuando corresponda;
 - coordinar repositorios;
 - manejar transacciones cuando sea necesario.
 
@@ -141,7 +141,7 @@ Responsabilidades:
 
 - encapsular acceso a datos;
 - realizar búsquedas y persistencia;
-- aplicar consultas restringidas por taller cuando corresponda.
+- aplicar consultas restringidas por usuario cuando corresponda.
 
 Los controllers nunca accederán directamente a repositories.
 
@@ -202,27 +202,28 @@ La plataforma tendrá múltiples talleres, pero el MVP no implementará una infr
 Se utilizará una regla simple de ownership:
 
 1. el usuario autenticado identifica su cuenta;
-2. su cuenta determina su único `workshopId`;
-3. las operaciones del negocio se ejecutan únicamente dentro de ese taller;
-4. un `workshopId` enviado por frontend nunca autoriza por sí mismo una operación.
+2. los datos operativos pertenecen a ese `userId`;
+3. las operaciones del negocio se ejecutan únicamente sobre datos de ese usuario;
+4. un identificador de propietario enviado por frontend nunca autoriza por sí mismo una operación.
 
 ```text
 Authenticated USER
       │
       ▼
-User.workshop
-      │
-      ▼
-workshopId confiable
+userId confiable
       │
       ▼
 Service / Repository
       │
       ▼
-WHERE workshop_id = :authenticatedWorkshopId
+WHERE user_id = :authenticatedUserId
 ```
 
-Los endpoints operativos deberían evitar pedir `workshopId` cuando el taller puede obtenerse directamente desde la identidad autenticada.
+El propietario de los datos es el `USER`, no el `Workshop`. `Workshop` guarda los datos del negocio y no participa del aislamiento.
+
+En el MVP un usuario tiene un único taller, así que el `userId` alcanza para aislar la información y evita resolver el taller en cada consulta. Si un taller llegara a necesitar más de una persona, estas referencias pasarían a `workshopId`.
+
+Los endpoints operativos nunca piden el identificador del propietario: se obtiene de la identidad autenticada.
 
 ---
 
@@ -245,10 +246,11 @@ Conceptualmente:
 
 ```text
 UNIQUE(workshop.user_id)
-UNIQUE(workshop_id, license_plate)
+UNIQUE(user_id, license_plate)
+UNIQUE(user_id, service_type.name)
 ```
 
-Las entidades operativas podrán almacenar `workshop_id` para facilitar el aislamiento y las consultas. La persistencia se implementará con **Spring Data JPA + Hibernate** y las migraciones de esquema se gestionarán con **Flyway**.
+Las entidades operativas almacenarán `user_id` para el aislamiento y las consultas. La persistencia se implementará con **Spring Data JPA + Hibernate** y las migraciones de esquema se gestionarán con **Flyway**.
 
 No se agregará una entidad abstracta `Tenant` en el MVP.
 
@@ -262,7 +264,7 @@ Requerimientos mínimos:
 - autenticación mediante **JWT**;
 - autorización por rol;
 - cuenta habilitada para iniciar sesión;
-- resolución del taller desde el usuario autenticado;
+- resolución del propietario de los datos desde el usuario autenticado;
 - validación de ownership en operaciones sensibles;
 - manejo centralizado de errores;
 - protección de endpoints administrativos.
@@ -288,8 +290,7 @@ VehicleController
     ▼
 VehicleService
     ├── obtiene usuario autenticado
-    ├── obtiene su workshopId
-    ├── valida cliente del mismo taller
+    ├── valida cliente del mismo usuario
     ├── valida patente
     └── registra vehículo
     │
@@ -300,7 +301,7 @@ VehicleRepository
 Database
 ```
 
-El frontend no decide a qué taller pertenece el vehículo.
+El frontend no decide a quién pertenece el vehículo.
 
 ---
 
@@ -344,7 +345,7 @@ Prioridad especial para:
 
 - autenticación;
 - autorización;
-- acceso restringido al taller autenticado;
+- acceso restringido al usuario autenticado;
 - constraints de base de datos;
 - persistencia de flujos críticos.
 

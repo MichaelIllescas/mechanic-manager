@@ -1,6 +1,6 @@
 # Product Scope / MVP Scope
 
-**Versión:** 1.1  
+**Versión:** 1.2  
 **Estado:** MVP simplificado para validación
 
 ---
@@ -22,12 +22,13 @@ SYSTEM_ADMIN -> administra usuarios de la plataforma
 
 USER -> administra 1 Taller
 
-Taller -> posee clientes, vehículos, turnos, presupuestos,
-         catálogo de servicios y órdenes de trabajo
+USER -> posee clientes, vehículos, turnos, presupuestos,
+        catálogo de servicios y órdenes de trabajo
 ```
 
 Reglas iniciales:
 
+- los datos operativos pertenecen al `USER`; el taller guarda los datos del negocio;
 - un `USER` puede tener como máximo un taller;
 - un taller pertenece a un único `USER`;
 - `SYSTEM_ADMIN` no administra talleres;
@@ -48,7 +49,7 @@ Reglas iniciales:
   - `USER`
 - Creación y edición del taller propio por parte de `USER`.
 - Asociación uno a uno entre usuario operativo y taller.
-- Separación de los datos operativos según el taller del usuario autenticado.
+- Separación de los datos operativos según el usuario autenticado.
 
 ### 3.2 Taller
 

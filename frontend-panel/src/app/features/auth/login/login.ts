@@ -1,6 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
+import { Router } from '@angular/router';
 
 import { AuthService } from '../../../core/auth/auth-service';
 
@@ -13,6 +14,7 @@ import { AuthService } from '../../../core/auth/auth-service';
 export class Login {
   private readonly fb = inject(FormBuilder);
   private readonly auth = inject(AuthService);
+  private readonly router = inject(Router);
 
   readonly loading = signal(false);
   readonly errorMessage = signal<string | null>(null);
@@ -34,7 +36,7 @@ export class Login {
     this.auth.login(this.form.getRawValue()).subscribe({
       next: (res) => {
         this.loading.set(false);
-        console.log('Login OK', res);
+        this.router.navigate([res.role === 'SYSTEM_ADMIN' ? '/admin/usuarios' : '/dashboard']);
       },
       error: (err: HttpErrorResponse) => {
         this.loading.set(false);

@@ -1,0 +1,14 @@
+@if (current(); as notification) {
+  <div
+    class="notification"
+    [class.notification--success]="notification.type === 'success'"
+    [class.notification--error]="notification.type === 'error'"
+    role="status"
+  >
+    <span>{{ notification.text }}</span>
+
+    <button type="button" class="notification__close" (click)="close()" aria-label="Cerrar">
+      &times;
+    </button>
+  </div>
+}

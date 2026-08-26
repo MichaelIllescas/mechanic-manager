@@ -34,9 +34,140 @@ tags:
   - name: History
     description: Consulta del historial técnico de vehículos.
 
-paths: {}
+paths:
+  /customers:
+    get:
+      tags:
+        - Customers
+      summary: Listar o buscar clientes
+      description: >
+        Sin el parámetro search lista los clientes del taller autenticado.
+        Con search busca por nombre, apellido, documento, teléfono o email.
+      operationId: listCustomers
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: search
+          in: query
+          required: false
+          description: Texto de búsqueda.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Listado obtenido correctamente.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CustomerResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    post:
+      tags:
+        - Customers
+      summary: Registrar un cliente
+      operationId: createCustomer
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomerRequest'
+      responses:
+        '201':
+          description: Cliente registrado correctamente.
+          headers:
+            Location:
+              description: URL del cliente registrado.
+              schema:
+                type: string
+                format: uri
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /customers/{id}:
+    put:
+      tags:
+        - Customers
+      summary: Editar un cliente
+      description: >
+        Solo permite editar un cliente perteneciente al taller del usuario autenticado.
+      operationId: updateCustomer
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Identificador del cliente.
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomerRequest'
+      responses:
+        '200':
+          description: Cliente actualizado correctamente.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
 
 components:
+  responses:
+    BadRequest:
+      description: Datos inválidos.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Unauthorized:
+      description: No autenticado.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Forbidden:
+      description: El usuario no tiene permisos para la operación.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    NotFound:
+      description: El taller o cliente solicitado no existe dentro del alcance autenticado.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
   securitySchemes:
     bearerAuth:
       type: http
@@ -44,6 +175,71 @@ components:
       bearerFormat: JWT
 
   schemas:
+    CustomerRequest:
+      type: object
+      required:
+        - firstName
+        - lastName
+        - phone
+      properties:
+        firstName:
+          type: string
+          maxLength: 120
+          example: Juan
+        lastName:
+          type: string
+          maxLength: 120
+          example: Pérez
+        documentNumber:
+          type:
+            - string
+            - 'null'
+          maxLength: 30
+          example: '30111222'
+        phone:
+          type: string
+          minLength: 6
+          maxLength: 30
+          example: 11 4444-5555
+        email:
+          type:
+            - string
+            - 'null'
+          format: email
+          maxLength: 255
+          example: juan@email.com
+        notes:
+          type:
+            - string
+            - 'null'
+          maxLength: 1000
+          example: Cliente habitual
+    CustomerResponse:
+      allOf:
+        - $ref: '#/components/schemas/CustomerRequest'
+        - type: object
+          required:
+            - id
+            - workshopId
+          properties:
+            id:
+              type: integer
+              format: int64
+              example: 1
+            workshopId:
+              type: integer
+              format: int64
+              example: 1
+            createdAt:
+              type:
+                - string
+                - 'null'
+              format: date-time
+            updatedAt:
+              type:
+                - string
+                - 'null'
+              format: date-time
     ErrorResponse:
       type: object
       required:

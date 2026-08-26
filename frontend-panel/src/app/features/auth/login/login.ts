@@ -18,11 +18,16 @@ export class Login {
 
   readonly loading = signal(false);
   readonly errorMessage = signal<string | null>(null);
+  readonly passwordVisible = signal(false);
 
   readonly form = this.fb.nonNullable.group({
     email: ['', [Validators.required, Validators.email]],
     password: ['', [Validators.required]],
   });
+
+  togglePasswordVisibility(): void {
+    this.passwordVisible.update((visible) => !visible);
+  }
 
   onSubmit(): void {
     if (this.form.invalid) {
@@ -36,7 +41,9 @@ export class Login {
     this.auth.login(this.form.getRawValue()).subscribe({
       next: (res) => {
         this.loading.set(false);
-        this.router.navigate([res.role === 'SYSTEM_ADMIN' ? '/admin/usuarios' : '/dashboard']);
+        void this.router.navigate([
+          res.role === 'SYSTEM_ADMIN' ? '/admin/usuarios' : '/dashboard',
+        ]);
       },
       error: (err: HttpErrorResponse) => {
         this.loading.set(false);

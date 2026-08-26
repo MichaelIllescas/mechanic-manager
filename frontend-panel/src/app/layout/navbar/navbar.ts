@@ -1,5 +1,7 @@
-import { Component } from '@angular/core';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { Component, inject } from '@angular/core';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+
+import { AuthService } from '../../core/auth/auth-service';
 
 @Component({
   selector: 'app-navbar',
@@ -8,6 +10,12 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
   styleUrl: './navbar.css',
 })
 export class Navbar {
+  private readonly authService = inject(AuthService);
+  private readonly router = inject(Router);
+
+  readonly userName = this.authService.getUserName() ?? 'Usuario';
+  readonly userInitial = this.userName.trim().charAt(0).toUpperCase() || 'U';
+
   isMenuOpen = false;
   isProfileMenuOpen = false;
 
@@ -23,5 +31,11 @@ export class Navbar {
   closeMenus(): void {
     this.isMenuOpen = false;
     this.isProfileMenuOpen = false;
+  }
+
+  logout(): void {
+    this.authService.logout();
+    this.closeMenus();
+    void this.router.navigate(['/login']);
   }
 }

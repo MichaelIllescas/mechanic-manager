@@ -2,11 +2,14 @@ import { Routes } from '@angular/router';
 
 import { adminGuard } from './core/guards/admin-guard';
 import { authGuard } from './core/guards/auth-guard';
-import { Login } from './features/auth/login/login';
-import { MainLayout } from './layout/main-layout/main-layout';
+import { guestGuard } from './core/guards/guest-guard';
 
 export const routes: Routes = [
-  { path: 'login', component: Login },
+  {
+    path: 'login',
+    canActivate: [guestGuard],
+    loadComponent: () => import('./features/auth/login/login').then((component) => component.Login),
+  },
   {
     path: 'admin',
     canMatch: [adminGuard],
@@ -14,8 +17,9 @@ export const routes: Routes = [
   },
   {
     path: '',
-    component: MainLayout,
     canMatch: [authGuard],
+    loadComponent: () =>
+      import('./layout/main-layout/main-layout').then((component) => component.MainLayout),
     children: [
       {
         path: 'dashboard',

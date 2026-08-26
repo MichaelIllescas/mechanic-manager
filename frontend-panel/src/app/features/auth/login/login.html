@@ -35,13 +35,27 @@
 
       <div class="field">
         <label for="password">Contrasena</label>
-        <input
-          id="password"
-          type="password"
-          formControlName="password"
-          placeholder="Tu contrasena"
-          autocomplete="current-password"
-        />
+        <div class="password-input">
+          <input
+            id="password"
+            [type]="passwordVisible() ? 'text' : 'password'"
+            formControlName="password"
+            placeholder="Tu contrasena"
+            autocomplete="current-password"
+          />
+          <button
+            class="password-input__toggle"
+            type="button"
+            [attr.aria-label]="passwordVisible() ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+            [attr.aria-pressed]="passwordVisible()"
+            (click)="togglePasswordVisibility()"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"></path>
+              <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+          </button>
+        </div>
         @if (form.controls.password.touched && form.controls.password.invalid) {
           <span class="field__error">La contrasena es obligatoria.</span>
         }

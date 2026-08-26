@@ -99,8 +99,8 @@
         [attr.aria-expanded]="isProfileMenuOpen"
         (click)="toggleProfileMenu()"
       >
-        <span class="navbar__avatar" aria-hidden="true">U</span>
-        <span class="navbar__profile-label">Mi Perfil</span>
+        <span class="navbar__avatar" aria-hidden="true">{{ userInitial }}</span>
+        <span class="navbar__profile-label">{{ userName }}</span>
         <span class="navbar__chevron" aria-hidden="true">⌄</span>
       </button>
 
@@ -112,7 +112,12 @@
         <button type="button" role="menuitem">Datos de la cuenta</button>
         <button type="button" role="menuitem">Cambiar contraseña</button>
         <div class="navbar__profile-divider"></div>
-        <button class="navbar__logout" type="button" role="menuitem">
+        <button
+          class="navbar__logout"
+          type="button"
+          role="menuitem"
+          (click)="logout()"
+        >
           Cerrar sesión
         </button>
       </div>

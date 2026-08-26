@@ -18,12 +18,7 @@
 .navbar__brand {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  color: #ffffff;
-  font-size: 1.125rem;
-  font-weight: 700;
   text-decoration: none;
-  white-space: nowrap;
 }
 
 .navbar__logo {
@@ -234,11 +229,5 @@
   .navbar__profile-dropdown {
     right: auto;
     left: 0;
-  }
-}
-
-@media (max-width: 30rem) {
-  .navbar__brand span {
-    display: none;
   }
 }

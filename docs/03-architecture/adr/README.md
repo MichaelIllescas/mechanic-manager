@@ -13,6 +13,7 @@ Cada decisión arquitectónica relevante se documenta en un ADR independiente.
 - [ADR-007 — Historial Derivado de Órdenes de Trabajo](ADR-007-historial-del-vehiculo.md)
 - [ADR-008 — OpenAPI como Contrato de Documentación de la API](ADR-008-openapi-contract.md)
 - [ADR-009 — Separación entre Catálogo de Servicios y Orden de Trabajo](ADR-009-servicio-vs-orden-de-trabajo.md)
+- [ADR-010 — Catálogo de Insumos separado del Control de Stock](ADR-010-catalogo-de-insumos.md)
 
 ## Principio del MVP
 

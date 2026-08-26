@@ -1,6 +1,6 @@
 # Product Backlog
 
-**Versión:** 1.1  
+**Versión:** 1.2  
 **Método de priorización:** MoSCoW
 
 ---
@@ -44,6 +44,10 @@
 | PB-42 | Catálogo de servicios | Editar servicio | Must | MVP |
 | PB-43 | Catálogo de servicios | Activar / desactivar servicio | Should | MVP |
 | PB-44 | Catálogo de servicios | Consultar servicios activos | Must | MVP |
+| PB-47 | Catálogo de insumos | Crear insumo del taller con precio de referencia | Must | MVP |
+| PB-48 | Catálogo de insumos | Editar insumo | Must | MVP |
+| PB-49 | Catálogo de insumos | Activar / desactivar insumo | Should | MVP |
+| PB-50 | Catálogo de insumos | Consultar insumos activos | Must | MVP |
 | PB-45 | Presupuestos | Agregar ítem tomándolo del catálogo | Should | MVP |
 | PB-25 | Órdenes de trabajo | Crear orden / registrar ingreso | Must | MVP |
 | PB-26 | Órdenes de trabajo | Vincular presupuesto aprobado | Should | MVP |
@@ -57,7 +61,7 @@
 | PB-33 | Organización | Varios usuarios por taller | Won't | Post-MVP |
 | PB-34 | Organización | Varios talleres por usuario | Won't | Post-MVP |
 | PB-35 | Seguridad | Roles y permisos internos del taller | Won't | Post-MVP |
-| PB-36 | Inventario | Gestionar repuestos y stock | Could | Post-MVP |
+| PB-36 | Inventario | Gestionar stock y movimientos de existencias | Could | Post-MVP |
 | PB-37 | Proveedores | Gestionar proveedores | Could | Post-MVP |
 | PB-38 | Comunicación | Notificar al cliente | Could | Post-MVP |
 | PB-39 | Facturación | Facturación electrónica | Could | Post-MVP |

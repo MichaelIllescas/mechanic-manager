@@ -1,6 +1,6 @@
 # Architecture / Technical Design
 
-**Versión:** 1.0  
+**Versión:** 1.1  
 **Estado:** Decisión técnica para MVP  
 **Estilo:** Monolito Modular + Arquitectura en Capas + KISS/YAGNI
 
@@ -98,6 +98,7 @@ com.mechanicmanager
 ├── appointments
 ├── quotes
 ├── servicetypes
+├── supplies
 ├── workorders
 └── shared
     ├── security

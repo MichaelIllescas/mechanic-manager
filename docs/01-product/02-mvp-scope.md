@@ -1,6 +1,6 @@
 # Product Scope / MVP Scope
 
-**Versión:** 1.2  
+**Versión:** 1.3  
 **Estado:** MVP simplificado para validación
 
 ---
@@ -167,7 +167,26 @@ Reglas iniciales:
 - un servicio utilizado no se elimina, se desactiva;
 - cambiar el precio no modifica presupuestos ni órdenes ya registrados.
 
-### 3.8 Órdenes de trabajo
+### 3.8 Catálogo de insumos
+
+Un insumo es un material o repuesto que el taller utiliza en sus trabajos: aceite, filtros, pastillas, bujías. Es catálogo, no un consumo ocurrido.
+
+Funciones:
+
+- crear insumo;
+- registrar nombre;
+- registrar precio de referencia;
+- activar y desactivar;
+- consultar insumos activos.
+
+Reglas iniciales:
+
+- un insumo utilizado no se elimina, se desactiva;
+- cambiar el precio no modifica presupuestos ni órdenes ya registrados.
+
+El MVP incluye el catálogo con sus precios, no el control de existencias. Cuántas unidades hay en el taller queda fuera del alcance.
+
+### 3.9 Órdenes de trabajo
 
 Una orden de trabajo es el ingreso concreto de un vehículo al taller.
 
@@ -191,7 +210,7 @@ Estados iniciales:
 - `FINISHED`
 - `DELIVERED`
 
-### 3.9 Historial
+### 3.10 Historial
 
 Funciones:
 
@@ -229,9 +248,9 @@ Quedan explícitamente fuera de la primera versión:
 
 ### Funcionalidad comercial y operativa
 
-- catálogo de repuestos con precios propios;
 - stock;
 - inventario de repuestos;
+- movimientos de existencias;
 - proveedores;
 - compras;
 - órdenes de compra;

@@ -27,6 +27,11 @@ export const routes: Routes = [
           import('./features/dashboard/dashboard').then((component) => component.Dashboard),
       },
       {
+        path: 'workshop',
+        loadComponent: () =>
+          import('./features/workshop/workshop/workshop').then((component) => component.Workshop),
+      },
+      {
         path: '',
         pathMatch: 'full',
         redirectTo: 'dashboard',

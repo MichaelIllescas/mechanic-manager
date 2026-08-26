@@ -1,0 +1,130 @@
+<section class="workshop">
+  <header class="workshop__header">
+    <div>
+      <p class="workshop__eyebrow">Configuración</p>
+      <h1>Datos del taller</h1>
+      <p>Estos datos identifican tu taller dentro del sistema.</p>
+    </div>
+  </header>
+
+  @if (loading()) {
+    <p class="workshop__state">Cargando datos del taller...</p>
+  } @else {
+    @if (errorMessage()) {
+      <p class="workshop__error">{{ errorMessage() }}</p>
+    }
+
+    @if (!complete() && !showForm()) {
+      <section class="workshop__empty">
+        <div>
+          <h2>Todavía no registraste los datos del taller</h2>
+          <p>Completá la información básica para identificar tu taller dentro del sistema.</p>
+        </div>
+
+        <button class="workshop__primary-button" type="button" (click)="onRegisterClick()">
+          Registrar datos
+        </button>
+      </section>
+    }
+
+    @if (complete() && !showForm() && workshop(); as currentWorkshop) {
+      <section class="workshop__detail">
+        <div class="workshop__detail-header">
+          <div>
+            <p class="workshop__eyebrow">Taller registrado</p>
+            <h2>{{ currentWorkshop.name }}</h2>
+          </div>
+
+          <button class="workshop__secondary-button" type="button" (click)="onEditClick()">
+            Editar datos
+          </button>
+        </div>
+
+        <dl class="workshop__detail-grid">
+          <div>
+            <dt>Teléfono</dt>
+            <dd>{{ currentWorkshop.phone || 'Sin cargar' }}</dd>
+          </div>
+
+          <div>
+            <dt>Email</dt>
+            <dd>{{ currentWorkshop.email || 'Sin cargar' }}</dd>
+          </div>
+
+          <div>
+            <dt>Dirección</dt>
+            <dd>{{ currentWorkshop.address || 'Sin cargar' }}</dd>
+          </div>
+
+          <div>
+            <dt>Estado</dt>
+            <dd>Datos completos</dd>
+          </div>
+
+          <div class="workshop__detail-notes">
+            <dt>Notas</dt>
+            <dd>{{ currentWorkshop.notes || 'Sin notas cargadas' }}</dd>
+          </div>
+        </dl>
+      </section>
+    }
+
+    @if (showForm()) {
+      @if (!complete()) {
+        <p class="workshop__warning">El taller todavía no tiene cargados todos los datos mínimos.</p>
+      }
+
+      <form class="workshop__form" [formGroup]="form" (ngSubmit)="onSubmit()">
+        <label>
+          Nombre
+          <input type="text" formControlName="name" maxlength="120" />
+          @if (fieldHasError('name')) {
+            <span>El nombre no puede superar los 120 caracteres.</span>
+          }
+        </label>
+
+        <label>
+          Teléfono
+          <input type="tel" formControlName="phone" />
+          @if (fieldHasError('phone')) {
+            <span>Usá números, espacios y los símbolos + - ( ).</span>
+          }
+        </label>
+
+        <label>
+          Email
+          <input type="email" formControlName="email" maxlength="255" />
+          @if (fieldHasError('email')) {
+            <span>Ingresá un email válido.</span>
+          }
+        </label>
+
+        <label>
+          Dirección
+          <input type="text" formControlName="address" maxlength="255" />
+          @if (fieldHasError('address')) {
+            <span>La dirección no puede superar los 255 caracteres.</span>
+          }
+        </label>
+
+        <label class="workshop__field--full">
+          Notas
+          <textarea rows="5" formControlName="notes" maxlength="1000"></textarea>
+          @if (fieldHasError('notes')) {
+            <span>Las notas no pueden superar los 1000 caracteres.</span>
+          }
+        </label>
+
+        <div class="workshop__actions">
+          <button class="workshop__secondary-button" type="button" [disabled]="saving()" (click)="onCancelClick()">
+            Cancelar
+          </button>
+
+          <button class="workshop__primary-button" type="submit" [disabled]="saving()">
+            {{ saving() ? 'Guardando...' : 'Guardar cambios' }}
+          </button>
+        </div>
+      </form>
+    }
+  }
+</section>

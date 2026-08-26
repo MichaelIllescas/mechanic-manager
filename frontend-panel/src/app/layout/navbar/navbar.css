@@ -109,8 +109,20 @@
 }
 
 .navbar__chevron {
+  flex-shrink: 0;
   color: #94a3b8;
-  font-size: 1rem;
+  transition:
+    transform 150ms ease,
+    color 150ms ease;
+}
+
+.navbar__profile:hover .navbar__chevron {
+  color: #ffffff;
+}
+
+.navbar__chevron--open {
+  color: #ffffff;
+  transform: rotate(180deg);
 }
 
 .navbar__profile-dropdown {

@@ -17,13 +17,15 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/admin/users")
+@RequestMapping(UserRoutes.BASE)
+@PreAuthorize("hasRole('SYSTEM_ADMIN')")
 @RequiredArgsConstructor
 public class UserController implements UserApi {
     
@@ -36,7 +38,7 @@ public class UserController implements UserApi {
     }
     
     @Override
-    @GetMapping("/{id}")
+    @GetMapping(UserRoutes.BY_ID)
     public ResponseEntity<UserResponse> findById(@PathVariable Long id) {
         return ResponseEntity.ok(userService.findById(id));
     }
@@ -50,14 +52,14 @@ public class UserController implements UserApi {
         UserResponse created = userService.create(request);
         
         return ResponseEntity
-                .created(uriBuilder.path("/api/v1/admin/users/{id}")
+                .created(uriBuilder.path(UserRoutes.BASE + UserRoutes.BY_ID)
                         .buildAndExpand(created.id())
                         .toUri())
                 .body(created);
     }
     
     @Override
-    @PutMapping("/{id}")
+    @PutMapping(UserRoutes.BY_ID)
     public ResponseEntity<UserResponse> update(
             @PathVariable Long id,
             @Valid @RequestBody UpdateUserRequest request
@@ -66,7 +68,7 @@ public class UserController implements UserApi {
     }
     
     @Override
-    @PatchMapping("/{id}/status")
+    @PatchMapping(UserRoutes.STATUS)
     public ResponseEntity<UserResponse> updateStatus(
             @PathVariable Long id,
             @Valid @RequestBody UpdateUserStatusRequest request,

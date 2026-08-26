@@ -1,6 +1,6 @@
 # Modelo de Dominio
 
-**Versión:** 1.0  
+**Versión:** 1.1  
 **Enfoque:** Modelo simple orientado al MVP
 
 ---
@@ -25,8 +25,10 @@ El modelo debe ser fácil de entender y modificar a medida que aparezca retroali
 | Turno | Reserva de fecha y hora para atención |
 | Presupuesto | Estimación económica previa a un trabajo |
 | Ítem de presupuesto | Concepto individual de trabajo o repuesto |
-| Servicio | Trabajo o intervención registrada sobre un vehículo |
-| Historial | Vista cronológica de los servicios realizados sobre un vehículo |
+| Servicio | Prestación que el taller ofrece, con precio de referencia. Es catálogo, no un hecho ocurrido |
+| Orden de trabajo | Ingreso concreto de un vehículo al taller, con su diagnóstico, estado y trabajos ejecutados |
+| Ítem de orden de trabajo | Servicio o repuesto efectivamente realizado dentro de una orden |
+| Historial | Vista cronológica de las órdenes de trabajo de un vehículo |
 
 ---
 
@@ -39,10 +41,11 @@ Customers
 Vehicles
 Appointments
 Quotes
-Services
+ServiceTypes
+WorkOrders
 ```
 
-`History` será inicialmente una consulta derivada de los servicios realizados.
+`History` será inicialmente una consulta derivada de las órdenes de trabajo registradas.
 
 Estas áreas son límites organizativos del código, no bounded contexts formales del MVP.
 
@@ -194,6 +197,7 @@ Atributos de `QuoteItem`:
 
 - `id`
 - `quoteId`
+- `serviceTypeId` opcional
 - `description`
 - `quantity`
 - `unitPrice`
@@ -210,12 +214,42 @@ Reglas:
 
 - el total surge de sus ítems;
 - cliente y vehículo deben pertenecer al taller autenticado;
-- un presupuesto aprobado puede vincularse a un servicio;
+- un ítem puede originarse en un `ServiceType` del catálogo o describirse libremente;
+- `description` y `unitPrice` se copian al crear el ítem y no siguen cambiando con el catálogo;
+- un presupuesto aprobado puede vincularse a una orden de trabajo;
 - un presupuesto aprobado no debe modificarse silenciosamente.
 
 ---
 
-### 4.7 Service
+### 4.7 ServiceType
+
+Representa una prestación que el taller ofrece. Es catálogo: no tiene fecha, estado ni vehículo asociado.
+
+Atributos:
+
+- `id`
+- `workshopId`
+- `name`
+- `description`
+- `basePrice`
+- `estimatedMinutes` opcional
+- `active`
+- `createdAt`
+- `updatedAt`
+
+Reglas:
+
+- pertenece a un taller;
+- `name` es único dentro de un taller;
+- `basePrice` es un precio de referencia y puede cambiar en el tiempo;
+- un cambio de precio no altera presupuestos ni órdenes ya registrados;
+- un servicio no se elimina si fue utilizado: se marca `active = false`.
+
+---
+
+### 4.8 WorkOrder
+
+Representa el ingreso concreto de un vehículo al taller. Es el hecho ocurrido.
 
 Atributos:
 
@@ -227,9 +261,9 @@ Atributos:
 - `entryMileage`
 - `reason`
 - `diagnosis`
-- `workPerformed`
 - `notes`
 - `status`
+- `total`
 - `finishedAt`
 - `deliveredAt`
 
@@ -244,7 +278,33 @@ Reglas:
 
 - pertenece a un vehículo del mismo taller;
 - puede vincular un presupuesto aprobado del mismo taller;
-- los servicios finalizados o entregados permanecen disponibles como historial.
+- el trabajo ejecutado se registra en sus ítems, no en un campo de texto;
+- `total` surge de sus ítems;
+- las órdenes finalizadas o entregadas permanecen disponibles como historial.
+
+---
+
+### 4.9 WorkOrderItem
+
+Representa un servicio o repuesto efectivamente realizado dentro de una orden.
+
+Atributos:
+
+- `id`
+- `workOrderId`
+- `serviceTypeId` opcional
+- `description`
+- `quantity`
+- `unitPrice`
+- `subtotal`
+- `notes` opcional
+
+Reglas:
+
+- pertenece a una única orden de trabajo;
+- puede originarse en un `ServiceType` del mismo taller o describirse libremente para trabajos no catalogados y repuestos;
+- `description` y `unitPrice` se copian del catálogo al crear el ítem y quedan congelados;
+- `subtotal` surge de `quantity` por `unitPrice`.
 
 ---
 
@@ -257,9 +317,15 @@ Customer 1 ─────── N Vehicle
 Vehicle 1 ───────── N Appointment
 Vehicle 1 ───────── N Quote
 Quote 1 ─────────── N QuoteItem
-Vehicle 1 ───────── N Service
-Quote 0..1 ───────── 1 Service
+Workshop 1 ─────── N ServiceType
+Vehicle 1 ───────── N WorkOrder
+Quote 1 ─────────── 0..1 WorkOrder
+WorkOrder 1 ─────── N WorkOrderItem
+ServiceType 1 ───── N QuoteItem
+ServiceType 1 ───── N WorkOrderItem
 ```
+
+`ServiceType` participa como origen opcional de los ítems: un ítem puede existir sin referencia al catálogo.
 
 No existe en el MVP:
 
@@ -275,11 +341,12 @@ Workshop 1 -> N User
 1. Todo dato operativo pertenece a un taller.
 2. Un `USER` sólo opera sobre su propio taller.
 3. El taller se obtiene desde la identidad autenticada, no desde un identificador confiado al frontend.
-4. Las referencias entre cliente, vehículo, turno, presupuesto y servicio deben corresponder al mismo taller.
+4. Las referencias entre cliente, vehículo, turno, presupuesto, servicio y orden de trabajo deben corresponder al mismo taller.
 5. La patente debe ser única por taller.
-6. El historial se deriva de servicios registrados.
-7. Los cambios de estado deben respetar transiciones válidas.
-8. `SYSTEM_ADMIN` administra usuarios de plataforma y no la operación de los talleres.
+6. El historial se deriva de las órdenes de trabajo registradas.
+7. Los importes de un presupuesto o de una orden se congelan al registrarse y no siguen al catálogo.
+8. Los cambios de estado deben respetar transiciones válidas.
+9. `SYSTEM_ADMIN` administra usuarios de plataforma y no la operación de los talleres.
 
 ---
 

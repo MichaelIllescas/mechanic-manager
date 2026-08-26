@@ -97,7 +97,8 @@ com.mechanicmanager
 ├── vehicles
 ├── appointments
 ├── quotes
-├── services
+├── servicetypes
+├── workorders
 └── shared
     ├── security
     ├── exception
@@ -270,7 +271,7 @@ Requerimientos mínimos:
 
 `SYSTEM_ADMIN` y `USER` son contextos distintos.
 
-Ser administrador de la plataforma no implica ser usuario operativo de un taller ni habilita automáticamente el acceso a datos de clientes, vehículos, presupuestos o servicios.
+Ser administrador de la plataforma no implica ser usuario operativo de un taller ni habilita automáticamente el acceso a datos de clientes, vehículos, presupuestos u órdenes de trabajo.
 
 ---
 

@@ -1,6 +1,6 @@
 # Product Backlog
 
-**Versión:** 1.0  
+**Versión:** 1.1  
 **Método de priorización:** MoSCoW
 
 ---
@@ -40,13 +40,19 @@
 | PB-22 | Presupuestos | Calcular subtotal y total | Must | MVP |
 | PB-23 | Presupuestos | Gestionar estado | Must | MVP |
 | PB-24 | Presupuestos | Consultar presupuestos por cliente/vehículo | Must | MVP |
-| PB-25 | Servicios | Crear servicio / registrar ingreso | Must | MVP |
-| PB-26 | Servicios | Vincular presupuesto aprobado | Should | MVP |
-| PB-27 | Servicios | Registrar diagnóstico | Must | MVP |
-| PB-28 | Servicios | Registrar trabajo realizado | Must | MVP |
-| PB-29 | Servicios | Agregar observaciones | Should | MVP |
-| PB-30 | Servicios | Actualizar estado | Must | MVP |
-| PB-31 | Servicios | Consultar servicios abiertos | Must | MVP |
+| PB-41 | Catálogo de servicios | Crear servicio del taller con precio de referencia | Must | MVP |
+| PB-42 | Catálogo de servicios | Editar servicio | Must | MVP |
+| PB-43 | Catálogo de servicios | Activar / desactivar servicio | Should | MVP |
+| PB-44 | Catálogo de servicios | Consultar servicios activos | Must | MVP |
+| PB-45 | Presupuestos | Agregar ítem tomándolo del catálogo | Should | MVP |
+| PB-25 | Órdenes de trabajo | Crear orden / registrar ingreso | Must | MVP |
+| PB-26 | Órdenes de trabajo | Vincular presupuesto aprobado | Should | MVP |
+| PB-27 | Órdenes de trabajo | Registrar diagnóstico | Must | MVP |
+| PB-28 | Órdenes de trabajo | Registrar ítems realizados (servicios y repuestos) | Must | MVP |
+| PB-29 | Órdenes de trabajo | Agregar observaciones | Should | MVP |
+| PB-30 | Órdenes de trabajo | Actualizar estado | Must | MVP |
+| PB-31 | Órdenes de trabajo | Consultar órdenes abiertas | Must | MVP |
+| PB-46 | Órdenes de trabajo | Calcular total desde los ítems | Must | MVP |
 | PB-32 | Historial | Consultar historial del vehículo | Must | MVP |
 | PB-33 | Organización | Varios usuarios por taller | Won't | Post-MVP |
 | PB-34 | Organización | Varios talleres por usuario | Won't | Post-MVP |
@@ -56,6 +62,12 @@
 | PB-38 | Comunicación | Notificar al cliente | Could | Post-MVP |
 | PB-39 | Facturación | Facturación electrónica | Could | Post-MVP |
 | PB-40 | Analítica | Reportes y estadísticas | Could | Post-MVP |
+
+---
+
+## Convención de identificadores
+
+Los `PB-xx` son estables: no se renumeran. Los ítems agregados después de la versión inicial toman el siguiente ID libre y se ubican en la tabla según su épica, por eso la numeración no es correlativa de arriba hacia abajo.
 
 ---
 

@@ -1,4 +1,4 @@
-# ADR-007 — Historial Derivado de Servicios
+# ADR-007 — Historial Derivado de Órdenes de Trabajo
 
 **Estado:** Accepted
 **Fecha:** Agosto 2026
@@ -7,13 +7,17 @@
 
 El historial de un vehículo representa los trabajos registrados a lo largo del tiempo.
 
+A partir de ADR-009, esos trabajos se registran como órdenes de trabajo con sus ítems, no como una entidad `Service`.
+
 Crear un almacenamiento independiente para historial duplicaría información.
 
 ## Decisión
 
 No crear inicialmente una entidad o agregado `VehicleHistory`.
 
-El historial será una consulta cronológica de los servicios asociados al vehículo.
+El historial será una consulta cronológica de las órdenes de trabajo asociadas al vehículo, con sus ítems.
+
+Los ítems conservan la descripción y el precio con los que fueron registrados, de modo que el historial no cambia cuando cambia el catálogo de servicios.
 
 ## Consecuencias positivas
 

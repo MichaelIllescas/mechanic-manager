@@ -1,6 +1,6 @@
 # Product Scope / MVP Scope
 
-**Versión:** 1.0  
+**Versión:** 1.1  
 **Estado:** MVP simplificado para validación
 
 ---
@@ -22,7 +22,8 @@ SYSTEM_ADMIN -> administra usuarios de la plataforma
 
 USER -> administra 1 Taller
 
-Taller -> posee clientes, vehículos, turnos, presupuestos y servicios
+Taller -> posee clientes, vehículos, turnos, presupuestos,
+         catálogo de servicios y órdenes de trabajo
 ```
 
 Reglas iniciales:
@@ -137,7 +138,8 @@ Funciones:
 - calcular subtotales y total;
 - consultar presupuestos;
 - gestionar estado;
-- vincular presupuesto aprobado a un servicio.
+- tomar ítems del catálogo de servicios o describirlos libremente;
+- vincular presupuesto aprobado a una orden de trabajo.
 
 Estados iniciales:
 
@@ -146,7 +148,27 @@ Estados iniciales:
 - `APPROVED`
 - `REJECTED`
 
-### 3.7 Servicios
+### 3.7 Catálogo de servicios
+
+Un servicio es lo que el taller ofrece: cambio de aceite, alineación, cambio de pastillas. Es catálogo, no un trabajo ocurrido.
+
+Funciones:
+
+- crear servicio;
+- registrar nombre y descripción;
+- registrar precio de referencia;
+- registrar duración estimada;
+- activar y desactivar;
+- consultar servicios activos.
+
+Reglas iniciales:
+
+- un servicio utilizado no se elimina, se desactiva;
+- cambiar el precio no modifica presupuestos ni órdenes ya registrados.
+
+### 3.8 Órdenes de trabajo
+
+Una orden de trabajo es el ingreso concreto de un vehículo al taller.
 
 Funciones:
 
@@ -154,10 +176,11 @@ Funciones:
 - registrar kilometraje;
 - registrar motivo;
 - registrar diagnóstico;
-- registrar trabajo realizado;
+- registrar los servicios y repuestos realizados como ítems;
 - registrar observaciones;
+- calcular total;
 - actualizar estado;
-- consultar servicios abiertos;
+- consultar órdenes abiertas;
 - vincular presupuesto aprobado cuando corresponda.
 
 Estados iniciales:
@@ -167,12 +190,12 @@ Estados iniciales:
 - `FINISHED`
 - `DELIVERED`
 
-### 3.8 Historial
+### 3.9 Historial
 
 Funciones:
 
-- consultar servicios anteriores de un vehículo;
-- ordenarlos cronológicamente;
+- consultar órdenes de trabajo anteriores de un vehículo;
+- ordenarlas cronológicamente;
 - visualizar información técnica relevante.
 
 Información mínima:
@@ -181,7 +204,8 @@ Información mínima:
 - kilometraje;
 - motivo;
 - diagnóstico;
-- trabajo realizado;
+- servicios y repuestos realizados;
+- total;
 - estado;
 - presupuesto asociado cuando exista.
 
@@ -204,6 +228,7 @@ Quedan explícitamente fuera de la primera versión:
 
 ### Funcionalidad comercial y operativa
 
+- catálogo de repuestos con precios propios;
 - stock;
 - inventario de repuestos;
 - proveedores;

@@ -27,8 +27,10 @@ tags:
     description: Agenda y turnos.
   - name: Quotes
     description: Gestión de presupuestos.
-  - name: Services
-    description: Gestión de servicios mecánicos.
+  - name: ServiceTypes
+    description: Catálogo de servicios que ofrece el taller.
+  - name: WorkOrders
+    description: Órdenes de trabajo sobre vehículos.
   - name: History
     description: Consulta del historial técnico de vehículos.
 

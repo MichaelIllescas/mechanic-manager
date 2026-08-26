@@ -33,10 +33,9 @@
     <nav class="navbar__menu" aria-label="Navegación principal">
       @for (link of links(); track link.path) {
         <a
-          [routerLink]="link.path"
-          routerLinkActive="navbar__link--active"
-          [routerLinkActiveOptions]="{ exact: link.exact ?? false }"
-          (click)="closeMenus()"
+          [href]="link.path"
+          [class.navbar__link--active]="isLinkActive(link)"
+          (click)="navigateTo($event, link.path)"
         >
           {{ link.label }}
         </a>

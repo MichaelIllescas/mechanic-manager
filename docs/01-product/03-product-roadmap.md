@@ -1,6 +1,6 @@
 # Product Roadmap
 
-**Versión:** 1.0  
+**Versión:** 1.1  
 **Estado:** Inicial — orientado a validación
 
 ---
@@ -96,7 +96,7 @@ Cubrir el flujo previo al ingreso del vehículo al taller.
 
 ---
 
-## Fase 3 — Catálogo de Servicios, Órdenes de Trabajo e Historial
+## Fase 3 — Catálogos, Órdenes de Trabajo e Historial
 
 ### Objetivo
 
@@ -105,6 +105,7 @@ Administrar el trabajo realizado sobre los vehículos y cerrar el flujo principa
 ### Incluye
 
 - catálogo de servicios del taller con precio de referencia;
+- catálogo de insumos del taller con precio de referencia;
 - ingreso del vehículo;
 - creación de la orden de trabajo;
 - vínculo con presupuesto aprobado;
@@ -117,7 +118,7 @@ Administrar el trabajo realizado sobre los vehículos y cerrar el flujo principa
 - entrega;
 - historial técnico.
 
-El catálogo se construye antes que las órdenes: los ítems de una orden lo toman como origen.
+Los catálogos se construyen antes que las órdenes: los ítems de una orden los toman como origen.
 
 ---
 
@@ -142,7 +143,7 @@ Posibles capacidades:
 - más de un usuario por taller;
 - roles y permisos internos;
 - más de un taller por usuario;
-- stock y repuestos;
+- stock y existencias;
 - proveedores;
 - órdenes de compra;
 - facturación;

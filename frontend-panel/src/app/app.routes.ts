@@ -39,6 +39,11 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'insumos',
+        loadChildren: () =>
+          import('./features/supplies/supplies.routes').then((m) => m.SUPPLY_ROUTES),
+      },
+      {
         path: '',
         pathMatch: 'full',
         redirectTo: 'dashboard',

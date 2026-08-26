@@ -1,6 +1,6 @@
 # Modelo de Dominio
 
-**Versión:** 1.2  
+**Versión:** 1.3  
 **Enfoque:** Modelo simple orientado al MVP
 
 ---
@@ -26,6 +26,7 @@ El modelo debe ser fácil de entender y modificar a medida que aparezca retroali
 | Presupuesto | Estimación económica previa a un trabajo |
 | Ítem de presupuesto | Concepto individual de trabajo o repuesto |
 | Servicio | Prestación que el taller ofrece, con precio de referencia. Es catálogo, no un hecho ocurrido |
+| Insumo | Material o repuesto que el taller utiliza en sus trabajos, con precio de referencia. Es catálogo, no un hecho ocurrido |
 | Orden de trabajo | Ingreso concreto de un vehículo al taller, con su diagnóstico, estado y trabajos ejecutados |
 | Ítem de orden de trabajo | Servicio o repuesto efectivamente realizado dentro de una orden |
 | Historial | Vista cronológica de las órdenes de trabajo de un vehículo |
@@ -42,6 +43,7 @@ Vehicles
 Appointments
 Quotes
 ServiceTypes
+Supplies
 WorkOrders
 ```
 
@@ -247,7 +249,33 @@ Reglas:
 
 ---
 
-### 4.8 WorkOrder
+### 4.8 Supply
+
+Representa un insumo o repuesto que el taller utiliza en sus trabajos. Es catálogo: no tiene stock, fecha ni vehículo asociado.
+
+Atributos:
+
+- `id`
+- `userId`
+- `name`
+- `price`
+- `active`
+- `createdAt`
+- `updatedAt`
+
+Reglas:
+
+- pertenece a un usuario;
+- `name` es único dentro de un usuario;
+- `price` es un precio de referencia y puede cambiar en el tiempo;
+- un cambio de precio no altera presupuestos ni órdenes ya registrados;
+- un insumo no se elimina nunca: se marca `active = false` (baja lógica).
+
+No forma parte del MVP el control de stock, existencias ni movimientos de inventario (`PB-36`).
+
+---
+
+### 4.9 WorkOrder
 
 Representa el ingreso concreto de un vehículo al taller. Es el hecho ocurrido.
 
@@ -284,7 +312,7 @@ Reglas:
 
 ---
 
-### 4.9 WorkOrderItem
+### 4.10 WorkOrderItem
 
 Representa un servicio o repuesto efectivamente realizado dentro de una orden.
 
@@ -318,6 +346,7 @@ Vehicle 1 ───────── N Appointment
 Vehicle 1 ───────── N Quote
 Quote 1 ─────────── N QuoteItem
 User 1 ──────────── N ServiceType
+User 1 ──────────── N Supply
 Vehicle 1 ───────── N WorkOrder
 Quote 1 ─────────── 0..1 WorkOrder
 WorkOrder 1 ─────── N WorkOrderItem

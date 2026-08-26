@@ -1,18 +1,16 @@
 .users-page {
-  min-height: 100dvh;
-  padding: 36px;
-  background:
-    radial-gradient(circle at top left, rgba(21, 156, 255, 0.16), transparent 30rem),
-    linear-gradient(135deg, #eef6ff 0%, #ffffff 48%, #f7fbff 100%);
+  min-height: calc(100dvh - 8.5rem);
+  padding: 0;
 }
 
 .users-header {
-  max-width: 1180px;
+  max-width: 100%;
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
   gap: 24px;
-  margin: 0 auto 28px;
+  margin: 0 0 24px;
+  padding: 10px 2px 0;
 }
 
 .users-header__eyebrow {
@@ -27,7 +25,7 @@
 .users-header h1 {
   margin: 0;
   color: #06152d;
-  font-size: clamp(2rem, 4vw, 3.4rem);
+  font-size: clamp(2rem, 3.2vw, 3rem);
   line-height: 1.04;
   letter-spacing: 0;
 }
@@ -54,8 +52,8 @@
 }
 
 .users-panel {
-  max-width: 1180px;
-  margin: 0 auto;
+  max-width: 100%;
+  margin: 0;
   border: 1px solid rgba(21, 156, 255, 0.16);
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.92);
@@ -282,7 +280,8 @@
 
 @media (max-width: 760px) {
   .users-page {
-    padding: 24px 16px;
+    min-height: auto;
+    padding: 0;
   }
 
   .users-header {

@@ -1,7 +1,7 @@
 <header class="navbar">
   <a
     class="navbar__brand"
-    routerLink="/dashboard"
+    [routerLink]="homePath()"
     aria-label="Ir al inicio"
     (click)="closeMenus()"
   >
@@ -10,7 +10,6 @@
       src="/assets/Logo-mechanic.jpeg"
       alt="Logo de Mechanic Manager"
     />
-    <span>Mechanic Manager</span>
   </a>
 
   <button
@@ -32,63 +31,16 @@
     [class.navbar__navigation--open]="isMenuOpen"
   >
     <nav class="navbar__menu" aria-label="Navegación principal">
-      <a
-        routerLink="/dashboard"
-        routerLinkActive="navbar__link--active"
-        [routerLinkActiveOptions]="{ exact: true }"
-        (click)="closeMenus()"
-      >
-        Inicio
-      </a>
-      <a
-        routerLink="/workshop"
-        routerLinkActive="navbar__link--active"
-        (click)="closeMenus()"
-      >
-        Taller
-      </a>
-      <a
-        routerLink="/customers"
-        routerLinkActive="navbar__link--active"
-        (click)="closeMenus()"
-      >
-        Clientes
-      </a>
-      <a
-        routerLink="/vehicles"
-        routerLinkActive="navbar__link--active"
-        (click)="closeMenus()"
-      >
-        Vehículos
-      </a>
-      <a
-        routerLink="/appointments"
-        routerLinkActive="navbar__link--active"
-        (click)="closeMenus()"
-      >
-        Turnos
-      </a>
-      <a
-        routerLink="/quotes"
-        routerLinkActive="navbar__link--active"
-        (click)="closeMenus()"
-      >
-        Presupuestos
-      </a>
-      <a
-        routerLink="/services"
-        routerLinkActive="navbar__link--active"
-        (click)="closeMenus()"
-      >
-        Servicios
-      </a>
-      <a
-        routerLink="/history"
-        routerLinkActive="navbar__link--active"
-        (click)="closeMenus()"
-      >
-        Historial
-      </a>
+      @for (link of links(); track link.path) {
+        <a
+          [routerLink]="link.path"
+          routerLinkActive="navbar__link--active"
+          [routerLinkActiveOptions]="{ exact: link.exact ?? false }"
+          (click)="closeMenus()"
+        >
+          {{ link.label }}
+        </a>
+      }
     </nav>
 
     <div class="navbar__profile-menu">
@@ -112,7 +64,12 @@
         <button type="button" role="menuitem">Datos de la cuenta</button>
         <button type="button" role="menuitem">Cambiar contraseña</button>
         <div class="navbar__profile-divider"></div>
-        <button class="navbar__logout" type="button" role="menuitem">
+        <button
+          class="navbar__logout"
+          type="button"
+          role="menuitem"
+          (click)="logout()"
+        >
           Cerrar sesión
         </button>
       </div>

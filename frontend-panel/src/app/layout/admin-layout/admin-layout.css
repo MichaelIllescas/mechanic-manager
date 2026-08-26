@@ -1,0 +1,22 @@
+:host {
+  display: block;
+  min-height: 100vh;
+}
+
+.admin-layout {
+  min-height: 100vh;
+  background-color: #f4f7fb;
+}
+
+.admin-layout__content {
+  width: min(100% - 2rem, 90rem);
+  margin: 0 auto;
+  padding: 2rem 0;
+}
+
+@media (max-width: 48rem) {
+  .admin-layout__content {
+    width: min(100% - 1.5rem, 90rem);
+    padding: 1.5rem 0;
+  }
+}

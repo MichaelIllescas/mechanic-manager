@@ -32,6 +32,13 @@ export const routes: Routes = [
           import('./features/workshop/workshop/workshop').then((component) => component.Workshop),
       },
       {
+        path: 'servicios',
+        loadChildren: () =>
+          import('./features/service-types/service-types.routes').then(
+            (m) => m.SERVICE_TYPE_ROUTES,
+          ),
+      },
+      {
         path: '',
         pathMatch: 'full',
         redirectTo: 'dashboard',

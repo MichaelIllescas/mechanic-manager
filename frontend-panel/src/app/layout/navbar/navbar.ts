@@ -17,7 +17,7 @@ const APP_LINKS: NavbarLink[] = [
   { label: 'Vehículos', path: '/vehicles' },
   { label: 'Turnos', path: '/appointments' },
   { label: 'Presupuestos', path: '/quotes' },
-  { label: 'Servicios', path: '/services' },
+  { label: 'Servicios', path: '/servicios' },
   { label: 'Historial', path: '/history' },
 ];
 

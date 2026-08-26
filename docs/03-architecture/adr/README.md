@@ -10,8 +10,9 @@ Cada decisión arquitectónica relevante se documenta en un ADR independiente.
 - [ADR-004 — Modelo Inicial de Roles](ADR-004-modelo-de-roles.md)
 - [ADR-005 — API REST Versionada](ADR-005-rest-api.md)
 - [ADR-006 — Base de Datos Relacional](ADR-006-base-de-datos-relacional.md)
-- [ADR-007 — Historial Derivado de Servicios](ADR-007-historial-del-vehiculo.md)
+- [ADR-007 — Historial Derivado de Órdenes de Trabajo](ADR-007-historial-del-vehiculo.md)
 - [ADR-008 — OpenAPI como Contrato de Documentación de la API](ADR-008-openapi-contract.md)
+- [ADR-009 — Separación entre Catálogo de Servicios y Orden de Trabajo](ADR-009-servicio-vs-orden-de-trabajo.md)
 
 ## Principio del MVP
 

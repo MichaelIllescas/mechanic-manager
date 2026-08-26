@@ -1,0 +1,131 @@
+<main class="services-page">
+  <section class="services-header">
+    <div>
+      <p class="services-header__eyebrow">Taller</p>
+      <h1>Catalogo de servicios</h1>
+      <p class="services-header__copy">
+        Los trabajos que ofrece el taller, con su precio de referencia. Se cargan una vez
+        y despues se toman al armar presupuestos y ordenes de trabajo.
+      </p>
+    </div>
+
+    <button class="services-header__action" type="button" routerLink="/servicios/nuevo">
+      Nuevo servicio
+    </button>
+  </section>
+
+  <section class="services-panel" aria-label="Listado de servicios">
+    <div class="services-panel__topbar">
+      <div>
+        <h2>Servicios cargados</h2>
+        <p>{{ serviceTypes().length }} servicios encontrados</p>
+      </div>
+
+      <button
+        class="filter"
+        type="button"
+        [class.filter--on]="onlyActive()"
+        [attr.aria-pressed]="onlyActive()"
+        (click)="toggleFilter()"
+      >
+        Solo activos
+      </button>
+    </div>
+
+    <div class="services-table-wrap">
+      <table class="services-table">
+        <thead>
+          <tr>
+            <th>Servicio</th>
+            <th>Precio</th>
+            <th>Duracion</th>
+            <th>Estado</th>
+            <th class="services-table__actions-heading">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (serviceType of serviceTypes(); track serviceType.id) {
+            <tr>
+              <td>
+                <div class="service-cell">
+                  <span class="service-cell__name">{{ serviceType.name }}</span>
+                  @if (serviceType.description) {
+                    <span class="service-cell__description">{{ serviceType.description }}</span>
+                  }
+                </div>
+              </td>
+              <td class="services-table__price">
+                $ {{ serviceType.basePrice | number: '1.2-2' }}
+              </td>
+              <td class="services-table__muted">
+                @if (serviceType.estimatedMinutes) {
+                  {{ serviceType.estimatedMinutes }} min
+                } @else {
+                  &mdash;
+                }
+              </td>
+              <td>
+                <span
+                  class="status"
+                  [class.status--enabled]="serviceType.active"
+                  [class.status--disabled]="!serviceType.active"
+                >
+                  {{ serviceType.active ? 'Activo' : 'Inactivo' }}
+                </span>
+              </td>
+              <td>
+                <div class="actions">
+                  <button
+                    class="actions__button actions__button--primary"
+                    type="button"
+                    aria-label="Editar servicio"
+                    title="Editar"
+                    [routerLink]="['/servicios', serviceType.id, 'editar']"
+                  >
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="M4 20h4.6L19.2 9.4a2.6 2.6 0 0 0-3.7-3.7L4.9 16.3 4 20Z" />
+                      <path d="m14.2 7 2.8 2.8" />
+                    </svg>
+                  </button>
+                  <button
+                    class="actions__button"
+                    [class.actions__button--danger]="serviceType.active"
+                    [class.actions__button--success]="!serviceType.active"
+                    type="button"
+                    [attr.aria-label]="
+                      serviceType.active ? 'Desactivar servicio' : 'Activar servicio'
+                    "
+                    [attr.title]="serviceType.active ? 'Desactivar' : 'Activar'"
+                    [disabled]="updatingId() === serviceType.id"
+                    (click)="toggleStatus(serviceType)"
+                  >
+                    @if (serviceType.active) {
+                      <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M18 6 6 18" />
+                        <path d="m6 6 12 12" />
+                      </svg>
+                    } @else {
+                      <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="m5 12 4 4L19 6" />
+                      </svg>
+                    }
+                  </button>
+                </div>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td class="empty-state" colspan="5">
+                <strong>Todavia no cargaste ningun servicio.</strong>
+                <span>
+                  Empeza por los trabajos mas comunes del taller: cambio de aceite,
+                  alineacion, cambio de pastillas.
+                </span>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+</main>

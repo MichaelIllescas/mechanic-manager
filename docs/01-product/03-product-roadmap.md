@@ -96,7 +96,7 @@ Cubrir el flujo previo al ingreso del vehículo al taller.
 
 ---
 
-## Fase 3 — Servicios e Historial
+## Fase 3 — Catálogo de Servicios, Órdenes de Trabajo e Historial
 
 ### Objetivo
 
@@ -104,16 +104,20 @@ Administrar el trabajo realizado sobre los vehículos y cerrar el flujo principa
 
 ### Incluye
 
+- catálogo de servicios del taller con precio de referencia;
 - ingreso del vehículo;
-- creación del servicio;
+- creación de la orden de trabajo;
 - vínculo con presupuesto aprobado;
 - diagnóstico;
-- trabajo realizado;
+- ítems de servicios y repuestos realizados;
 - observaciones;
+- total;
 - estados;
 - finalización;
 - entrega;
 - historial técnico.
+
+El catálogo se construye antes que las órdenes: los ítems de una orden lo toman como origen.
 
 ---
 

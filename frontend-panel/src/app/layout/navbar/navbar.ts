@@ -1,5 +1,5 @@
 import { Component, computed, inject, input } from '@angular/core';
-import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 
 import { AuthService } from '../../core/auth/auth-service';
 import { NotificationService } from '../../core/notifications/notification-service';
@@ -18,6 +18,7 @@ const APP_LINKS: NavbarLink[] = [
   { label: 'Turnos', path: '/appointments' },
   { label: 'Presupuestos', path: '/quotes' },
   { label: 'Servicios', path: '/servicios' },
+  { label: 'Insumos', path: '/insumos' },
   { label: 'Historial', path: '/history' },
 ];
 
@@ -25,7 +26,7 @@ const ADMIN_LINKS: NavbarLink[] = [{ label: 'Usuarios', path: '/admin/usuarios' 
 
 @Component({
   selector: 'app-navbar',
-  imports: [RouterLink, RouterLinkActive],
+  imports: [RouterLink],
   templateUrl: './navbar.html',
   styleUrl: './navbar.css',
 })
@@ -51,6 +52,20 @@ export class Navbar {
 
   toggleProfileMenu(): void {
     this.isProfileMenuOpen = !this.isProfileMenuOpen;
+  }
+
+  navigateTo(event: MouseEvent, path: string): void {
+    event.preventDefault();
+    void this.router.navigateByUrl(path).then(() => this.closeMenus());
+  }
+
+  isLinkActive(link: NavbarLink): boolean {
+    return this.router.isActive(link.path, {
+      paths: link.exact ? 'exact' : 'subset',
+      queryParams: 'ignored',
+      fragment: 'ignored',
+      matrixParams: 'ignored',
+    });
   }
 
   closeMenus(): void {

@@ -1,0 +1,111 @@
+<main class="supplies-page">
+  <section class="supplies-header">
+    <div>
+      <p class="supplies-header__eyebrow">Taller</p>
+      <h1>Catalogo de insumos</h1>
+      <p class="supplies-header__copy">
+        Materiales y repuestos del taller con precio de referencia. No administra stock:
+        solo mantiene la fuente de precio para presupuestos y ordenes.
+      </p>
+    </div>
+
+    <button class="supplies-header__action" type="button" routerLink="/insumos/nuevo">
+      Nuevo insumo
+    </button>
+  </section>
+
+  <section class="supplies-panel" aria-label="Listado de insumos">
+    <div class="supplies-panel__topbar">
+      <div>
+        <h2>Insumos cargados</h2>
+        <p>{{ supplies().length }} insumos encontrados</p>
+      </div>
+
+      <button
+        class="filter"
+        type="button"
+        [class.filter--on]="onlyActive()"
+        [attr.aria-pressed]="onlyActive()"
+        (click)="toggleFilter()"
+      >
+        Solo activos
+      </button>
+    </div>
+
+    <div class="supplies-table-wrap">
+      <table class="supplies-table">
+        <thead>
+          <tr>
+            <th>Insumo</th>
+            <th>Precio</th>
+            <th>Estado</th>
+            <th class="supplies-table__actions-heading">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (supply of supplies(); track supply.id) {
+            <tr>
+              <td>
+                <span class="supply-cell__name">{{ supply.name }}</span>
+              </td>
+              <td class="supplies-table__price">$ {{ supply.price | number: '1.2-2' }}</td>
+              <td>
+                <span
+                  class="status"
+                  [class.status--enabled]="supply.active"
+                  [class.status--disabled]="!supply.active"
+                >
+                  {{ supply.active ? 'Activo' : 'Inactivo' }}
+                </span>
+              </td>
+              <td>
+                <div class="actions">
+                  <button
+                    class="actions__button actions__button--primary"
+                    type="button"
+                    aria-label="Editar insumo"
+                    title="Editar"
+                    [routerLink]="['/insumos', supply.id, 'editar']"
+                  >
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="M4 20h4.6L19.2 9.4a2.6 2.6 0 0 0-3.7-3.7L4.9 16.3 4 20Z" />
+                      <path d="m14.2 7 2.8 2.8" />
+                    </svg>
+                  </button>
+                  <button
+                    class="actions__button"
+                    [class.actions__button--danger]="supply.active"
+                    [class.actions__button--success]="!supply.active"
+                    type="button"
+                    [attr.aria-label]="supply.active ? 'Desactivar insumo' : 'Activar insumo'"
+                    [attr.title]="supply.active ? 'Desactivar' : 'Activar'"
+                    [disabled]="updatingId() === supply.id"
+                    (click)="toggleStatus(supply)"
+                  >
+                    @if (supply.active) {
+                      <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M18 6 6 18" />
+                        <path d="m6 6 12 12" />
+                      </svg>
+                    } @else {
+                      <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="m5 12 4 4L19 6" />
+                      </svg>
+                    }
+                  </button>
+                </div>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td class="empty-state" colspan="4">
+                <strong>Todavia no cargaste ningun insumo.</strong>
+                <span>Empeza por materiales frecuentes: aceite, filtros, bujias o pastillas.</span>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+</main>

@@ -2,6 +2,8 @@ package com.mechanicmanager.servicetypes.model;
 
 import com.mechanicmanager.users.model.User;
 import jakarta.persistence.*;
+import org.hibernate.annotations.Generated;
+import org.hibernate.generator.EventType;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -68,9 +70,16 @@ public class ServiceType {
     @Column(name = "active", nullable = false)
     private boolean active = true;
     
+    /**
+     * Lo genera la base con su DEFAULT. @Generated hace que Hibernate lo relea
+     * después del INSERT: sin eso, la entidad recién guardada queda con null
+     * y la response del POST devuelve null.
+     */
+    @Generated(event = EventType.INSERT)
     @Column(name = "created_at", nullable = false, insertable = false, updatable = false)
     private LocalDateTime createdAt;
     
+    @Generated(event = {EventType.INSERT, EventType.UPDATE})
     @Column(name = "updated_at", nullable = false, insertable = false, updatable = false)
     private LocalDateTime updatedAt;
 }

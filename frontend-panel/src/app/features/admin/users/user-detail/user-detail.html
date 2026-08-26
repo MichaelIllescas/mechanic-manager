@@ -1,0 +1,70 @@
+<main class="user-detail-page">
+  <section class="user-detail-header">
+    <a class="user-detail__back" routerLink="/admin/usuarios">Volver</a>
+    <p class="user-detail-header__eyebrow">Administracion</p>
+    <h1>Detalle de usuario</h1>
+    <p>Informacion de la cuenta y estado de acceso a la plataforma.</p>
+  </section>
+
+  @if (errorMessage()) {
+    <p class="user-detail__error" role="alert">{{ errorMessage() }}</p>
+  }
+
+  @if (user(); as user) {
+    <section class="profile-card" aria-label="Detalle de usuario">
+      <div class="profile-card__hero">
+        <div class="profile-card__identity">
+          <span class="profile-card__avatar">{{ user.name.charAt(0) }}</span>
+          <div>
+            <h2>{{ user.name }}</h2>
+            <p>{{ user.email }}</p>
+          </div>
+        </div>
+
+        <div class="profile-card__badges">
+          <span
+            class="status"
+            [class.status--enabled]="user.status === 'ENABLED'"
+            [class.status--disabled]="user.status === 'DISABLED'"
+          >
+            {{ user.status === 'ENABLED' ? 'Habilitado' : 'Deshabilitado' }}
+          </span>
+          <span class="role" [class.role--admin]="user.role === 'SYSTEM_ADMIN'">
+            {{ user.role === 'SYSTEM_ADMIN' ? 'Admin sistema' : 'Usuario taller' }}
+          </span>
+        </div>
+      </div>
+
+      <dl class="user-detail__data">
+        <div class="data-item">
+          <dt>Email</dt>
+          <dd>{{ user.email }}</dd>
+        </div>
+
+        <div class="data-item">
+          <dt>Rol</dt>
+          <dd>{{ user.role === 'SYSTEM_ADMIN' ? 'Admin sistema' : 'Usuario taller' }}</dd>
+        </div>
+
+        <div class="data-item">
+          <dt>Estado</dt>
+          <dd>{{ user.status === 'ENABLED' ? 'Habilitado' : 'Deshabilitado' }}</dd>
+        </div>
+
+        <div class="data-item">
+          <dt>Contrasena inicial</dt>
+          <dd>{{ user.mustChangePassword ? 'Pendiente de cambio' : 'Ya fue cambiada' }}</dd>
+        </div>
+
+        <div class="data-item data-item--wide">
+          <dt>Fecha de alta</dt>
+          <dd>{{ user.createdAt | date: 'dd/MM/yyyy HH:mm' }}</dd>
+        </div>
+      </dl>
+
+      <div class="profile-card__footer">
+        <a class="button button--secondary" routerLink="/admin/usuarios">Volver al listado</a>
+      </div>
+    </section>
+  }
+</main>

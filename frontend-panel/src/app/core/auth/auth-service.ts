@@ -34,6 +34,14 @@ export class AuthService {
     return localStorage.getItem(ROLE_KEY);
   }
 
+  isAuthenticated(): boolean {
+    return this.getToken() !== null;
+  }
+
+  isAdmin(): boolean {
+    return this.getRole() === 'SYSTEM_ADMIN';
+  }
+
   logout(): void {
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(ROLE_KEY);

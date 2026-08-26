@@ -1,0 +1,127 @@
+<main class="users-page">
+  <section class="users-header">
+    <div>
+      <p class="users-header__eyebrow">Administracion</p>
+      <h1>Gestion de usuarios</h1>
+      <p class="users-header__copy">
+        Control de accesos, roles y estado de las cuentas de la plataforma.
+      </p>
+    </div>
+
+    <button class="users-header__action" type="button" routerLink="/admin/usuarios/nuevo">
+      Nuevo usuario
+    </button>
+  </section>
+
+  <section class="users-panel" aria-label="Listado de usuarios">
+    <div class="users-panel__topbar">
+      <div>
+        <h2>Usuarios registrados</h2>
+        <p>{{ users().length }} cuentas encontradas</p>
+      </div>
+    </div>
+
+    <div class="users-table-wrap">
+      <table class="users-table">
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Email</th>
+            <th>Rol</th>
+            <th>Estado</th>
+            <th class="users-table__actions-heading">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (user of users(); track user.id) {
+            <tr>
+              <td>
+                <div class="user-cell">
+                  <span class="user-cell__avatar">{{ user.name.charAt(0) }}</span>
+                  <span>{{ user.name }}</span>
+                </div>
+              </td>
+              <td class="users-table__muted">{{ user.email }}</td>
+              <td>
+                <span
+                  class="badge"
+                  [class.badge--admin]="user.role === 'SYSTEM_ADMIN'"
+                  [class.badge--user]="user.role === 'USER'"
+                >
+                  {{ user.role === 'SYSTEM_ADMIN' ? 'Admin sistema' : 'Usuario taller' }}
+                </span>
+              </td>
+              <td>
+                <span
+                  class="status"
+                  [class.status--enabled]="user.status === 'ENABLED'"
+                  [class.status--disabled]="user.status === 'DISABLED'"
+                >
+                  {{ user.status === 'ENABLED' ? 'Habilitado' : 'Deshabilitado' }}
+                </span>
+              </td>
+              <td>
+                <div class="actions">
+                  <button
+                    class="actions__button"
+                    type="button"
+                    aria-label="Ver usuario"
+                    title="Ver"
+                    [routerLink]="['/admin/usuarios', user.id]"
+                  >
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z" />
+                      <path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z" />
+                    </svg>
+                  </button>
+                  <button
+                    class="actions__button actions__button--primary"
+                    type="button"
+                    aria-label="Editar usuario"
+                    title="Editar"
+                    [routerLink]="['/admin/usuarios', user.id, 'editar']"
+                  >
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="M4 20h4.6L19.2 9.4a2.6 2.6 0 0 0-3.7-3.7L4.9 16.3 4 20Z" />
+                      <path d="m14.2 7 2.8 2.8" />
+                    </svg>
+                  </button>
+                  <button
+                    class="actions__button"
+                    [class.actions__button--danger]="user.status === 'ENABLED'"
+                    [class.actions__button--success]="user.status === 'DISABLED'"
+                    type="button"
+                    [attr.aria-label]="
+                      user.status === 'ENABLED' ? 'Deshabilitar usuario' : 'Habilitar usuario'
+                    "
+                    [attr.title]="user.status === 'ENABLED' ? 'Deshabilitar' : 'Habilitar'"
+                    [disabled]="updatingId() === user.id"
+                    (click)="toggleStatus(user)"
+                  >
+                    @if (user.status === 'ENABLED') {
+                      <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M18 6 6 18" />
+                        <path d="m6 6 12 12" />
+                      </svg>
+                    } @else {
+                      <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="m5 12 4 4L19 6" />
+                      </svg>
+                    }
+                  </button>
+                </div>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td class="empty-state" colspan="5">
+                <strong>No hay usuarios para mostrar.</strong>
+                <span>Cuando se creen cuentas nuevas, apareceran en este listado.</span>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+</main>

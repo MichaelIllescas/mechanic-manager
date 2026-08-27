@@ -1,0 +1,128 @@
+<main class="customers-page">
+  <section class="customers-header">
+    <div>
+      <p class="customers-header__eyebrow">Taller</p>
+      <h1>Clientes</h1>
+      <p class="customers-header__copy">
+        Administrá los datos de contacto de las personas y empresas que atiende el taller.
+      </p>
+    </div>
+
+    <button class="customers-header__action" type="button" routerLink="/customers/nuevo">
+      Nuevo cliente
+    </button>
+  </section>
+
+  <section class="customers-panel" aria-label="Listado de clientes">
+    <div class="customers-panel__topbar">
+      <div>
+        <h2>Clientes registrados</h2>
+        <p>{{ customers().length }} clientes encontrados</p>
+      </div>
+
+      <div class="search">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="11" cy="11" r="7" />
+          <path d="m20 20-4-4" />
+        </svg>
+        <input
+          type="search"
+          aria-label="Buscar clientes"
+          placeholder="Nombre, DNI, teléfono o email"
+          autocomplete="off"
+          [formControl]="searchControl"
+        />
+        @if (searchControl.value) {
+          <button type="button" aria-label="Limpiar búsqueda" (click)="clearSearch()">
+            &times;
+          </button>
+        }
+      </div>
+    </div>
+
+    @if (errorMessage()) {
+      <p class="customers-panel__error" role="alert">{{ errorMessage() }}</p>
+    }
+
+    <div class="customers-table-wrap">
+      <table class="customers-table">
+        <thead>
+          <tr>
+            <th>Cliente</th>
+            <th>Documento</th>
+            <th>Contacto</th>
+            <th>Observaciones</th>
+            <th class="customers-table__actions-heading">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (loading()) {
+            <tr>
+              <td class="table-message" colspan="5">Cargando clientes...</td>
+            </tr>
+          } @else {
+            @for (customer of customers(); track customer.id) {
+              <tr>
+                <td>
+                  <div class="customer-cell">
+                    <span class="customer-cell__avatar" aria-hidden="true">
+                      {{ customer.firstName.charAt(0) }}{{ customer.lastName.charAt(0) }}
+                    </span>
+                    <div>
+                      <span class="customer-cell__name">
+                        {{ customer.firstName }} {{ customer.lastName }}
+                      </span>
+                      <span class="customer-cell__id">Cliente #{{ customer.id }}</span>
+                    </div>
+                  </div>
+                </td>
+                <td class="customers-table__muted">
+                  {{ customer.documentNumber || '—' }}
+                </td>
+                <td>
+                  <div class="contact-cell">
+                    <span>{{ customer.phone }}</span>
+                    @if (customer.email) {
+                      <span>{{ customer.email }}</span>
+                    }
+                  </div>
+                </td>
+                <td class="customers-table__notes">
+                  {{ customer.notes || '—' }}
+                </td>
+                <td>
+                  <div class="actions">
+                    <button
+                      class="actions__button"
+                      type="button"
+                      aria-label="Editar cliente"
+                      title="Editar"
+                      [routerLink]="['/customers', customer.id, 'editar']"
+                    >
+                      <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M4 20h4.6L19.2 9.4a2.6 2.6 0 0 0-3.7-3.7L4.9 16.3 4 20Z" />
+                        <path d="m14.2 7 2.8 2.8" />
+                      </svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td class="empty-state" colspan="5">
+                  @if (searchControl.value.trim()) {
+                    <strong>No encontramos clientes con esa búsqueda.</strong>
+                    <span>Probá con otro nombre, documento, teléfono o email.</span>
+                  } @else {
+                    <strong>Todavía no registraste ningún cliente.</strong>
+                    <span>Creá el primero para empezar a asociar sus vehículos y trabajos.</span>
+                  }
+                </td>
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+</main>

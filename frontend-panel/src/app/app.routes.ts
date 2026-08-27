@@ -11,6 +11,22 @@ export const routes: Routes = [
     loadComponent: () => import('./features/auth/login/login').then((component) => component.Login),
   },
   {
+    path: 'recuperar-password',
+    canActivate: [guestGuard],
+    loadComponent: () =>
+      import('./features/auth/forgot-password/forgot-password').then(
+        (component) => component.ForgotPassword,
+      ),
+  },
+  {
+    path: 'reset-password',
+    canActivate: [guestGuard],
+    loadComponent: () =>
+      import('./features/auth/reset-password/reset-password').then(
+        (component) => component.ResetPassword,
+      ),
+  },
+  {
     path: 'admin',
     canMatch: [adminGuard],
     loadChildren: () => import('./features/admin/admin.routes').then((m) => m.ADMIN_ROUTES),
@@ -42,6 +58,11 @@ export const routes: Routes = [
           import('./features/service-types/service-types.routes').then(
             (m) => m.SERVICE_TYPE_ROUTES,
           ),
+      },
+      {
+        path: 'mi-cuenta',
+        loadComponent: () =>
+          import('./features/account/account').then((component) => component.Account),
       },
       {
         path: 'insumos',

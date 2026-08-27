@@ -1,0 +1,100 @@
+<section class="account">
+  <header class="account__header">
+    <div>
+      <p class="account__eyebrow">Mi cuenta</p>
+      <h1>Datos y seguridad</h1>
+      <p>Consultá los datos de tu cuenta y actualizá tu contraseña cuando lo necesites.</p>
+    </div>
+  </header>
+
+  <div class="account__layout">
+    <aside class="account__side">
+      <section class="account__card account__profile">
+        <span class="account__avatar" aria-hidden="true">{{ userInitial }}</span>
+        <div>
+          <h2>{{ userName }}</h2>
+          <p class="account__role">{{ roleLabel }}</p>
+        </div>
+      </section>
+
+      <section class="account__card">
+        <h2>Recomendaciones</h2>
+        <ul class="account__tips">
+          <li>Usá al menos 8 caracteres, combinando letras, números y símbolos.</li>
+          <li>No reutilices la contraseña de tu email ni la de tu banco.</li>
+          <li>Si sospechás que alguien más la conoce, cambiala cuanto antes.</li>
+          <li>Nadie del equipo te va a pedir tu contraseña por teléfono ni por mail.</li>
+        </ul>
+      </section>
+    </aside>
+
+    <section class="account__card account__form-card" id="password">
+      <div class="account__card-header">
+        <h2>Cambiar contraseña</h2>
+        <p>Necesitamos tu contraseña actual para confirmar que sos vos.</p>
+      </div>
+
+      <form class="account__form" [formGroup]="form" (ngSubmit)="onSubmit()">
+        <div class="field">
+          <label for="currentPassword">Contraseña actual</label>
+          <input
+            id="currentPassword"
+            [type]="passwordVisible() ? 'text' : 'password'"
+            formControlName="currentPassword"
+            autocomplete="current-password"
+          />
+          @if (form.controls.currentPassword.touched && form.controls.currentPassword.invalid) {
+            <span class="field__error">Ingresá tu contraseña actual.</span>
+          }
+        </div>
+
+        <div class="field">
+          <label for="newPassword">Contraseña nueva</label>
+          <input
+            id="newPassword"
+            [type]="passwordVisible() ? 'text' : 'password'"
+            formControlName="newPassword"
+            placeholder="Al menos 8 caracteres"
+            autocomplete="new-password"
+          />
+          @if (form.controls.newPassword.touched && form.controls.newPassword.invalid) {
+            <span class="field__error">La contraseña debe tener al menos 8 caracteres.</span>
+          }
+          @if (form.controls.newPassword.touched && form.hasError('passwordNotChanged')) {
+            <span class="field__error">La contraseña nueva debe ser distinta de la actual.</span>
+          }
+        </div>
+
+        <div class="field">
+          <label for="confirmation">Repetir contraseña nueva</label>
+          <input
+            id="confirmation"
+            [type]="passwordVisible() ? 'text' : 'password'"
+            formControlName="confirmation"
+            autocomplete="new-password"
+          />
+          @if (form.controls.confirmation.touched && form.hasError('passwordsMismatch')) {
+            <span class="field__error">Las contraseñas no coinciden.</span>
+          }
+        </div>
+
+        <label class="account__toggle">
+          <input
+            type="checkbox"
+            [checked]="passwordVisible()"
+            (change)="togglePasswordVisibility()"
+          />
+          Mostrar contraseñas
+        </label>
+
+        @if (errorMessage()) {
+          <p class="account__error" role="alert">{{ errorMessage() }}</p>
+        }
+
+        <button class="account__submit" type="submit" [disabled]="form.invalid || loading()">
+          {{ loading() ? 'Guardando...' : 'Guardar contraseña' }}
+        </button>
+      </form>
+    </section>
+  </div>
+</section>

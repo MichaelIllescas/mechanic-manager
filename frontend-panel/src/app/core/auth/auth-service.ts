@@ -3,7 +3,13 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
-import { LoginRequest, LoginResponse } from './auth.models';
+import {
+  ChangePasswordRequest,
+  ForgotPasswordRequest,
+  LoginRequest,
+  LoginResponse,
+  ResetPasswordRequest,
+} from './auth.models';
 
 const TOKEN_KEY = 'mm_token';
 const ROLE_KEY = 'mm_role';
@@ -19,18 +25,28 @@ export class AuthService {
   private readonly apiUrl = environment.apiUrl;
 
   login(credentials: LoginRequest): Observable<LoginResponse> {
-    return this.http
-      .post<LoginResponse>(`${this.apiUrl}/auth/login`, credentials)
-      .pipe(
-        tap((res) => {
-          const expiresAt = Date.now() + res.expiresIn * 1000;
-          localStorage.setItem(TOKEN_KEY, res.token);
-          localStorage.setItem(ROLE_KEY, res.role);
-          localStorage.setItem(USER_ID_KEY, res.userId.toString());
-          localStorage.setItem(USER_NAME_KEY, res.name);
-          localStorage.setItem(EXPIRES_AT_KEY, expiresAt.toString());
-        }),
-      );
+    return this.http.post<LoginResponse>(`${this.apiUrl}/auth/login`, credentials).pipe(
+      tap((res) => {
+        const expiresAt = Date.now() + res.expiresIn * 1000;
+        localStorage.setItem(TOKEN_KEY, res.token);
+        localStorage.setItem(ROLE_KEY, res.role);
+        localStorage.setItem(USER_ID_KEY, res.userId.toString());
+        localStorage.setItem(USER_NAME_KEY, res.name);
+        localStorage.setItem(EXPIRES_AT_KEY, expiresAt.toString());
+      }),
+    );
+  }
+
+  forgotPassword(request: ForgotPasswordRequest): Observable<void> {
+    return this.http.post<void>(`${this.apiUrl}/auth/forgot-password`, request);
+  }
+
+  resetPassword(request: ResetPasswordRequest): Observable<void> {
+    return this.http.post<void>(`${this.apiUrl}/auth/reset-password`, request);
+  }
+
+  changePassword(request: ChangePasswordRequest): Observable<void> {
+    return this.http.post<void>(`${this.apiUrl}/auth/change-password`, request);
   }
 
   isAuthenticated(): boolean {
@@ -38,12 +54,7 @@ export class AuthService {
     const expiresAt = localStorage.getItem(EXPIRES_AT_KEY);
     const expiration = Number(expiresAt);
 
-    if (
-      !token ||
-      !expiresAt ||
-      !Number.isFinite(expiration) ||
-      Date.now() >= expiration
-    ) {
+    if (!token || !expiresAt || !Number.isFinite(expiration) || Date.now() >= expiration) {
       this.logout();
       return false;
     }

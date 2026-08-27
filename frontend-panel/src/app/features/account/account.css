@@ -1,0 +1,173 @@
+:host {
+  display: block;
+}
+
+.account {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.account__header h1,
+.account__header p {
+  margin: 0;
+}
+
+.account__header h1 {
+  margin-top: 0.25rem;
+  color: #0f172a;
+  font-size: 2rem;
+}
+
+.account__header p {
+  margin-top: 0.5rem;
+  color: #64748b;
+}
+
+.account__eyebrow {
+  color: #1268dc;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.account__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 20rem) minmax(0, 1fr);
+  align-items: start;
+  gap: 1.5rem;
+}
+
+.account__side {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.account__card {
+  padding: 1.5rem;
+  background-color: #ffffff;
+  border: 1px solid #dbe3ef;
+  border-radius: 0.75rem;
+  box-shadow: 0 0.25rem 1rem rgb(15 23 42 / 6%);
+}
+
+.account__card h2 {
+  margin: 0;
+  color: #0f172a;
+  font-size: 1.125rem;
+}
+
+.account__profile {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.account__avatar {
+  display: grid;
+  place-items: center;
+  width: 3rem;
+  height: 3rem;
+  background-color: #1268dc;
+  border-radius: 50%;
+  color: #ffffff;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.account__role {
+  margin: 0.25rem 0 0;
+  color: #64748b;
+  font-size: 0.875rem;
+}
+
+.account__tips {
+  margin: 1rem 0 0;
+  padding-left: 1.1rem;
+  display: grid;
+  gap: 0.6rem;
+  color: #475569;
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+
+.account__card-header p {
+  margin: 0.5rem 0 0;
+  color: #64748b;
+  font-size: 0.9rem;
+}
+
+.account__form {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  max-width: 26rem;
+}
+
+.field {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.field label {
+  color: #0f172a;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.field input {
+  padding: 0.65rem 0.75rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.5rem;
+  font: inherit;
+  color: #0f172a;
+}
+
+.field input:focus {
+  outline: 2px solid #1268dc;
+  outline-offset: 1px;
+}
+
+.field__error {
+  color: #b3261e;
+  font-size: 0.8rem;
+}
+
+.account__toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #475569;
+  font-size: 0.875rem;
+}
+
+.account__error {
+  margin: 0;
+  padding: 0.75rem;
+  background: #fdecea;
+  border-radius: 0.5rem;
+  color: #b3261e;
+}
+
+.account__submit {
+  justify-self: start;
+  padding: 0.7rem 1.5rem;
+  background-color: #1268dc;
+  border: none;
+  border-radius: 0.5rem;
+  color: #ffffff;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.account__submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@media (max-width: 60rem) {
+  .account__layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

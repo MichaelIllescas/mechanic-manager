@@ -74,8 +74,12 @@
         [class.navbar__profile-dropdown--open]="isProfileMenuOpen"
         role="menu"
       >
-        <button type="button" role="menuitem">Datos de la cuenta</button>
-        <button type="button" role="menuitem">Cambiar contraseña</button>
+        <button type="button" role="menuitem" (click)="navigateTo($event, '/mi-cuenta')">
+          Datos de la cuenta
+        </button>
+        <button type="button" role="menuitem" (click)="navigateTo($event, '/mi-cuenta')">
+          Cambiar contraseña
+        </button>
         <div class="navbar__profile-divider"></div>
         <button
           class="navbar__logout"

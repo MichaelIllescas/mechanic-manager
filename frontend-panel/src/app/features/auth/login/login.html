@@ -67,6 +67,7 @@
       <button class="login-form__submit" type="submit" [disabled]="form.invalid || loading()">
         {{ loading() ? 'Ingresando...' : 'Ingresar' }}
       </button>
+      <a class="login-form__link" routerLink="/recuperar-password">Olvide mi contrasena</a>
     </form>
   </section>
 </main>

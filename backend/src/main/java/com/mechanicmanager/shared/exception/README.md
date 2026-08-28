@@ -97,5 +97,6 @@ uniforme sin importar dónde se haya frenado el request.
 | `ACCOUNT_DISABLED` | 403 | `auth` |
 | `ACCESS_DENIED` | 403 | Filter chain / ownership |
 | `RESOURCE_NOT_FOUND` | 404 | Genérico |
+| `LICENSE_PLATE_ALREADY_EXISTS` | 409 | `vehicles` |
 
 Mantener esta tabla al día al agregar excepciones nuevas.

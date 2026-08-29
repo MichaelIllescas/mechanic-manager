@@ -17,6 +17,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.dao.DataIntegrityViolationException;
 
 import java.util.Optional;
 
@@ -66,7 +67,7 @@ class CreateVehicleUseCaseTest {
         when(vehicleRepository.existsByUserIdAndLicensePlateIgnoreCase(7L, "AB123CD"))
                 .thenReturn(false);
         when(userRepository.getReferenceById(7L)).thenReturn(user);
-        when(vehicleRepository.save(any(Vehicle.class))).thenAnswer(invocation -> {
+        when(vehicleRepository.saveAndFlush(any(Vehicle.class))).thenAnswer(invocation -> {
             Vehicle vehicle = invocation.getArgument(0);
             vehicle.setId(30L);
             return vehicle;
@@ -75,7 +76,7 @@ class CreateVehicleUseCaseTest {
         var response = useCase.execute(7L, request());
 
         ArgumentCaptor<Vehicle> captor = ArgumentCaptor.forClass(Vehicle.class);
-        verify(vehicleRepository).save(captor.capture());
+        verify(vehicleRepository).saveAndFlush(captor.capture());
         Vehicle saved = captor.getValue();
 
         assertThat(saved.getUser()).isSameAs(user);
@@ -102,7 +103,7 @@ class CreateVehicleUseCaseTest {
         assertThatThrownBy(() -> useCase.execute(7L, request()))
                 .isInstanceOf(LicensePlateAlreadyExistsException.class);
 
-        verify(vehicleRepository, never()).save(any(Vehicle.class));
+        verify(vehicleRepository, never()).saveAndFlush(any(Vehicle.class));
     }
 
     @Test
@@ -114,7 +115,45 @@ class CreateVehicleUseCaseTest {
                 .isInstanceOf(ResourceNotFoundException.class)
                 .hasMessage("No se encontró el cliente indicado");
 
-        verify(vehicleRepository, never()).save(any(Vehicle.class));
+        verify(vehicleRepository, never()).saveAndFlush(any(Vehicle.class));
+    }
+
+    @Test
+    void translatesConcurrentDuplicateLicensePlateIntoDomainConflict() {
+        User user = User.builder().id(7L).build();
+        Customer customer = Customer.builder().id(20L).build();
+
+        when(customerRepository.findByIdAndUserId(20L, 7L))
+                .thenReturn(Optional.of(customer));
+        when(vehicleRepository.existsByUserIdAndLicensePlateIgnoreCase(7L, "AB123CD"))
+                .thenReturn(false);
+        when(userRepository.getReferenceById(7L)).thenReturn(user);
+        when(vehicleRepository.saveAndFlush(any(Vehicle.class))).thenThrow(
+                new DataIntegrityViolationException(
+                        "Duplicate entry for key 'uq_vehicles_user_license_plate'")
+        );
+
+        assertThatThrownBy(() -> useCase.execute(7L, request()))
+                .isInstanceOf(LicensePlateAlreadyExistsException.class);
+    }
+
+    @Test
+    void doesNotDisguiseUnrelatedIntegrityViolations() {
+        User user = User.builder().id(7L).build();
+        Customer customer = Customer.builder().id(20L).build();
+
+        when(customerRepository.findByIdAndUserId(20L, 7L))
+                .thenReturn(Optional.of(customer));
+        when(vehicleRepository.existsByUserIdAndLicensePlateIgnoreCase(7L, "AB123CD"))
+                .thenReturn(false);
+        when(userRepository.getReferenceById(7L)).thenReturn(user);
+        when(vehicleRepository.saveAndFlush(any(Vehicle.class))).thenThrow(
+                new DataIntegrityViolationException(
+                        "Cannot add or update a child row: fk_vehicles_customer_user")
+        );
+
+        assertThatThrownBy(() -> useCase.execute(7L, request()))
+                .isInstanceOf(DataIntegrityViolationException.class);
     }
 
     private static CreateVehicleRequest request() {

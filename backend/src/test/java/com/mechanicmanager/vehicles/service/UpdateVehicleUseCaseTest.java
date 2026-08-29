@@ -62,7 +62,7 @@ class UpdateVehicleUseCaseTest {
                 "AC456EF",
                 30L
         )).thenReturn(false);
-        when(vehicleRepository.save(vehicle)).thenReturn(vehicle);
+        when(vehicleRepository.saveAndFlush(vehicle)).thenReturn(vehicle);
 
         var response = useCase.execute(7L, 30L, request());
 
@@ -86,7 +86,7 @@ class UpdateVehicleUseCaseTest {
                 .isInstanceOf(ResourceNotFoundException.class)
                 .hasMessage("No se encontró el vehículo con id 30");
 
-        verify(vehicleRepository, never()).save(any(Vehicle.class));
+        verify(vehicleRepository, never()).saveAndFlush(any(Vehicle.class));
     }
 
     @Test
@@ -102,7 +102,7 @@ class UpdateVehicleUseCaseTest {
                 .isInstanceOf(ResourceNotFoundException.class)
                 .hasMessage("No se encontró el cliente indicado");
 
-        verify(vehicleRepository, never()).save(any(Vehicle.class));
+        verify(vehicleRepository, never()).saveAndFlush(any(Vehicle.class));
     }
 
     @Test
@@ -123,7 +123,7 @@ class UpdateVehicleUseCaseTest {
         assertThatThrownBy(() -> useCase.execute(7L, 30L, request()))
                 .isInstanceOf(LicensePlateAlreadyExistsException.class);
 
-        verify(vehicleRepository, never()).save(any(Vehicle.class));
+        verify(vehicleRepository, never()).saveAndFlush(any(Vehicle.class));
     }
 
     private static UpdateVehicleRequest request() {

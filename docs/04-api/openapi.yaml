@@ -339,13 +339,8 @@ components:
         - type: object
           required:
             - id
-            - workshopId
           properties:
             id:
-              type: integer
-              format: int64
-              example: 1
-            workshopId:
               type: integer
               format: int64
               example: 1

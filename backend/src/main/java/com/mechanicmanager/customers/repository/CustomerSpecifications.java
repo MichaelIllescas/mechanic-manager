@@ -12,16 +12,16 @@ public final class CustomerSpecifications {
     private CustomerSpecifications() {
     }
 
-    public static Specification<Customer> belongsToWorkshopAndMatches(
-            Long workshopId,
+    public static Specification<Customer> belongsToUserAndMatches(
+            Long userId,
             String search
     ) {
         return (root, query, criteriaBuilder) -> {
             String pattern = "%" + search.toLowerCase(Locale.ROOT) + "%";
 
-            Predicate belongsToWorkshop = criteriaBuilder.equal(
-                    root.get("workshop").get("id"),
-                    workshopId
+            Predicate belongsToUser = criteriaBuilder.equal(
+                    root.get("user").get("id"),
+                    userId
             );
 
             Expression<String> fullName = criteriaBuilder.concat(
@@ -38,7 +38,7 @@ public final class CustomerSpecifications {
                     criteriaBuilder.like(criteriaBuilder.lower(root.get("email")), pattern)
             );
 
-            return criteriaBuilder.and(belongsToWorkshop, matchesSearch);
+            return criteriaBuilder.and(belongsToUser, matchesSearch);
         };
     }
 }

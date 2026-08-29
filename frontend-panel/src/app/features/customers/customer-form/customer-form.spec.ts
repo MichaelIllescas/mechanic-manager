@@ -20,7 +20,6 @@ describe('CustomerForm', () => {
 
   const customer: Customer = {
     id: 1,
-    workshopId: 3,
     firstName: 'Ana',
     lastName: 'Gómez',
     documentNumber: '30111222',

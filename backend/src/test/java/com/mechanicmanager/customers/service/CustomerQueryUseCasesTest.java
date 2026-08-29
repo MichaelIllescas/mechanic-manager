@@ -3,8 +3,7 @@ package com.mechanicmanager.customers.service;
 import com.mechanicmanager.customers.mapper.CustomerMapper;
 import com.mechanicmanager.customers.model.Customer;
 import com.mechanicmanager.customers.repository.CustomerRepository;
-import com.mechanicmanager.workshops.model.Workshop;
-import com.mechanicmanager.workshops.repository.WorkshopRepository;
+import com.mechanicmanager.users.model.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,7 +13,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
@@ -27,50 +25,35 @@ class CustomerQueryUseCasesTest {
     @Mock
     private CustomerRepository customerRepository;
 
-    @Mock
-    private WorkshopRepository workshopRepository;
-
     private ListCustomersUseCase listUseCase;
     private SearchCustomersUseCase searchUseCase;
 
     @BeforeEach
     void setUp() {
         CustomerMapper mapper = new CustomerMapper();
-        listUseCase = new ListCustomersUseCase(
-                customerRepository,
-                workshopRepository,
-                mapper
-        );
-        searchUseCase = new SearchCustomersUseCase(
-                customerRepository,
-                workshopRepository,
-                mapper
-        );
+        listUseCase = new ListCustomersUseCase(customerRepository, mapper);
+        searchUseCase = new SearchCustomersUseCase(customerRepository, mapper);
     }
 
     @Test
-    void listsOnlyCustomersFromAuthenticatedUsersWorkshop() {
-        Workshop workshop = Workshop.builder().id(12L).build();
-        Customer customer = customer(1L, workshop, "Ana", "Gómez");
+    void listsOnlyCustomersFromAuthenticatedUser() {
+        Customer customer = customer(1L, User.builder().id(3L).build(), "Ana", "Gómez");
 
-        when(workshopRepository.findByUserId(3L)).thenReturn(Optional.of(workshop));
-        when(customerRepository.findAllByWorkshop_IdOrderByLastNameAscFirstNameAsc(12L))
+        when(customerRepository.findAllByUserIdOrderByLastNameAscFirstNameAsc(3L))
                 .thenReturn(List.of(customer));
 
         var result = listUseCase.execute(3L);
 
         assertThat(result).hasSize(1);
-        assertThat(result.getFirst().workshopId()).isEqualTo(12L);
+        assertThat(result.getFirst().firstName()).isEqualTo("Ana");
         verify(customerRepository)
-                .findAllByWorkshop_IdOrderByLastNameAscFirstNameAsc(12L);
+                .findAllByUserIdOrderByLastNameAscFirstNameAsc(3L);
     }
 
     @Test
-    void searchesOnlyInsideAuthenticatedUsersWorkshop() {
-        Workshop workshop = Workshop.builder().id(15L).build();
-        Customer customer = customer(2L, workshop, "Luis", "López");
+    void searchesOnlyInsideAuthenticatedUsersCustomers() {
+        Customer customer = customer(2L, User.builder().id(4L).build(), "Luis", "López");
 
-        when(workshopRepository.findByUserId(4L)).thenReturn(Optional.of(workshop));
         when(customerRepository.findAll(
                 org.mockito.ArgumentMatchers.<Specification<Customer>>any(),
                 eq(Sort.by("lastName", "firstName"))
@@ -89,13 +72,13 @@ class CustomerQueryUseCasesTest {
 
     private static Customer customer(
             Long id,
-            Workshop workshop,
+            User user,
             String firstName,
             String lastName
     ) {
         return Customer.builder()
                 .id(id)
-                .workshop(workshop)
+                .user(user)
                 .firstName(firstName)
                 .lastName(lastName)
                 .phone("11 4444-5555")

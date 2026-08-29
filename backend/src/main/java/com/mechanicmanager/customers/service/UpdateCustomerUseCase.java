@@ -6,8 +6,6 @@ import com.mechanicmanager.customers.mapper.CustomerMapper;
 import com.mechanicmanager.customers.model.Customer;
 import com.mechanicmanager.customers.repository.CustomerRepository;
 import com.mechanicmanager.shared.exception.ResourceNotFoundException;
-import com.mechanicmanager.workshops.model.Workshop;
-import com.mechanicmanager.workshops.repository.WorkshopRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,16 +15,11 @@ import org.springframework.transaction.annotation.Transactional;
 public class UpdateCustomerUseCase {
 
     private final CustomerRepository customerRepository;
-    private final WorkshopRepository workshopRepository;
     private final CustomerMapper customerMapper;
 
     @Transactional
     public CustomerResponse execute(Long userId, Long customerId, UpdateCustomerRequest request) {
-        Workshop workshop = workshopRepository.findByUserId(userId)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "El usuario no tiene un taller asociado"));
-
-        Customer customer = customerRepository.findByIdAndWorkshop_Id(customerId, workshop.getId())
+        Customer customer = customerRepository.findByIdAndUserId(customerId, userId)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "No se encontró el cliente con id " + customerId));
 

@@ -13,7 +13,6 @@ describe('CustomerList', () => {
   const customers: Customer[] = [
     {
       id: 1,
-      workshopId: 3,
       firstName: 'Ana',
       lastName: 'Gómez',
       documentNumber: '30111222',

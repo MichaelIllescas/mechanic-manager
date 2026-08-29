@@ -10,7 +10,6 @@ public class CustomerMapper {
     public CustomerResponse toResponse(Customer customer) {
         return new CustomerResponse(
                 customer.getId(),
-                customer.getWorkshop().getId(),
                 customer.getFirstName(),
                 customer.getLastName(),
                 customer.getDocumentNumber(),

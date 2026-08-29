@@ -5,8 +5,7 @@ import com.mechanicmanager.customers.mapper.CustomerMapper;
 import com.mechanicmanager.customers.model.Customer;
 import com.mechanicmanager.customers.repository.CustomerRepository;
 import com.mechanicmanager.shared.exception.ResourceNotFoundException;
-import com.mechanicmanager.workshops.model.Workshop;
-import com.mechanicmanager.workshops.repository.WorkshopRepository;
+import com.mechanicmanager.users.model.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,26 +26,21 @@ class UpdateCustomerUseCaseTest {
     @Mock
     private CustomerRepository customerRepository;
 
-    @Mock
-    private WorkshopRepository workshopRepository;
-
     private UpdateCustomerUseCase useCase;
 
     @BeforeEach
     void setUp() {
         useCase = new UpdateCustomerUseCase(
                 customerRepository,
-                workshopRepository,
                 new CustomerMapper()
         );
     }
 
     @Test
-    void updatesCustomerBelongingToAuthenticatedUsersWorkshop() {
-        Workshop workshop = Workshop.builder().id(20L).build();
+    void updatesCustomerBelongingToAuthenticatedUser() {
         Customer customer = Customer.builder()
                 .id(8L)
-                .workshop(workshop)
+                .user(User.builder().id(5L).build())
                 .firstName("Nombre anterior")
                 .lastName("Apellido anterior")
                 .phone("11 1111-1111")
@@ -60,8 +54,7 @@ class UpdateCustomerUseCaseTest {
                 " Cliente habitual "
         );
 
-        when(workshopRepository.findByUserId(5L)).thenReturn(Optional.of(workshop));
-        when(customerRepository.findByIdAndWorkshop_Id(8L, 20L))
+        when(customerRepository.findByIdAndUserId(8L, 5L))
                 .thenReturn(Optional.of(customer));
         when(customerRepository.save(customer)).thenReturn(customer);
 
@@ -72,13 +65,12 @@ class UpdateCustomerUseCaseTest {
         assertThat(response.documentNumber()).isNull();
         assertThat(response.email()).isEqualTo("maria@email.com");
         assertThat(response.notes()).isEqualTo("Cliente habitual");
-        verify(customerRepository).findByIdAndWorkshop_Id(8L, 20L);
+        verify(customerRepository).findByIdAndUserId(8L, 5L);
         verify(customerRepository).save(customer);
     }
 
     @Test
-    void doesNotRevealOrUpdateCustomerFromAnotherWorkshop() {
-        Workshop workshop = Workshop.builder().id(20L).build();
+    void doesNotRevealOrUpdateCustomerFromAnotherUser() {
         UpdateCustomerRequest request = new UpdateCustomerRequest(
                 "María",
                 "Suárez",
@@ -88,8 +80,7 @@ class UpdateCustomerUseCaseTest {
                 null
         );
 
-        when(workshopRepository.findByUserId(5L)).thenReturn(Optional.of(workshop));
-        when(customerRepository.findByIdAndWorkshop_Id(99L, 20L))
+        when(customerRepository.findByIdAndUserId(99L, 5L))
                 .thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> useCase.execute(5L, 99L, request))

@@ -1,6 +1,5 @@
 export interface Customer {
   id: number;
-  workshopId: number;
   firstName: string;
   lastName: string;
   documentNumber: string | null;

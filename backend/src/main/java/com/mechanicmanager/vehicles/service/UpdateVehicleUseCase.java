@@ -9,8 +9,6 @@ import com.mechanicmanager.vehicles.exception.LicensePlateAlreadyExistsException
 import com.mechanicmanager.vehicles.mapper.VehicleMapper;
 import com.mechanicmanager.vehicles.model.Vehicle;
 import com.mechanicmanager.vehicles.repository.VehicleRepository;
-import com.mechanicmanager.workshops.model.Workshop;
-import com.mechanicmanager.workshops.repository.WorkshopRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,7 +21,6 @@ public class UpdateVehicleUseCase {
 
     private final VehicleRepository vehicleRepository;
     private final CustomerRepository customerRepository;
-    private final WorkshopRepository workshopRepository;
     private final VehicleMapper vehicleMapper;
 
     @Transactional
@@ -32,28 +29,21 @@ public class UpdateVehicleUseCase {
             Long vehicleId,
             UpdateVehicleRequest request
     ) {
-        Workshop workshop = workshopRepository.findByUserId(userId)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "El usuario no tiene un taller asociado"));
-
-        Vehicle vehicle = vehicleRepository.findByIdAndWorkshop_Id(
-                        vehicleId,
-                        workshop.getId()
-                )
+        Vehicle vehicle = vehicleRepository.findByIdAndUserId(vehicleId, userId)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "No se encontró el vehículo con id " + vehicleId));
 
-        Customer customer = customerRepository.findByIdAndWorkshop_Id(
+        Customer customer = customerRepository.findByIdAndUserId(
                         request.customerId(),
-                        workshop.getId()
+                        userId
                 )
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "No se encontró el cliente indicado"));
 
         String licensePlate = normalizeIdentifier(request.licensePlate());
 
-        if (vehicleRepository.existsByWorkshop_IdAndLicensePlateIgnoreCaseAndIdNot(
-                workshop.getId(),
+        if (vehicleRepository.existsByUserIdAndLicensePlateIgnoreCaseAndIdNot(
+                userId,
                 licensePlate,
                 vehicleId
         )) {

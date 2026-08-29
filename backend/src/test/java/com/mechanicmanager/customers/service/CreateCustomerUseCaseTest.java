@@ -4,16 +4,14 @@ import com.mechanicmanager.customers.dto.CreateCustomerRequest;
 import com.mechanicmanager.customers.mapper.CustomerMapper;
 import com.mechanicmanager.customers.model.Customer;
 import com.mechanicmanager.customers.repository.CustomerRepository;
-import com.mechanicmanager.workshops.model.Workshop;
-import com.mechanicmanager.workshops.repository.WorkshopRepository;
+import com.mechanicmanager.users.model.User;
+import com.mechanicmanager.users.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -27,7 +25,7 @@ class CreateCustomerUseCaseTest {
     private CustomerRepository customerRepository;
 
     @Mock
-    private WorkshopRepository workshopRepository;
+    private UserRepository userRepository;
 
     private CreateCustomerUseCase useCase;
 
@@ -35,14 +33,14 @@ class CreateCustomerUseCaseTest {
     void setUp() {
         useCase = new CreateCustomerUseCase(
                 customerRepository,
-                workshopRepository,
+                userRepository,
                 new CustomerMapper()
         );
     }
 
     @Test
-    void createsCustomerForAuthenticatedUsersWorkshopAndNormalizesData() {
-        Workshop workshop = Workshop.builder().id(10L).build();
+    void createsCustomerForAuthenticatedUserAndNormalizesData() {
+        User user = User.builder().id(7L).build();
         CreateCustomerRequest request = new CreateCustomerRequest(
                 "  Juan  ",
                 "  Pérez  ",
@@ -52,7 +50,7 @@ class CreateCustomerUseCaseTest {
                 "   "
         );
 
-        when(workshopRepository.findByUserId(7L)).thenReturn(Optional.of(workshop));
+        when(userRepository.getReferenceById(7L)).thenReturn(user);
         when(customerRepository.save(any(Customer.class))).thenAnswer(invocation -> {
             Customer customer = invocation.getArgument(0);
             customer.setId(25L);
@@ -65,7 +63,7 @@ class CreateCustomerUseCaseTest {
         verify(customerRepository).save(captor.capture());
         Customer saved = captor.getValue();
 
-        assertThat(saved.getWorkshop()).isSameAs(workshop);
+        assertThat(saved.getUser()).isSameAs(user);
         assertThat(saved.getFirstName()).isEqualTo("Juan");
         assertThat(saved.getLastName()).isEqualTo("Pérez");
         assertThat(saved.getDocumentNumber()).isEqualTo("30111222");
@@ -73,6 +71,5 @@ class CreateCustomerUseCaseTest {
         assertThat(saved.getEmail()).isEqualTo("juan@email.com");
         assertThat(saved.getNotes()).isNull();
         assertThat(response.id()).isEqualTo(25L);
-        assertThat(response.workshopId()).isEqualTo(10L);
     }
 }

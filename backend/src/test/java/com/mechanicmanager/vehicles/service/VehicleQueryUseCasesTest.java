@@ -1,12 +1,11 @@
 package com.mechanicmanager.vehicles.service;
 
 import com.mechanicmanager.customers.model.Customer;
+import com.mechanicmanager.users.model.User;
 import com.mechanicmanager.vehicles.mapper.VehicleMapper;
 import com.mechanicmanager.vehicles.model.Vehicle;
 import com.mechanicmanager.vehicles.model.VehicleType;
 import com.mechanicmanager.vehicles.repository.VehicleRepository;
-import com.mechanicmanager.workshops.model.Workshop;
-import com.mechanicmanager.workshops.repository.WorkshopRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,7 +15,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
@@ -29,49 +27,34 @@ class VehicleQueryUseCasesTest {
     @Mock
     private VehicleRepository vehicleRepository;
 
-    @Mock
-    private WorkshopRepository workshopRepository;
-
     private ListVehiclesUseCase listUseCase;
     private SearchVehiclesUseCase searchUseCase;
 
     @BeforeEach
     void setUp() {
         VehicleMapper mapper = new VehicleMapper();
-        listUseCase = new ListVehiclesUseCase(
-                vehicleRepository,
-                workshopRepository,
-                mapper
-        );
-        searchUseCase = new SearchVehiclesUseCase(
-                vehicleRepository,
-                workshopRepository,
-                mapper
-        );
+        listUseCase = new ListVehiclesUseCase(vehicleRepository, mapper);
+        searchUseCase = new SearchVehiclesUseCase(vehicleRepository, mapper);
     }
 
     @Test
-    void listsOnlyVehiclesFromAuthenticatedUsersWorkshop() {
-        Workshop workshop = Workshop.builder().id(12L).build();
-        Vehicle vehicle = vehicle(1L, workshop, "AB123CD");
+    void listsOnlyVehiclesFromAuthenticatedUser() {
+        Vehicle vehicle = vehicle(1L, User.builder().id(3L).build(), "AB123CD");
 
-        when(workshopRepository.findByUserId(3L)).thenReturn(Optional.of(workshop));
-        when(vehicleRepository.findAllByWorkshop_IdOrderByLicensePlateAsc(12L))
+        when(vehicleRepository.findAllByUserIdOrderByLicensePlateAsc(3L))
                 .thenReturn(List.of(vehicle));
 
         var result = listUseCase.execute(3L);
 
         assertThat(result).hasSize(1);
         assertThat(result.getFirst().licensePlate()).isEqualTo("AB123CD");
-        verify(vehicleRepository).findAllByWorkshop_IdOrderByLicensePlateAsc(12L);
+        verify(vehicleRepository).findAllByUserIdOrderByLicensePlateAsc(3L);
     }
 
     @Test
-    void searchesLicensePlateOnlyInsideAuthenticatedUsersWorkshop() {
-        Workshop workshop = Workshop.builder().id(15L).build();
-        Vehicle vehicle = vehicle(2L, workshop, "AC456EF");
+    void searchesLicensePlateOnlyInsideAuthenticatedUsersVehicles() {
+        Vehicle vehicle = vehicle(2L, User.builder().id(4L).build(), "AC456EF");
 
-        when(workshopRepository.findByUserId(4L)).thenReturn(Optional.of(workshop));
         when(vehicleRepository.findAll(
                 org.mockito.ArgumentMatchers.<Specification<Vehicle>>any(),
                 eq(Sort.by("licensePlate"))
@@ -88,17 +71,17 @@ class VehicleQueryUseCasesTest {
         );
     }
 
-    private static Vehicle vehicle(Long id, Workshop workshop, String licensePlate) {
+    private static Vehicle vehicle(Long id, User user, String licensePlate) {
         Customer customer = Customer.builder()
                 .id(20L)
-                .workshop(workshop)
+                .user(user)
                 .firstName("Ana")
                 .lastName("Gómez")
                 .build();
 
         return Vehicle.builder()
                 .id(id)
-                .workshop(workshop)
+                .user(user)
                 .customer(customer)
                 .licensePlate(licensePlate)
                 .brand("Toyota")

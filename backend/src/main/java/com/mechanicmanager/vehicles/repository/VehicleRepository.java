@@ -13,18 +13,18 @@ public interface VehicleRepository extends
         JpaSpecificationExecutor<Vehicle> {
 
     @EntityGraph(attributePaths = "customer")
-    List<Vehicle> findAllByWorkshop_IdOrderByLicensePlateAsc(Long workshopId);
+    List<Vehicle> findAllByUserIdOrderByLicensePlateAsc(Long userId);
 
     @EntityGraph(attributePaths = "customer")
-    Optional<Vehicle> findByIdAndWorkshop_Id(Long id, Long workshopId);
+    Optional<Vehicle> findByIdAndUserId(Long id, Long userId);
 
-    boolean existsByWorkshop_IdAndLicensePlateIgnoreCase(
-            Long workshopId,
+    boolean existsByUserIdAndLicensePlateIgnoreCase(
+            Long userId,
             String licensePlate
     );
 
-    boolean existsByWorkshop_IdAndLicensePlateIgnoreCaseAndIdNot(
-            Long workshopId,
+    boolean existsByUserIdAndLicensePlateIgnoreCaseAndIdNot(
+            Long userId,
             String licensePlate,
             Long id
     );

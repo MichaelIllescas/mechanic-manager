@@ -11,16 +11,16 @@ public final class VehicleSpecifications {
     private VehicleSpecifications() {
     }
 
-    public static Specification<Vehicle> belongsToWorkshopAndLicensePlateMatches(
-            Long workshopId,
+    public static Specification<Vehicle> belongsToUserAndLicensePlateMatches(
+            Long userId,
             String search
     ) {
         return (root, query, criteriaBuilder) -> {
             String pattern = "%" + search.toLowerCase(Locale.ROOT) + "%";
 
-            Predicate belongsToWorkshop = criteriaBuilder.equal(
-                    root.get("workshop").get("id"),
-                    workshopId
+            Predicate belongsToUser = criteriaBuilder.equal(
+                    root.get("user").get("id"),
+                    userId
             );
 
             Predicate licensePlateMatches = criteriaBuilder.like(
@@ -28,7 +28,7 @@ public final class VehicleSpecifications {
                     pattern
             );
 
-            return criteriaBuilder.and(belongsToWorkshop, licensePlateMatches);
+            return criteriaBuilder.and(belongsToUser, licensePlateMatches);
         };
     }
 }

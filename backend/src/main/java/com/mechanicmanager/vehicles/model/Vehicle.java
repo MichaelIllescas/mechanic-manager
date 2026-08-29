@@ -1,7 +1,7 @@
 package com.mechanicmanager.vehicles.model;
 
 import com.mechanicmanager.customers.model.Customer;
-import com.mechanicmanager.workshops.model.Workshop;
+import com.mechanicmanager.users.model.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -37,8 +37,8 @@ public class Vehicle {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "workshop_id", nullable = false)
-    private Workshop workshop;
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "customer_id", nullable = false)

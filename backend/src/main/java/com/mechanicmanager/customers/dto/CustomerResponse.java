@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 
 public record CustomerResponse(
         Long id,
-        Long workshopId,
         String firstName,
         String lastName,
         String documentNumber,

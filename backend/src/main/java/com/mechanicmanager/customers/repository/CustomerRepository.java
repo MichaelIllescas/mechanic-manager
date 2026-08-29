@@ -11,8 +11,8 @@ public interface CustomerRepository extends
         JpaRepository<Customer, Long>,
         JpaSpecificationExecutor<Customer> {
 
-    List<Customer> findAllByWorkshop_IdOrderByLastNameAscFirstNameAsc(Long workshopId);
+    List<Customer> findAllByUserIdOrderByLastNameAscFirstNameAsc(Long userId);
 
-    Optional<Customer> findByIdAndWorkshop_Id(Long id, Long workshopId);
+    Optional<Customer> findByIdAndUserId(Long id, Long userId);
 
 }

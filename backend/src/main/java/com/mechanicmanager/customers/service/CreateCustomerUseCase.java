@@ -5,9 +5,7 @@ import com.mechanicmanager.customers.dto.CustomerResponse;
 import com.mechanicmanager.customers.mapper.CustomerMapper;
 import com.mechanicmanager.customers.model.Customer;
 import com.mechanicmanager.customers.repository.CustomerRepository;
-import com.mechanicmanager.shared.exception.ResourceNotFoundException;
-import com.mechanicmanager.workshops.model.Workshop;
-import com.mechanicmanager.workshops.repository.WorkshopRepository;
+import com.mechanicmanager.users.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,17 +15,13 @@ import org.springframework.transaction.annotation.Transactional;
 public class CreateCustomerUseCase {
 
     private final CustomerRepository customerRepository;
-    private final WorkshopRepository workshopRepository;
+    private final UserRepository userRepository;
     private final CustomerMapper customerMapper;
 
     @Transactional
     public CustomerResponse execute(Long userId, CreateCustomerRequest request) {
-        Workshop workshop = workshopRepository.findByUserId(userId)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "El usuario no tiene un taller asociado"));
-
         Customer customer = Customer.builder()
-                .workshop(workshop)
+                .user(userRepository.getReferenceById(userId))
                 .firstName(request.firstName().trim())
                 .lastName(request.lastName().trim())
                 .documentNumber(normalize(request.documentNumber()))

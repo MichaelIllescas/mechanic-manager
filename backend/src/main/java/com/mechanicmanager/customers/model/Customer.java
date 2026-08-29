@@ -1,6 +1,6 @@
 package com.mechanicmanager.customers.model;
 
-import com.mechanicmanager.workshops.model.Workshop;
+import com.mechanicmanager.users.model.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -32,8 +32,8 @@ public class Customer {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "workshop_id", nullable = false)
-    private Workshop workshop;
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     @Column(name = "first_name", nullable = false, length = 120)
     private String firstName;

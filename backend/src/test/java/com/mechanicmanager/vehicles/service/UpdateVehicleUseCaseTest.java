@@ -3,14 +3,13 @@ package com.mechanicmanager.vehicles.service;
 import com.mechanicmanager.customers.model.Customer;
 import com.mechanicmanager.customers.repository.CustomerRepository;
 import com.mechanicmanager.shared.exception.ResourceNotFoundException;
+import com.mechanicmanager.users.model.User;
 import com.mechanicmanager.vehicles.dto.UpdateVehicleRequest;
 import com.mechanicmanager.vehicles.exception.LicensePlateAlreadyExistsException;
 import com.mechanicmanager.vehicles.mapper.VehicleMapper;
 import com.mechanicmanager.vehicles.model.Vehicle;
 import com.mechanicmanager.vehicles.model.VehicleType;
 import com.mechanicmanager.vehicles.repository.VehicleRepository;
-import com.mechanicmanager.workshops.model.Workshop;
-import com.mechanicmanager.workshops.repository.WorkshopRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,14 +28,13 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class UpdateVehicleUseCaseTest {
 
+    private static final User USER = User.builder().id(7L).build();
+
     @Mock
     private VehicleRepository vehicleRepository;
 
     @Mock
     private CustomerRepository customerRepository;
-
-    @Mock
-    private WorkshopRepository workshopRepository;
 
     private UpdateVehicleUseCase useCase;
 
@@ -45,25 +43,22 @@ class UpdateVehicleUseCaseTest {
         useCase = new UpdateVehicleUseCase(
                 vehicleRepository,
                 customerRepository,
-                workshopRepository,
                 new VehicleMapper()
         );
     }
 
     @Test
-    void updatesVehicleAndAllowsCustomerFromSameWorkshop() {
-        Workshop workshop = Workshop.builder().id(10L).build();
-        Customer originalCustomer = customer(20L, workshop, "Ana", "Gómez");
-        Customer newCustomer = customer(21L, workshop, "Luis", "López");
-        Vehicle vehicle = vehicle(30L, workshop, originalCustomer);
+    void updatesVehicleAndAllowsCustomerFromSameUser() {
+        Customer originalCustomer = customer(20L, "Ana", "Gómez");
+        Customer newCustomer = customer(21L, "Luis", "López");
+        Vehicle vehicle = vehicle(30L, originalCustomer);
 
-        when(workshopRepository.findByUserId(7L)).thenReturn(Optional.of(workshop));
-        when(vehicleRepository.findByIdAndWorkshop_Id(30L, 10L))
+        when(vehicleRepository.findByIdAndUserId(30L, 7L))
                 .thenReturn(Optional.of(vehicle));
-        when(customerRepository.findByIdAndWorkshop_Id(21L, 10L))
+        when(customerRepository.findByIdAndUserId(21L, 7L))
                 .thenReturn(Optional.of(newCustomer));
-        when(vehicleRepository.existsByWorkshop_IdAndLicensePlateIgnoreCaseAndIdNot(
-                10L,
+        when(vehicleRepository.existsByUserIdAndLicensePlateIgnoreCaseAndIdNot(
+                7L,
                 "AC456EF",
                 30L
         )).thenReturn(false);
@@ -83,11 +78,8 @@ class UpdateVehicleUseCaseTest {
     }
 
     @Test
-    void rejectsVehicleOutsideAuthenticatedUsersWorkshop() {
-        Workshop workshop = Workshop.builder().id(10L).build();
-
-        when(workshopRepository.findByUserId(7L)).thenReturn(Optional.of(workshop));
-        when(vehicleRepository.findByIdAndWorkshop_Id(30L, 10L))
+    void rejectsVehicleFromAnotherUser() {
+        when(vehicleRepository.findByIdAndUserId(30L, 7L))
                 .thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> useCase.execute(7L, 30L, request()))
@@ -98,14 +90,12 @@ class UpdateVehicleUseCaseTest {
     }
 
     @Test
-    void rejectsCustomerOutsideAuthenticatedUsersWorkshop() {
-        Workshop workshop = Workshop.builder().id(10L).build();
-        Vehicle vehicle = vehicle(30L, workshop, customer(20L, workshop, "Ana", "Gómez"));
+    void rejectsCustomerFromAnotherUser() {
+        Vehicle vehicle = vehicle(30L, customer(20L, "Ana", "Gómez"));
 
-        when(workshopRepository.findByUserId(7L)).thenReturn(Optional.of(workshop));
-        when(vehicleRepository.findByIdAndWorkshop_Id(30L, 10L))
+        when(vehicleRepository.findByIdAndUserId(30L, 7L))
                 .thenReturn(Optional.of(vehicle));
-        when(customerRepository.findByIdAndWorkshop_Id(21L, 10L))
+        when(customerRepository.findByIdAndUserId(21L, 7L))
                 .thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> useCase.execute(7L, 30L, request()))
@@ -116,18 +106,16 @@ class UpdateVehicleUseCaseTest {
     }
 
     @Test
-    void rejectsDuplicateLicensePlateInsideWorkshop() {
-        Workshop workshop = Workshop.builder().id(10L).build();
-        Customer customer = customer(21L, workshop, "Luis", "López");
-        Vehicle vehicle = vehicle(30L, workshop, customer);
+    void rejectsDuplicateLicensePlateForSameUser() {
+        Customer customer = customer(21L, "Luis", "López");
+        Vehicle vehicle = vehicle(30L, customer);
 
-        when(workshopRepository.findByUserId(7L)).thenReturn(Optional.of(workshop));
-        when(vehicleRepository.findByIdAndWorkshop_Id(30L, 10L))
+        when(vehicleRepository.findByIdAndUserId(30L, 7L))
                 .thenReturn(Optional.of(vehicle));
-        when(customerRepository.findByIdAndWorkshop_Id(21L, 10L))
+        when(customerRepository.findByIdAndUserId(21L, 7L))
                 .thenReturn(Optional.of(customer));
-        when(vehicleRepository.existsByWorkshop_IdAndLicensePlateIgnoreCaseAndIdNot(
-                10L,
+        when(vehicleRepository.existsByUserIdAndLicensePlateIgnoreCaseAndIdNot(
+                7L,
                 "AC456EF",
                 30L
         )).thenReturn(true);
@@ -153,24 +141,19 @@ class UpdateVehicleUseCaseTest {
         );
     }
 
-    private static Customer customer(
-            Long id,
-            Workshop workshop,
-            String firstName,
-            String lastName
-    ) {
+    private static Customer customer(Long id, String firstName, String lastName) {
         return Customer.builder()
                 .id(id)
-                .workshop(workshop)
+                .user(USER)
                 .firstName(firstName)
                 .lastName(lastName)
                 .build();
     }
 
-    private static Vehicle vehicle(Long id, Workshop workshop, Customer customer) {
+    private static Vehicle vehicle(Long id, Customer customer) {
         return Vehicle.builder()
                 .id(id)
-                .workshop(workshop)
+                .user(USER)
                 .customer(customer)
                 .licensePlate("AB123CD")
                 .brand("Toyota")

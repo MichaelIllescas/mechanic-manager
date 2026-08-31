@@ -1,1 +1,227 @@
-<p>vehicle-form works!</p>
+<main class="vehicle-form-page">
+  <section class="vehicle-form-header">
+    <a class="vehicle-form-header__back" routerLink="/vehicles" aria-label="Volver a vehículos">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="m15 18-6-6 6-6" />
+      </svg>
+      Volver
+    </a>
+
+    <p class="vehicle-form-header__eyebrow">Taller</p>
+    <h1>{{ isEdit() ? 'Editar vehículo' : 'Nuevo vehículo' }}</h1>
+    <p>
+      {{
+        isEdit()
+          ? 'Actualizá la información y el cliente asociado al vehículo.'
+          : 'Registrá un vehículo y asocialo a uno de tus clientes.'
+      }}
+    </p>
+  </section>
+
+  <section class="vehicle-form-card" aria-labelledby="vehicle-form-title">
+    <div class="vehicle-form-card__header">
+      <div class="vehicle-form-card__icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24">
+          <path d="M5 17h14l-1.5-6.5A2 2 0 0 0 15.6 9H8.4a2 2 0 0 0-1.9 1.5L5 17Z" />
+          <path d="M3 17h18v3H3z" />
+          <circle cx="7" cy="20" r="1.5" />
+          <circle cx="17" cy="20" r="1.5" />
+        </svg>
+      </div>
+
+      <div>
+        <span class="vehicle-form-card__mode">
+          {{ isEdit() ? 'Modo edición' : 'Modo alta' }}
+        </span>
+        <h2 id="vehicle-form-title">Datos del vehículo</h2>
+        <p>Cliente, patente, marca, modelo, chasis, motor y tipo son obligatorios.</p>
+      </div>
+    </div>
+
+    @if (loading()) {
+      <p class="vehicle-form__loading">Cargando datos del vehículo...</p>
+    } @else {
+      <form class="vehicle-form" [formGroup]="form" (ngSubmit)="onSubmit()" autocomplete="off">
+        <div class="form-grid">
+          <label class="field field--wide">
+            <span>Cliente</span>
+            <select formControlName="customerId">
+              <option [ngValue]="null">Seleccioná un cliente</option>
+              @for (customer of customers(); track customer.id) {
+                <option [ngValue]="customer.id">
+                  {{ customer.firstName }} {{ customer.lastName }}
+                </option>
+              }
+            </select>
+            @if (customers().length === 0) {
+              <span class="field__hint">
+                Primero tenés que registrar un cliente para asociarle el vehículo.
+              </span>
+            }
+            @if (form.controls.customerId.touched && form.controls.customerId.invalid) {
+              <small>Seleccioná un cliente válido.</small>
+            }
+          </label>
+
+          <label class="field">
+            <span>Patente</span>
+            <input
+              type="text"
+              formControlName="licensePlate"
+              placeholder="AB123CD"
+              maxlength="20"
+              autocomplete="off"
+            />
+            @if (form.controls.licensePlate.touched && form.controls.licensePlate.invalid) {
+              <small>
+                @if (form.controls.licensePlate.hasError('required')) {
+                  La patente es obligatoria.
+                } @else {
+                  La patente no puede superar los 20 caracteres.
+                }
+              </small>
+            }
+          </label>
+
+          <label class="field">
+            <span>Tipo</span>
+            <select formControlName="vehicleType">
+              @for (type of vehicleTypes; track type.value) {
+                <option [value]="type.value">{{ type.label }}</option>
+              }
+            </select>
+            @if (form.controls.vehicleType.touched && form.controls.vehicleType.invalid) {
+              <small>Seleccioná un tipo de vehículo.</small>
+            }
+          </label>
+
+          <label class="field">
+            <span>Marca</span>
+            <input
+              type="text"
+              formControlName="brand"
+              placeholder="Toyota"
+              maxlength="80"
+              autocomplete="off"
+            />
+            @if (form.controls.brand.touched && form.controls.brand.invalid) {
+              <small>
+                @if (form.controls.brand.hasError('required')) {
+                  La marca es obligatoria.
+                } @else {
+                  La marca no puede superar los 80 caracteres.
+                }
+              </small>
+            }
+          </label>
+
+          <label class="field">
+            <span>Modelo</span>
+            <input
+              type="text"
+              formControlName="model"
+              placeholder="Corolla"
+              maxlength="120"
+              autocomplete="off"
+            />
+            @if (form.controls.model.touched && form.controls.model.invalid) {
+              <small>
+                @if (form.controls.model.hasError('required')) {
+                  El modelo es obligatorio.
+                } @else {
+                  El modelo no puede superar los 120 caracteres.
+                }
+              </small>
+            }
+          </label>
+
+          <label class="field">
+            <span>Año</span>
+            <input type="number" formControlName="year" placeholder="2020" min="1886" max="9999" />
+            <span class="field__hint">Opcional.</span>
+            @if (form.controls.year.touched && form.controls.year.invalid) {
+              <small>Ingresá un año entre 1886 y 9999.</small>
+            }
+          </label>
+
+          <label class="field">
+            <span>Kilometraje</span>
+            <input type="number" formControlName="mileage" placeholder="45000" min="0" />
+            <span class="field__hint">Opcional. No puede ser negativo.</span>
+            @if (form.controls.mileage.touched && form.controls.mileage.invalid) {
+              <small>El kilometraje no puede ser negativo.</small>
+            }
+          </label>
+
+          <label class="field">
+            <span>Número de chasis</span>
+            <input
+              type="text"
+              formControlName="chassisNumber"
+              placeholder="Número de identificación del chasis"
+              maxlength="100"
+              autocomplete="off"
+            />
+            @if (form.controls.chassisNumber.touched && form.controls.chassisNumber.invalid) {
+              <small>
+                @if (form.controls.chassisNumber.hasError('required')) {
+                  El número de chasis es obligatorio.
+                } @else {
+                  El número de chasis no puede superar los 100 caracteres.
+                }
+              </small>
+            }
+          </label>
+
+          <label class="field">
+            <span>Número de motor</span>
+            <input
+              type="text"
+              formControlName="engineNumber"
+              placeholder="Número de identificación del motor"
+              maxlength="100"
+              autocomplete="off"
+            />
+            @if (form.controls.engineNumber.touched && form.controls.engineNumber.invalid) {
+              <small>
+                @if (form.controls.engineNumber.hasError('required')) {
+                  El número de motor es obligatorio.
+                } @else {
+                  El número de motor no puede superar los 100 caracteres.
+                }
+              </small>
+            }
+          </label>
+
+          <label class="field field--wide">
+            <span>Observaciones</span>
+            <textarea
+              formControlName="notes"
+              rows="4"
+              placeholder="Información adicional útil sobre el vehículo"
+            ></textarea>
+            <span class="field__hint">Opcional. Máximo 1000 caracteres.</span>
+            @if (form.controls.notes.touched && form.controls.notes.invalid) {
+              <small>Las observaciones no pueden superar los 1000 caracteres.</small>
+            }
+          </label>
+        </div>
+
+        @if (errorMessage()) {
+          <p class="vehicle-form__error" role="alert">{{ errorMessage() }}</p>
+        }
+
+        <div class="vehicle-form__actions">
+          <a class="button button--secondary" routerLink="/vehicles">Cancelar</a>
+          <button
+            class="button button--primary"
+            type="submit"
+            [disabled]="form.invalid || saving() || customers().length === 0"
+          >
+            {{ saving() ? 'Guardando...' : isEdit() ? 'Guardar cambios' : 'Registrar vehículo' }}
+          </button>
+        </div>
+      </form>
+    }
+  </section>
+</main>

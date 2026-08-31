@@ -52,7 +52,9 @@ export class VehicleList implements OnInit {
         switchMap((search) =>
           this.vehicleService.findAll(search).pipe(
             catchError((error: HttpErrorResponse) => {
-              this.errorMessage.set(error.error?.message ?? 'No se pudieron cargar los vehículos');
+              this.errorMessage.set(
+                error.error?.message ?? 'No se pudieron cargar los vehículos',
+              );
               return of([]);
             }),
           ),

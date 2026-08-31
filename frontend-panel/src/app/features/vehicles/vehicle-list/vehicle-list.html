@@ -4,7 +4,7 @@
       <p class="vehicles-header__eyebrow">Taller</p>
       <h1>Vehículos</h1>
       <p class="vehicles-header__copy">
-        Administrá los vehículos de los clientes registrados en el taller.
+        Administrá los vehículos de tus clientes y mantené actualizados sus datos.
       </p>
     </div>
 
@@ -48,9 +48,11 @@
       <table class="vehicles-table">
         <thead>
           <tr>
+            <th>N.º</th>
             <th>Patente</th>
             <th>Vehículo</th>
             <th>Cliente</th>
+            <th>Tipo</th>
             <th>Año</th>
             <th>Kilometraje</th>
             <th class="vehicles-table__actions-heading">Acciones</th>
@@ -59,31 +61,57 @@
         <tbody>
           @if (loading()) {
             <tr>
-              <td class="table-message" colspan="6">Cargando vehículos...</td>
+              <td class="table-message" colspan="8">Cargando vehículos...</td>
             </tr>
           } @else {
             @for (vehicle of vehicles(); track vehicle.id) {
               <tr>
                 <td>
-                  <div class="license-plate-cell">
-                    <strong>{{ vehicle.licensePlate }}</strong>
-                    <span>Vehículo #{{ vehicle.id }}</span>
-                  </div>
+                  <span class="vehicle-number">#{{ vehicle.id }}</span>
+                </td>
+                <td>
+                  <span class="license-plate">{{ vehicle.licensePlate }}</span>
                 </td>
                 <td>
                   <div class="vehicle-cell">
-                    <strong>{{ vehicle.brand }} {{ vehicle.model }}</strong>
-                    <span>{{ vehicle.vehicleType }}</span>
+                    <span class="vehicle-cell__name">{{ vehicle.brand }} {{ vehicle.model }}</span>
                   </div>
                 </td>
-                <td>
-                  {{ vehicle.customerFirstName }} {{ vehicle.customerLastName }}
+                <td>{{ vehicle.customerFirstName }} {{ vehicle.customerLastName }}</td>
+                <td class="vehicles-table__muted">
+                  @switch (vehicle.vehicleType) {
+                    @case ('CAR') {
+                      Auto
+                    }
+                    @case ('SUV') {
+                      SUV
+                    }
+                    @case ('PICKUP') {
+                      Pickup
+                    }
+                    @case ('VAN') {
+                      Utilitario
+                    }
+                    @case ('TRUCK') {
+                      Camión
+                    }
+                    @case ('MOTORCYCLE') {
+                      Motocicleta
+                    }
+                    @default {
+                      Otro
+                    }
+                  }
                 </td>
                 <td class="vehicles-table__muted">
                   {{ vehicle.year ?? '—' }}
                 </td>
                 <td class="vehicles-table__muted">
-                  {{ vehicle.mileage === null ? '—' : vehicle.mileage + ' km' }}
+                  @if (vehicle.mileage !== null) {
+                    {{ vehicle.mileage }} km
+                  } @else {
+                    —
+                  }
                 </td>
                 <td>
                   <div class="actions">
@@ -104,13 +132,13 @@
               </tr>
             } @empty {
               <tr>
-                <td class="empty-state" colspan="6">
+                <td class="empty-state" colspan="8">
                   @if (searchControl.value.trim()) {
                     <strong>No encontramos vehículos con esa patente.</strong>
-                    <span>Probá con otra patente.</span>
+                    <span>Revisá la búsqueda o probá con otra patente.</span>
                   } @else {
                     <strong>Todavía no registraste ningún vehículo.</strong>
-                    <span>Creá el primero y asocialo con uno de tus clientes.</span>
+                    <span>Creá el primero y asocialo a uno de tus clientes.</span>
                   }
                 </td>
               </tr>

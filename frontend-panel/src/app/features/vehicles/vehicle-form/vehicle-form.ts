@@ -40,6 +40,21 @@ export class VehicleForm implements OnInit {
   readonly saving = signal(false);
   readonly errorMessage = signal<string | null>(null);
   readonly customers = signal<Customer[]>([]);
+  readonly customerSearch = signal('');
+  readonly customerResultsOpen = signal(false);
+  readonly selectedCustomerLabel = signal<string | null>(null);
+  readonly filteredCustomers = computed(() => {
+    const search = this.normalizeSearch(this.customerSearch());
+    const customers = this.customers();
+
+    if (!search) {
+      return [];
+    }
+
+    return customers
+      .filter((customer) => this.customerMatchesSearch(customer, search))
+      .slice(0, 8);
+  });
 
   readonly vehicleTypes: ReadonlyArray<{ value: VehicleType; label: string }> = [
     { value: 'CAR', label: 'Auto' },
@@ -117,12 +132,40 @@ export class VehicleForm implements OnInit {
     });
   }
 
+  onCustomerSearch(value: string): void {
+    this.customerSearch.set(value);
+    this.customerResultsOpen.set(true);
+  }
+
+  openCustomerResults(): void {
+    if (!this.selectedCustomerLabel() && this.customerSearch().trim()) {
+      this.customerResultsOpen.set(true);
+    }
+  }
+
+  selectCustomer(customer: Customer): void {
+    this.form.controls.customerId.setValue(customer.id);
+    this.form.controls.customerId.markAsTouched();
+    this.selectedCustomerLabel.set(this.formatCustomer(customer));
+    this.customerSearch.set('');
+    this.customerResultsOpen.set(false);
+  }
+
+  changeCustomer(): void {
+    this.form.controls.customerId.setValue(null);
+    this.form.controls.customerId.markAsTouched();
+    this.selectedCustomerLabel.set(null);
+    this.customerSearch.set('');
+    this.customerResultsOpen.set(false);
+  }
+
   private loadCustomers(): void {
     this.loadingCustomers.set(true);
 
     this.customerService.findAll().subscribe({
       next: (customers) => {
         this.customers.set(customers);
+        this.syncSelectedCustomerFromList();
         this.loadingCustomers.set(false);
       },
       error: (error: HttpErrorResponse) => {
@@ -156,6 +199,10 @@ export class VehicleForm implements OnInit {
           vehicleType: vehicle.vehicleType,
           notes: vehicle.notes ?? '',
         });
+        this.selectedCustomerLabel.set(
+          this.formatCustomerName(vehicle.customerFirstName, vehicle.customerLastName),
+        );
+        this.syncSelectedCustomerFromList();
       },
       error: (error: HttpErrorResponse) => {
         this.loadingVehicle.set(false);
@@ -194,5 +241,48 @@ export class VehicleForm implements OnInit {
 
   private trimToNull(value: string | null | undefined): string | null {
     return value?.trim() || null;
+  }
+
+  private syncSelectedCustomerFromList(): void {
+    const customerId = this.form.controls.customerId.value;
+
+    if (!customerId) {
+      return;
+    }
+
+    const customer = this.customers().find((customer) => customer.id === customerId);
+
+    if (customer) {
+      this.selectedCustomerLabel.set(this.formatCustomer(customer));
+    }
+  }
+
+  private customerMatchesSearch(customer: Customer, search: string): boolean {
+    return this.normalizeSearch(
+      [
+        customer.firstName,
+        customer.lastName,
+        customer.documentNumber,
+        customer.phone,
+        customer.email,
+      ]
+        .filter(Boolean)
+        .join(' '),
+    ).includes(search);
+  }
+
+  private formatCustomer(customer: Customer): string {
+    const details = [customer.documentNumber, customer.phone].filter(Boolean).join(' · ');
+    const name = this.formatCustomerName(customer.firstName, customer.lastName);
+
+    return details ? `${name} · ${details}` : name;
+  }
+
+  private formatCustomerName(firstName: string, lastName: string): string {
+    return `${firstName} ${lastName}`;
+  }
+
+  private normalizeSearch(value: string): string {
+    return value.trim().toLowerCase();
   }
 }

@@ -50,3 +50,69 @@ img {
   display: block;
   max-width: 100%;
 }
+
+.customer-picker__selected {
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 14px;
+  border: 1px solid #c8d7eb;
+  border-radius: 8px;
+  background: #fbfdff;
+}
+
+.customer-picker__selected span {
+  min-width: 0;
+  color: #07182e;
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+
+.customer-picker__selected button {
+  border: 0;
+  color: #067bd2;
+  background: transparent;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.customer-picker__results {
+  margin-top: 6px;
+  padding: 6px;
+  border: 1px solid #c8d7eb;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.customer-picker__results p {
+  margin: 0;
+  padding: 10px 12px;
+  color: #6d7f97;
+}
+
+.customer-picker__option {
+  width: 100%;
+  display: block;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: 6px;
+  color: #10233d;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+
+.customer-picker__option:hover,
+.customer-picker__option:focus-visible {
+  background: #eaf5ff;
+  outline: none;
+}
+
+.customer-picker__option span {
+  display: block;
+  margin-top: 3px;
+  color: #60728c;
+  font-size: 0.84rem;
+}

@@ -45,14 +45,48 @@
         <div class="form-grid">
           <label class="field field--wide">
             <span>Cliente</span>
-            <select formControlName="customerId">
-              <option [ngValue]="null">Seleccioná un cliente</option>
-              @for (customer of customers(); track customer.id) {
-                <option [ngValue]="customer.id">
-                  {{ customer.firstName }} {{ customer.lastName }}
-                </option>
+            <div class="customer-picker">
+              @if (selectedCustomerLabel(); as customerLabel) {
+                <div class="customer-picker__selected">
+                  <span>{{ customerLabel }}</span>
+                  <button type="button" (click)="changeCustomer()">Cambiar</button>
+                </div>
+              } @else {
+                <input
+                  type="search"
+                  [value]="customerSearch()"
+                  placeholder="Buscar por nombre, DNI, teléfono o email"
+                  autocomplete="off"
+                  role="combobox"
+                  aria-controls="customer-results"
+                  [attr.aria-expanded]="customerResultsOpen()"
+                  (focus)="openCustomerResults()"
+                  (input)="onCustomerSearch($any($event.target).value)"
+                />
+                @if (customerResultsOpen()) {
+                  <div class="customer-picker__results" id="customer-results" role="listbox">
+                    @for (customer of filteredCustomers(); track customer.id) {
+                      <button
+                        type="button"
+                        role="option"
+                        class="customer-picker__option"
+                        (click)="selectCustomer(customer)"
+                      >
+                        <strong>{{ customer.firstName }} {{ customer.lastName }}</strong>
+                        <span>
+                          @if (customer.documentNumber) {
+                            DNI {{ customer.documentNumber }} ·
+                          }
+                          {{ customer.phone }}
+                        </span>
+                      </button>
+                    } @empty {
+                      <p>No encontramos clientes con esa búsqueda.</p>
+                    }
+                  </div>
+                }
               }
-            </select>
+            </div>
             @if (customers().length === 0) {
               <span class="field__hint">
                 Primero tenés que registrar un cliente para asociarle el vehículo.

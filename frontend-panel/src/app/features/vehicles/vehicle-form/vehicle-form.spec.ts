@@ -126,6 +126,36 @@ describe('VehicleForm', () => {
     expect(component.customers()).toEqual([customer]);
   });
 
+  it('should filter and select a customer from the search input', () => {
+    createComponent();
+
+    component.openCustomerResults();
+
+    expect(component.filteredCustomers()).toEqual([]);
+    expect(component.customerResultsOpen()).toBe(false);
+
+    component.onCustomerSearch('30111222');
+
+    expect(component.filteredCustomers()).toEqual([customer]);
+
+    component.selectCustomer(customer);
+
+    expect(component.form.controls.customerId.value).toBe(20);
+    expect(component.selectedCustomerLabel()).toBe('Ana Gómez · 30111222 · 11 4444-5555');
+    expect(component.customerResultsOpen()).toBe(false);
+  });
+
+  it('should clear the selected customer when changing it', () => {
+    createComponent();
+    component.selectCustomer(customer);
+
+    component.changeCustomer();
+
+    expect(component.form.controls.customerId.value).toBeNull();
+    expect(component.selectedCustomerLabel()).toBeNull();
+    expect(component.customerResultsOpen()).toBe(false);
+  });
+
   it('should not submit an invalid form', () => {
     createComponent();
 
@@ -178,6 +208,7 @@ describe('VehicleForm', () => {
     expect(vehicleService.findFromListById).toHaveBeenCalledWith(30);
     expect(component.form.controls.customerId.value).toBe(20);
     expect(component.form.controls.licensePlate.value).toBe('AB123CD');
+    expect(component.selectedCustomerLabel()).toBe('Ana Gómez · 30111222 · 11 4444-5555');
 
     component.form.controls.mileage.setValue(47000);
     component.onSubmit();

@@ -71,11 +71,9 @@ describe('VehicleList', () => {
     const text = fixture.nativeElement.textContent as string;
 
     expect(text).toContain('AB123CD');
-    expect(text).toContain('#30');
     expect(text).toContain('Toyota Corolla');
     expect(text).toContain('Ana Gómez');
     expect(text).toContain('Auto');
-    expect(text).toContain('45000 km');
   });
 
   it('should clear the current search', () => {

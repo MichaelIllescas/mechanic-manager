@@ -48,29 +48,25 @@
       <table class="vehicles-table">
         <thead>
           <tr>
-            <th>N.º</th>
             <th>Patente</th>
             <th>Vehículo</th>
             <th>Cliente</th>
             <th>Tipo</th>
-            <th>Año</th>
-            <th>Kilometraje</th>
             <th class="vehicles-table__actions-heading">Acciones</th>
           </tr>
         </thead>
         <tbody>
           @if (loading()) {
             <tr>
-              <td class="table-message" colspan="8">Cargando vehículos...</td>
+              <td class="table-message" colspan="5">Cargando vehículos...</td>
             </tr>
           } @else {
             @for (vehicle of vehicles(); track vehicle.id) {
               <tr>
                 <td>
-                  <span class="vehicle-number">#{{ vehicle.id }}</span>
-                </td>
-                <td>
-                  <span class="license-plate">{{ vehicle.licensePlate }}</span>
+                  <a class="license-plate" [routerLink]="['/vehicles', vehicle.id]">
+                    {{ vehicle.licensePlate }}
+                  </a>
                 </td>
                 <td>
                   <div class="vehicle-cell">
@@ -103,18 +99,20 @@
                     }
                   }
                 </td>
-                <td class="vehicles-table__muted">
-                  {{ vehicle.year ?? '—' }}
-                </td>
-                <td class="vehicles-table__muted">
-                  @if (vehicle.mileage !== null) {
-                    {{ vehicle.mileage }} km
-                  } @else {
-                    —
-                  }
-                </td>
                 <td>
                   <div class="actions">
+                    <button
+                      class="actions__button actions__button--secondary"
+                      type="button"
+                      aria-label="Ver detalle del vehículo"
+                      title="Ver detalle"
+                      [routerLink]="['/vehicles', vehicle.id]"
+                    >
+                      <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z" />
+                        <circle cx="12" cy="12" r="2.5" />
+                      </svg>
+                    </button>
                     <button
                       class="actions__button"
                       type="button"
@@ -132,7 +130,7 @@
               </tr>
             } @empty {
               <tr>
-                <td class="empty-state" colspan="8">
+                <td class="empty-state" colspan="5">
                   @if (searchControl.value.trim()) {
                     <strong>No encontramos vehículos con esa patente.</strong>
                     <span>Revisá la búsqueda o probá con otra patente.</span>

@@ -1,0 +1,105 @@
+<main class="vehicle-detail-page">
+  <section class="vehicle-detail-header">
+    <a class="vehicle-detail-header__back" routerLink="/vehicles" aria-label="Volver a vehículos">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="m15 18-6-6 6-6" />
+      </svg>
+      Volver
+    </a>
+
+    <div>
+      <p class="vehicle-detail-header__eyebrow">Taller</p>
+      <h1>Detalle del vehículo</h1>
+      <p>Ficha completa con datos principales, técnicos y observaciones.</p>
+    </div>
+
+    @if (vehicle(); as currentVehicle) {
+      <a class="vehicle-detail-header__action" [routerLink]="['/vehicles', currentVehicle.id, 'editar']">
+        Editar
+      </a>
+    }
+  </section>
+
+  @if (loading()) {
+    <section class="vehicle-detail-panel">
+      <p class="vehicle-detail__loading">Cargando vehículo...</p>
+    </section>
+  } @else if (errorMessage()) {
+    <p class="vehicle-detail__error" role="alert">{{ errorMessage() }}</p>
+  } @else if (vehicle(); as currentVehicle) {
+    <section class="vehicle-detail-panel" aria-labelledby="vehicle-title">
+      <div class="vehicle-detail-panel__top">
+        <span class="license-plate">{{ currentVehicle.licensePlate }}</span>
+        <div>
+          <h2 id="vehicle-title">{{ currentVehicle.brand }} {{ currentVehicle.model }}</h2>
+          <p>{{ currentVehicle.customerFirstName }} {{ currentVehicle.customerLastName }}</p>
+        </div>
+      </div>
+
+      <div class="detail-grid" aria-label="Datos principales">
+        <div class="detail-field">
+          <span>Número interno</span>
+          <strong>#{{ currentVehicle.id }}</strong>
+        </div>
+        <div class="detail-field">
+          <span>Cliente</span>
+          <strong>{{ currentVehicle.customerFirstName }} {{ currentVehicle.customerLastName }}</strong>
+        </div>
+        <div class="detail-field">
+          <span>Tipo</span>
+          <strong>{{ vehicleTypeLabel(currentVehicle.vehicleType) }}</strong>
+        </div>
+        <div class="detail-field">
+          <span>Marca</span>
+          <strong>{{ currentVehicle.brand }}</strong>
+        </div>
+        <div class="detail-field">
+          <span>Modelo</span>
+          <strong>{{ currentVehicle.model }}</strong>
+        </div>
+        <div class="detail-field">
+          <span>Fecha de alta</span>
+          <strong>{{ displayDateTime(currentVehicle.createdAt) }}</strong>
+        </div>
+        <div class="detail-field">
+          <span>Última actualización</span>
+          <strong>{{ displayDateTime(currentVehicle.updatedAt) }}</strong>
+        </div>
+      </div>
+    </section>
+
+    <section class="vehicle-detail-section" aria-labelledby="technical-title">
+      <h2 id="technical-title">Datos técnicos</h2>
+
+      <div class="detail-grid">
+        <div class="detail-field">
+          <span>Año</span>
+          <strong>{{ displayValue(currentVehicle.year) }}</strong>
+        </div>
+        <div class="detail-field">
+          <span>Kilometraje</span>
+          <strong>
+            @if (currentVehicle.mileage !== null) {
+              {{ currentVehicle.mileage }} km
+            } @else {
+              Sin informar
+            }
+          </strong>
+        </div>
+        <div class="detail-field">
+          <span>Número de chasis</span>
+          <strong>{{ displayValue(currentVehicle.chassisNumber) }}</strong>
+        </div>
+        <div class="detail-field">
+          <span>Número de motor</span>
+          <strong>{{ displayValue(currentVehicle.engineNumber) }}</strong>
+        </div>
+      </div>
+    </section>
+
+    <section class="vehicle-detail-section" aria-labelledby="notes-title">
+      <h2 id="notes-title">Observaciones</h2>
+      <p class="vehicle-detail__notes">{{ displayValue(currentVehicle.notes) }}</p>
+    </section>
+  }
+</main>

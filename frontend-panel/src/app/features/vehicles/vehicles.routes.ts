@@ -16,4 +16,9 @@ export const VEHICLE_ROUTES: Routes = [
     loadComponent: () =>
       import('./vehicle-form/vehicle-form').then((component) => component.VehicleForm),
   },
+  {
+    path: ':id',
+    loadComponent: () =>
+      import('./vehicle-detail/vehicle-detail').then((component) => component.VehicleDetail),
+  },
 ];

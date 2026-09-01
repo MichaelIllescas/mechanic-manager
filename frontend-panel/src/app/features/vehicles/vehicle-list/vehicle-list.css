@@ -135,7 +135,7 @@
 
 .vehicles-table {
   width: 100%;
-  min-width: 1180px;
+  min-width: 860px;
   border-collapse: collapse;
 }
 
@@ -183,6 +183,7 @@
   font-weight: 900;
   letter-spacing: 0.08em;
   text-align: center;
+  text-decoration: none;
   text-transform: uppercase;
 }
 
@@ -206,6 +207,7 @@
 
 .actions {
   display: flex;
+  gap: 8px;
   justify-content: center;
 }
 
@@ -227,6 +229,15 @@
 .actions__button:hover {
   background: #067bd2;
   transform: translateY(-2px);
+}
+
+.actions__button--secondary {
+  color: #067bd2;
+  background: #eaf5ff;
+}
+
+.actions__button--secondary:hover {
+  color: #fff;
 }
 
 .actions__button:focus-visible {

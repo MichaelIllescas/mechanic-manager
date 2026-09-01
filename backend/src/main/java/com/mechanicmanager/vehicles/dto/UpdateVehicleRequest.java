@@ -31,11 +31,9 @@ public record UpdateVehicleRequest(
         @Max(value = 9999, message = "El año no puede superar 9999")
         Integer year,
 
-        @NotBlank(message = "El número de chasis es obligatorio")
         @Size(max = 100, message = "El número de chasis no puede superar los 100 caracteres")
         String chassisNumber,
 
-        @NotBlank(message = "El número de motor es obligatorio")
         @Size(max = 100, message = "El número de motor no puede superar los 100 caracteres")
         String engineNumber,
 

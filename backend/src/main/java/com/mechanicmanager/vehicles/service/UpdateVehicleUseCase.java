@@ -58,8 +58,8 @@ public class UpdateVehicleUseCase {
         vehicle.setBrand(request.brand().trim());
         vehicle.setModel(request.model().trim());
         vehicle.setYear(request.year());
-        vehicle.setChassisNumber(normalizeIdentifier(request.chassisNumber()));
-        vehicle.setEngineNumber(normalizeIdentifier(request.engineNumber()));
+        vehicle.setChassisNumber(normalizeIdentifierToNull(request.chassisNumber()));
+        vehicle.setEngineNumber(normalizeIdentifierToNull(request.engineNumber()));
         vehicle.setMileage(request.mileage());
         vehicle.setVehicleType(request.vehicleType());
         vehicle.setNotes(trimToNull(request.notes()));
@@ -92,6 +92,12 @@ public class UpdateVehicleUseCase {
 
     private static String normalizeIdentifier(String value) {
         return value.trim().toUpperCase(Locale.ROOT);
+    }
+
+    private static String normalizeIdentifierToNull(String value) {
+        return value == null || value.isBlank()
+                ? null
+                : normalizeIdentifier(value);
     }
 
     private static String trimToNull(String value) {

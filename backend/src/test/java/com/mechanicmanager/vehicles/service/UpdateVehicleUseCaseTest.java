@@ -71,10 +71,34 @@ class UpdateVehicleUseCaseTest {
         assertThat(vehicle.getBrand()).isEqualTo("Ford");
         assertThat(vehicle.getModel()).isEqualTo("Ranger");
         assertThat(vehicle.getYear()).isNull();
+        assertThat(vehicle.getChassisNumber()).isEqualTo("CHASIS789");
+        assertThat(vehicle.getEngineNumber()).isEqualTo("MOTOR012");
         assertThat(vehicle.getMileage()).isNull();
         assertThat(vehicle.getVehicleType()).isEqualTo(VehicleType.PICKUP);
         assertThat(vehicle.getNotes()).isNull();
         assertThat(response.customerId()).isEqualTo(21L);
+    }
+
+    @Test
+    void updatesVehicleClearingTechnicalIdentifiers() {
+        Customer customer = customer(21L, "Luis", "López");
+        Vehicle vehicle = vehicle(30L, customer);
+
+        when(vehicleRepository.findByIdAndUserId(30L, 7L))
+                .thenReturn(Optional.of(vehicle));
+        when(customerRepository.findByIdAndUserId(21L, 7L))
+                .thenReturn(Optional.of(customer));
+        when(vehicleRepository.existsByUserIdAndLicensePlateIgnoreCaseAndIdNot(
+                7L,
+                "AC456EF",
+                30L
+        )).thenReturn(false);
+        when(vehicleRepository.saveAndFlush(vehicle)).thenReturn(vehicle);
+
+        useCase.execute(7L, 30L, requestWithoutTechnicalIdentifiers());
+
+        assertThat(vehicle.getChassisNumber()).isNull();
+        assertThat(vehicle.getEngineNumber()).isNull();
     }
 
     @Test
@@ -138,6 +162,21 @@ class UpdateVehicleUseCaseTest {
                 null,
                 VehicleType.PICKUP,
                 "  "
+        );
+    }
+
+    private static UpdateVehicleRequest requestWithoutTechnicalIdentifiers() {
+        return new UpdateVehicleRequest(
+                21L,
+                " ac456ef ",
+                " Ford ",
+                " Ranger ",
+                null,
+                null,
+                "  ",
+                null,
+                VehicleType.PICKUP,
+                null
         );
     }
 

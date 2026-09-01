@@ -53,8 +53,8 @@ public class CreateVehicleUseCase {
                 .brand(request.brand().trim())
                 .model(request.model().trim())
                 .year(request.year())
-                .chassisNumber(normalizeIdentifier(request.chassisNumber()))
-                .engineNumber(normalizeIdentifier(request.engineNumber()))
+                .chassisNumber(normalizeIdentifierToNull(request.chassisNumber()))
+                .engineNumber(normalizeIdentifierToNull(request.engineNumber()))
                 .mileage(request.mileage())
                 .vehicleType(request.vehicleType())
                 .notes(trimToNull(request.notes()))
@@ -88,6 +88,12 @@ public class CreateVehicleUseCase {
 
     private static String normalizeIdentifier(String value) {
         return value.trim().toUpperCase(Locale.ROOT);
+    }
+
+    private static String normalizeIdentifierToNull(String value) {
+        return value == null || value.isBlank()
+                ? null
+                : normalizeIdentifier(value);
     }
 
     private static String trimToNull(String value) {

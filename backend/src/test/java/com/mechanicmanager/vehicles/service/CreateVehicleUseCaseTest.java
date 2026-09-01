@@ -92,6 +92,37 @@ class CreateVehicleUseCaseTest {
     }
 
     @Test
+    void createsVehicleWithoutTechnicalIdentifiers() {
+        User user = User.builder().id(7L).build();
+        Customer customer = Customer.builder()
+                .id(20L)
+                .user(user)
+                .firstName("Juan")
+                .lastName("Pérez")
+                .build();
+
+        when(customerRepository.findByIdAndUserId(20L, 7L))
+                .thenReturn(Optional.of(customer));
+        when(vehicleRepository.existsByUserIdAndLicensePlateIgnoreCase(7L, "AB123CD"))
+                .thenReturn(false);
+        when(userRepository.getReferenceById(7L)).thenReturn(user);
+        when(vehicleRepository.saveAndFlush(any(Vehicle.class))).thenAnswer(invocation -> {
+            Vehicle vehicle = invocation.getArgument(0);
+            vehicle.setId(30L);
+            return vehicle;
+        });
+
+        useCase.execute(7L, requestWithoutTechnicalIdentifiers());
+
+        ArgumentCaptor<Vehicle> captor = ArgumentCaptor.forClass(Vehicle.class);
+        verify(vehicleRepository).saveAndFlush(captor.capture());
+        Vehicle saved = captor.getValue();
+
+        assertThat(saved.getChassisNumber()).isNull();
+        assertThat(saved.getEngineNumber()).isNull();
+    }
+
+    @Test
     void rejectsDuplicateLicensePlateForSameUser() {
         Customer customer = Customer.builder().id(20L).build();
 
@@ -168,6 +199,21 @@ class CreateVehicleUseCaseTest {
                 null,
                 VehicleType.CAR,
                 "  "
+        );
+    }
+
+    private static CreateVehicleRequest requestWithoutTechnicalIdentifiers() {
+        return new CreateVehicleRequest(
+                20L,
+                " ab123cd ",
+                " Toyota ",
+                " Corolla ",
+                null,
+                null,
+                "  ",
+                null,
+                VehicleType.CAR,
+                null
         );
     }
 }

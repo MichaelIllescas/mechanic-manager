@@ -56,10 +56,10 @@ public class Vehicle {
     @Column(name = "year")
     private Integer year;
 
-    @Column(name = "chassis_number", nullable = false, length = 100)
+    @Column(name = "chassis_number", length = 100)
     private String chassisNumber;
 
-    @Column(name = "engine_number", nullable = false, length = 100)
+    @Column(name = "engine_number", length = 100)
     private String engineNumber;
 
     @Column(name = "mileage")

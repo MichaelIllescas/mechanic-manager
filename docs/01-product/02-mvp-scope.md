@@ -97,16 +97,19 @@ Funciones:
 - consultar;
 - acceder a historial.
 
-Datos mínimos:
+Datos mínimos obligatorios:
 
 - patente;
 - marca;
 - modelo;
+- tipo de vehículo.
+
+Datos técnicos opcionales:
+
 - año;
 - número de chasis;
 - número de motor;
 - kilometraje;
-- tipo de vehículo;
 - observaciones opcionales.
 
 ### 3.5 Agenda

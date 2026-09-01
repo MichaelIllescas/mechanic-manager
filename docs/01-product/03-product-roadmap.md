@@ -58,9 +58,9 @@ Permitir registrar la información fundamental del negocio.
 - vehículos;
 - asociación cliente-vehículo;
 - patente;
-- número de chasis;
-- número de motor;
-- kilometraje;
+- número de chasis opcional;
+- número de motor opcional;
+- kilometraje opcional;
 - búsqueda por patente;
 - consulta;
 - edición.

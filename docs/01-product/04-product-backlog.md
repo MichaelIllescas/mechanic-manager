@@ -26,7 +26,7 @@
 | PB-08 | Clientes | Listar clientes | Must | MVP |
 | PB-09 | Clientes | Buscar cliente | Must | MVP |
 | PB-10 | Clientes | Editar cliente | Must | MVP |
-| PB-11 | Vehículos | Registrar vehículo con patente, chasis y motor | Must | MVP |
+| PB-11 | Vehículos | Registrar vehículo con patente, datos básicos y datos técnicos opcionales | Must | MVP |
 | PB-12 | Vehículos | Asociar vehículo a cliente | Must | MVP |
 | PB-13 | Vehículos | Buscar vehículo por patente | Must | MVP |
 | PB-14 | Vehículos | Editar vehículo | Must | MVP |

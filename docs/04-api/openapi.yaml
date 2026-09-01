@@ -361,8 +361,6 @@ components:
         - licensePlate
         - brand
         - model
-        - chassisNumber
-        - engineNumber
         - vehicleType
       properties:
         customerId:
@@ -390,11 +388,15 @@ components:
           maximum: 9999
           example: 2020
         chassisNumber:
-          type: string
+          type:
+            - string
+            - 'null'
           maxLength: 100
           example: 8AJZZZ12345678901
         engineNumber:
-          type: string
+          type:
+            - string
+            - 'null'
           maxLength: 100
           example: 2ZR1234567
         mileage:

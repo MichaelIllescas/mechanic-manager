@@ -36,7 +36,7 @@ Un vehículo sólo puede asociarse a un cliente perteneciente al mismo taller.
 - `licensePlate`;
 - `brand` y `model`;
 - `year`, opcional;
-- `chassisNumber` y `engineNumber`;
+- `chassisNumber` y `engineNumber`, opcionales;
 - `mileage`, opcional;
 - `vehicleType`;
 - `notes`, opcional;
@@ -53,8 +53,9 @@ Tipos admitidos:
 - `OTHER`.
 
 La patente es única dentro de cada taller. Patente, número de chasis y número
-de motor se guardan en mayúsculas. Los textos obligatorios se guardan sin
-espacios exteriores y las notas vacías se convierten en `null`.
+de motor se guardan en mayúsculas cuando están informados. Los textos
+obligatorios se guardan sin espacios exteriores y los campos opcionales vacíos
+se convierten en `null`.
 
 ## Endpoints
 
@@ -100,7 +101,8 @@ La tabla se crea mediante `V10__create_vehicles.sql`.
 
 La migración usa `DATETIME(6)`, claves foráneas restrictivas hacia `workshops`
 y `customers`, unicidad de patente por taller e índices para las consultas del
-módulo. `year` y `mileage` aceptan `NULL`.
+módulo. `year`, `chassisNumber`, `engineNumber`, `mileage` y `notes` aceptan
+`NULL`.
 
 ## Pruebas
 

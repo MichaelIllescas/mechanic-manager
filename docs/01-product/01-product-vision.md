@@ -31,7 +31,7 @@ Esto dificulta:
 - conocer qué vehículos están agendados para cada día;
 - recuperar rápidamente la información de un cliente;
 - identificar correctamente un vehículo;
-- conservar número de patente, chasis y motor;
+- conservar número de patente y, cuando estén disponibles, chasis y motor;
 - generar y consultar presupuestos;
 - conocer el estado actual de un trabajo;
 - recuperar reparaciones anteriores;

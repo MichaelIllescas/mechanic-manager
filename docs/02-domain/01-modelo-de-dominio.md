@@ -135,18 +135,20 @@ Atributos:
 - `licensePlate`
 - `brand`
 - `model`
-- `year`
-- `chassisNumber`
-- `engineNumber`
-- `mileage`
+- `year` opcional
+- `chassisNumber` opcional
+- `engineNumber` opcional
+- `mileage` opcional
 - `vehicleType`
-- `notes`
+- `notes` opcional
 
 Reglas:
 
 - pertenece a un cliente;
 - pertenece a un usuario;
 - la patente es única dentro de un usuario;
+- patente, marca, modelo y tipo de vehículo son obligatorios para registrar la ficha;
+- chasis y motor son datos técnicos que pueden completarse cuando estén disponibles;
 - cliente y vehículo deben pertenecer al mismo usuario;
 - su historial no se elimina al modificar datos descriptivos.
 

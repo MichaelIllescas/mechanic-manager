@@ -34,7 +34,7 @@
           {{ isEdit() ? 'Modo edición' : 'Modo alta' }}
         </span>
         <h2 id="vehicle-form-title">Datos del vehículo</h2>
-        <p>Cliente, patente, marca, modelo, chasis, motor y tipo son obligatorios.</p>
+        <p>Cliente, patente, marca, modelo y tipo son obligatorios.</p>
       </div>
     </div>
 
@@ -162,14 +162,9 @@
               maxlength="100"
               autocomplete="off"
             />
+            <span class="field__hint">Opcional.</span>
             @if (form.controls.chassisNumber.touched && form.controls.chassisNumber.invalid) {
-              <small>
-                @if (form.controls.chassisNumber.hasError('required')) {
-                  El número de chasis es obligatorio.
-                } @else {
-                  El número de chasis no puede superar los 100 caracteres.
-                }
-              </small>
+              <small>El número de chasis no puede superar los 100 caracteres.</small>
             }
           </label>
 
@@ -182,14 +177,9 @@
               maxlength="100"
               autocomplete="off"
             />
+            <span class="field__hint">Opcional.</span>
             @if (form.controls.engineNumber.touched && form.controls.engineNumber.invalid) {
-              <small>
-                @if (form.controls.engineNumber.hasError('required')) {
-                  El número de motor es obligatorio.
-                } @else {
-                  El número de motor no puede superar los 100 caracteres.
-                }
-              </small>
+              <small>El número de motor no puede superar los 100 caracteres.</small>
             }
           </label>
 

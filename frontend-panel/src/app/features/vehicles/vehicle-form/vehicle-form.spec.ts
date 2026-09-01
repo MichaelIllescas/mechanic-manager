@@ -155,6 +155,22 @@ describe('VehicleForm', () => {
     expect(notifications.success).toHaveBeenCalledWith('Vehículo registrado correctamente');
   });
 
+  it('should create a vehicle without technical identifiers', () => {
+    createComponent();
+    fillValidForm();
+    component.form.controls.chassisNumber.setValue('   ');
+    component.form.controls.engineNumber.setValue('');
+
+    component.onSubmit();
+
+    expect(vehicleService.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        chassisNumber: null,
+        engineNumber: null,
+      }),
+    );
+  });
+
   it('should load and update an existing vehicle', () => {
     routeId = '30';
     createComponent();

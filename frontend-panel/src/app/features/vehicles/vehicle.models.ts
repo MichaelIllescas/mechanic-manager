@@ -16,8 +16,8 @@ export interface Vehicle {
   brand: string;
   model: string;
   year: number | null;
-  chassisNumber: string;
-  engineNumber: string;
+  chassisNumber: string | null;
+  engineNumber: string | null;
   mileage: number | null;
   vehicleType: VehicleType;
   notes: string | null;
@@ -31,8 +31,8 @@ export interface CreateVehicleRequest {
   brand: string;
   model: string;
   year: number | null;
-  chassisNumber: string;
-  engineNumber: string;
+  chassisNumber: string | null;
+  engineNumber: string | null;
   mileage: number | null;
   vehicleType: VehicleType;
   notes: string | null;
@@ -44,8 +44,8 @@ export interface UpdateVehicleRequest {
   brand: string;
   model: string;
   year: number | null;
-  chassisNumber: string;
-  engineNumber: string;
+  chassisNumber: string | null;
+  engineNumber: string | null;
   mileage: number | null;
   vehicleType: VehicleType;
   notes: string | null;

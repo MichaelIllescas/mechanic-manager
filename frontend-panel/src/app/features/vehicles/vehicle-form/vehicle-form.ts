@@ -57,8 +57,8 @@ export class VehicleForm implements OnInit {
     brand: ['', [Validators.required, Validators.maxLength(80)]],
     model: ['', [Validators.required, Validators.maxLength(120)]],
     year: [null as number | null, [Validators.min(1886), Validators.max(9999)]],
-    chassisNumber: ['', [Validators.required, Validators.maxLength(100)]],
-    engineNumber: ['', [Validators.required, Validators.maxLength(100)]],
+    chassisNumber: ['', [Validators.maxLength(100)]],
+    engineNumber: ['', [Validators.maxLength(100)]],
     mileage: [null as number | null, [Validators.min(0)]],
     vehicleType: ['CAR' as VehicleType, [Validators.required]],
     notes: ['', [Validators.maxLength(1000)]],
@@ -150,8 +150,8 @@ export class VehicleForm implements OnInit {
           brand: vehicle.brand,
           model: vehicle.model,
           year: vehicle.year,
-          chassisNumber: vehicle.chassisNumber,
-          engineNumber: vehicle.engineNumber,
+          chassisNumber: vehicle.chassisNumber ?? '',
+          engineNumber: vehicle.engineNumber ?? '',
           mileage: vehicle.mileage,
           vehicleType: vehicle.vehicleType,
           notes: vehicle.notes ?? '',
@@ -184,11 +184,15 @@ export class VehicleForm implements OnInit {
       brand: brand!.trim(),
       model: model!.trim(),
       year,
-      chassisNumber: chassisNumber!.trim(),
-      engineNumber: engineNumber!.trim(),
+      chassisNumber: this.trimToNull(chassisNumber),
+      engineNumber: this.trimToNull(engineNumber),
       mileage,
       vehicleType: vehicleType!,
       notes: notes?.trim() || null,
     };
+  }
+
+  private trimToNull(value: string | null | undefined): string | null {
+    return value?.trim() || null;
   }
 }

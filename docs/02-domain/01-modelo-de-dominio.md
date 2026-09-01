@@ -116,6 +116,7 @@ Atributos:
 - `documentNumber`
 - `phone`
 - `email`
+- `address`
 - `notes`
 
 Reglas:

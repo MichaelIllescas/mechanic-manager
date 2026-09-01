@@ -327,6 +327,12 @@ components:
           format: email
           maxLength: 255
           example: juan@email.com
+        address:
+          type:
+            - string
+            - 'null'
+          maxLength: 255
+          example: Av. Siempre Viva 742
         notes:
           type:
             - string

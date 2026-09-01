@@ -84,6 +84,7 @@ Datos mínimos:
 - teléfono;
 - DNI opcional;
 - email opcional;
+- dirección opcional;
 - observaciones opcionales.
 
 ### 3.4 Vehículos

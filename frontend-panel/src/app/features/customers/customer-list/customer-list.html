@@ -51,14 +51,13 @@
             <th>Cliente</th>
             <th>Documento</th>
             <th>Contacto</th>
-            <th>Observaciones</th>
             <th class="customers-table__actions-heading">Acciones</th>
           </tr>
         </thead>
         <tbody>
           @if (loading()) {
             <tr>
-              <td class="table-message" colspan="5">Cargando clientes...</td>
+              <td class="table-message" colspan="4">Cargando clientes...</td>
             </tr>
           } @else {
             @for (customer of customers(); track customer.id) {
@@ -87,11 +86,20 @@
                     }
                   </div>
                 </td>
-                <td class="customers-table__notes">
-                  {{ customer.notes || '—' }}
-                </td>
                 <td>
                   <div class="actions">
+                    <button
+                      class="actions__button actions__button--secondary"
+                      type="button"
+                      aria-label="Ver detalle del cliente"
+                      title="Ver detalle"
+                      [routerLink]="['/customers', customer.id]"
+                    >
+                      <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z" />
+                        <circle cx="12" cy="12" r="2.5" />
+                      </svg>
+                    </button>
                     <button
                       class="actions__button"
                       type="button"
@@ -109,7 +117,7 @@
               </tr>
             } @empty {
               <tr>
-                <td class="empty-state" colspan="5">
+                <td class="empty-state" colspan="4">
                   @if (searchControl.value.trim()) {
                     <strong>No encontramos clientes con esa búsqueda.</strong>
                     <span>Probá con otro nombre, documento, teléfono o email.</span>

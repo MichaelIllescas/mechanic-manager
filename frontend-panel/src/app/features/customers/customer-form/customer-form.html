@@ -122,6 +122,20 @@
             }
           </label>
 
+          <label class="field">
+            <span>Dirección</span>
+            <input
+              type="text"
+              formControlName="address"
+              placeholder="Av. Siempre Viva 742"
+              autocomplete="street-address"
+            />
+            <span class="field__hint">Opcional. Máximo 255 caracteres.</span>
+            @if (form.controls.address.touched && form.controls.address.invalid) {
+              <small>La dirección no puede superar los 255 caracteres.</small>
+            }
+          </label>
+
           <label class="field field--wide">
             <span>Observaciones</span>
             <textarea

@@ -18,6 +18,7 @@ describe('CustomerList', () => {
       documentNumber: '30111222',
       phone: '11 4444-5555',
       email: 'ana@email.com',
+      address: null,
       notes: null,
       createdAt: null,
       updatedAt: null,

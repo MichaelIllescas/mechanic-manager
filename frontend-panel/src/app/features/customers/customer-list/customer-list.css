@@ -161,16 +161,8 @@
   background: #f7fbff;
 }
 
-.customers-table__muted,
-.customers-table__notes {
+.customers-table__muted {
   color: #5e7089;
-}
-
-.customers-table__notes {
-  max-width: 280px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .customers-table__actions-heading,
@@ -219,6 +211,7 @@
 
 .actions {
   display: flex;
+  gap: 8px;
   justify-content: center;
 }
 
@@ -232,11 +225,23 @@
   color: #fff;
   background: #078cf0;
   cursor: pointer;
+  transition:
+    background 160ms ease,
+    transform 160ms ease;
 }
 
 .actions__button:hover {
   background: #067bd2;
   transform: translateY(-2px);
+}
+
+.actions__button--secondary {
+  color: #067bd2;
+  background: #eaf5ff;
+}
+
+.actions__button--secondary:hover {
+  color: #fff;
 }
 
 .actions__button:focus-visible {

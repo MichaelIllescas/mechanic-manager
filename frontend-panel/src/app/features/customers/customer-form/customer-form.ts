@@ -42,6 +42,7 @@ export class CustomerForm implements OnInit {
       ],
     ],
     email: ['', [Validators.email, Validators.maxLength(255)]],
+    address: ['', [Validators.maxLength(255)]],
     notes: ['', [Validators.maxLength(1000)]],
   });
 
@@ -77,6 +78,7 @@ export class CustomerForm implements OnInit {
           documentNumber: customer.documentNumber ?? '',
           phone: customer.phone,
           email: customer.email ?? '',
+          address: customer.address ?? '',
           notes: customer.notes ?? '',
         });
       },
@@ -120,7 +122,8 @@ export class CustomerForm implements OnInit {
   }
 
   private payload(): CreateCustomerRequest {
-    const { firstName, lastName, documentNumber, phone, email, notes } = this.form.getRawValue();
+    const { firstName, lastName, documentNumber, phone, email, address, notes } =
+      this.form.getRawValue();
 
     return {
       firstName: firstName!.trim(),
@@ -128,6 +131,7 @@ export class CustomerForm implements OnInit {
       documentNumber: this.optionalValue(documentNumber),
       phone: phone!.trim(),
       email: this.optionalValue(email)?.toLowerCase() ?? null,
+      address: this.optionalValue(address),
       notes: this.optionalValue(notes),
     };
   }

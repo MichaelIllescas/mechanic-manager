@@ -25,6 +25,7 @@ describe('CustomerForm', () => {
     documentNumber: '30111222',
     phone: '11 4444-5555',
     email: 'ana@email.com',
+    address: 'Av. Siempre Viva 742',
     notes: 'Cliente habitual',
     createdAt: null,
     updatedAt: null,
@@ -83,6 +84,7 @@ describe('CustomerForm', () => {
       documentNumber: '32111222',
       phone: '11 5555-6666',
       email: 'juan@email.com',
+      address: ' San Martín 123 ',
       notes: '',
     });
   }
@@ -113,6 +115,7 @@ describe('CustomerForm', () => {
       documentNumber: '32111222',
       phone: '11 5555-6666',
       email: 'juan@email.com',
+      address: 'San Martín 123',
       notes: null,
     });
     expect(notifications.success).toHaveBeenCalledWith('Cliente registrado correctamente');
@@ -124,6 +127,7 @@ describe('CustomerForm', () => {
 
     expect(customerService.findFromListById).toHaveBeenCalledWith(1);
     expect(component.form.controls.firstName.value).toBe('Ana');
+    expect(component.form.controls.address.value).toBe('Av. Siempre Viva 742');
 
     component.form.controls.firstName.setValue('Andrea');
     component.onSubmit();

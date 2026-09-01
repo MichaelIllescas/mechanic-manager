@@ -5,6 +5,7 @@ export interface Customer {
   documentNumber: string | null;
   phone: string;
   email: string | null;
+  address: string | null;
   notes: string | null;
   createdAt: string | null;
   updatedAt: string | null;
@@ -16,6 +17,7 @@ export interface CreateCustomerRequest {
   documentNumber: string | null;
   phone: string;
   email: string | null;
+  address: string | null;
   notes: string | null;
 }
 
@@ -25,5 +27,6 @@ export interface UpdateCustomerRequest {
   documentNumber: string | null;
   phone: string;
   email: string | null;
+  address: string | null;
   notes: string | null;
 }

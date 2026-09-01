@@ -47,6 +47,7 @@ class CreateCustomerUseCaseTest {
                 "  30111222  ",
                 " 11 4444-5555 ",
                 "  JUAN@EMAIL.COM  ",
+                " Av. Siempre Viva 742 ",
                 "   "
         );
 
@@ -69,7 +70,9 @@ class CreateCustomerUseCaseTest {
         assertThat(saved.getDocumentNumber()).isEqualTo("30111222");
         assertThat(saved.getPhone()).isEqualTo("11 4444-5555");
         assertThat(saved.getEmail()).isEqualTo("juan@email.com");
+        assertThat(saved.getAddress()).isEqualTo("Av. Siempre Viva 742");
         assertThat(saved.getNotes()).isNull();
         assertThat(response.id()).isEqualTo(25L);
+        assertThat(response.address()).isEqualTo("Av. Siempre Viva 742");
     }
 }

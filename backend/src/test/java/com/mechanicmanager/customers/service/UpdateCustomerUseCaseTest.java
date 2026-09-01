@@ -51,6 +51,7 @@ class UpdateCustomerUseCaseTest {
                 " ",
                 "11 5555-6666",
                 " MARIA@EMAIL.COM ",
+                " San Martín 123 ",
                 " Cliente habitual "
         );
 
@@ -64,6 +65,7 @@ class UpdateCustomerUseCaseTest {
         assertThat(response.lastName()).isEqualTo("Suárez");
         assertThat(response.documentNumber()).isNull();
         assertThat(response.email()).isEqualTo("maria@email.com");
+        assertThat(response.address()).isEqualTo("San Martín 123");
         assertThat(response.notes()).isEqualTo("Cliente habitual");
         verify(customerRepository).findByIdAndUserId(8L, 5L);
         verify(customerRepository).save(customer);
@@ -76,6 +78,7 @@ class UpdateCustomerUseCaseTest {
                 "Suárez",
                 null,
                 "11 5555-6666",
+                null,
                 null,
                 null
         );

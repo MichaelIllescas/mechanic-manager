@@ -28,6 +28,7 @@ public class UpdateCustomerUseCase {
         customer.setDocumentNumber(normalize(request.documentNumber()));
         customer.setPhone(request.phone().trim());
         customer.setEmail(normalizeEmail(request.email()));
+        customer.setAddress(normalize(request.address()));
         customer.setNotes(normalize(request.notes()));
 
         return customerMapper.toResponse(customerRepository.save(customer));

@@ -27,6 +27,7 @@ public class CreateCustomerUseCase {
                 .documentNumber(normalize(request.documentNumber()))
                 .phone(request.phone().trim())
                 .email(normalizeEmail(request.email()))
+                .address(normalize(request.address()))
                 .notes(normalize(request.notes()))
                 .build();
 

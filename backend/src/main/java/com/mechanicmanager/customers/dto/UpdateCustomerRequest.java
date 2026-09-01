@@ -27,6 +27,9 @@ public record UpdateCustomerRequest(
         @Size(max = 255, message = "El email no puede superar los 255 caracteres")
         String email,
 
+        @Size(max = 255, message = "La dirección no puede superar los 255 caracteres")
+        String address,
+
         @Size(max = 1000, message = "Las notas no pueden superar los 1000 caracteres")
         String notes
 ) {

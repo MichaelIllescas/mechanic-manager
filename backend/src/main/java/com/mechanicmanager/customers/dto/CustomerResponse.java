@@ -9,6 +9,7 @@ public record CustomerResponse(
         String documentNumber,
         String phone,
         String email,
+        String address,
         String notes,
         LocalDateTime createdAt,
         LocalDateTime updatedAt

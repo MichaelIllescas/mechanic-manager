@@ -50,6 +50,9 @@ public class Customer {
     @Column(name = "email", length = 255)
     private String email;
 
+    @Column(name = "address", length = 255)
+    private String address;
+
     @Column(name = "notes", columnDefinition = "TEXT")
     private String notes;
 

@@ -15,6 +15,7 @@ public class CustomerMapper {
                 customer.getDocumentNumber(),
                 customer.getPhone(),
                 customer.getEmail(),
+                customer.getAddress(),
                 customer.getNotes(),
                 customer.getCreatedAt(),
                 customer.getUpdatedAt()

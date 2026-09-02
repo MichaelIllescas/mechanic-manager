@@ -75,12 +75,13 @@ Cubrir el flujo previo al ingreso del vehículo al taller.
 
 ### Agenda
 
-- crear turno;
+- crear turno sobre un vehículo;
 - consultar agenda por fecha;
 - reprogramar;
-- confirmar;
-- atender;
+- completar;
 - cancelar.
+
+La agenda no valida solapamiento: un taller puede atender varios vehículos en el mismo horario.
 
 ### Presupuestos
 

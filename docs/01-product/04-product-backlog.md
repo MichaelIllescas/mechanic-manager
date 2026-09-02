@@ -30,11 +30,11 @@
 | PB-12 | Vehículos | Asociar vehículo a cliente | Must | MVP |
 | PB-13 | Vehículos | Buscar vehículo por patente | Must | MVP |
 | PB-14 | Vehículos | Editar vehículo | Must | MVP |
-| PB-15 | Agenda | Crear turno | Must | MVP |
+| PB-15 | Agenda | Crear turno sobre un vehículo | Must | MVP |
 | PB-16 | Agenda | Consultar agenda por fecha | Must | MVP |
 | PB-17 | Agenda | Reprogramar turno | Must | MVP |
 | PB-18 | Agenda | Cancelar turno | Must | MVP |
-| PB-19 | Agenda | Actualizar estado del turno | Must | MVP |
+| PB-19 | Agenda | Completar turno al ingresar el vehículo | Must | MVP |
 | PB-20 | Presupuestos | Crear presupuesto | Must | MVP |
 | PB-21 | Presupuestos | Agregar ítems | Must | MVP |
 | PB-22 | Presupuestos | Calcular subtotal y total | Must | MVP |

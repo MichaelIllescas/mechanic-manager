@@ -33,16 +33,27 @@ public class AppointmentController implements AppointmentApi {
     private final AppointmentService appointmentService;
 
     /**
-     * La fecha es obligatoria y no tiene default: un "hoy" implícito dejaría
-     * que la zona horaria del servidor decida qué día está viendo el taller.
+     * Las fechas son obligatorias y no tienen default: un "hoy" implícito
+     * dejaría que la zona horaria del servidor decida qué día está viendo el
+     * taller. Cada vista del calendario arma su propio rango.
      */
     @Override
     @GetMapping
-    public ResponseEntity<List<AppointmentResponse>> findByDate(
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+    public ResponseEntity<List<AppointmentResponse>> findByRange(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to,
             @AuthenticationPrincipal AuthenticatedUser currentUser
     ) {
-        return ResponseEntity.ok(appointmentService.findByDate(currentUser.id(), date));
+        return ResponseEntity.ok(appointmentService.findByRange(currentUser.id(), from, to));
+    }
+
+    @Override
+    @GetMapping(AppointmentRoutes.BY_ID)
+    public ResponseEntity<AppointmentResponse> findById(
+            @PathVariable Long id,
+            @AuthenticationPrincipal AuthenticatedUser currentUser
+    ) {
+        return ResponseEntity.ok(appointmentService.findById(currentUser.id(), id));
     }
 
     @Override

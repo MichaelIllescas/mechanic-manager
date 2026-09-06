@@ -26,21 +26,43 @@ import java.util.List;
 public interface AppointmentApi {
 
     @Operation(
-            summary = "Consultar la agenda de un día",
-            description = "Devuelve los turnos de la fecha indicada, ordenados por horario. "
-                    + "La fecha es obligatoria: la agenda siempre se consulta por día."
+            summary = "Consultar la agenda entre dos fechas",
+            description = "Devuelve los turnos del rango indicado, ordenados por horario. "
+                    + "Ambas fechas son inclusivas y obligatorias: la vista diaria pide un rango "
+                    + "de un día, la semanal de siete y la mensual la grilla completa. "
+                    + "El rango no puede superar los 92 días."
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Agenda obtenida correctamente"),
-            @ApiResponse(responseCode = "400", description = "Fecha ausente o con formato inválido",
+            @ApiResponse(responseCode = "400",
+                    description = "Fechas ausentes, con formato inválido, invertidas o rango mayor a 92 días",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "401", description = "No autenticado",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "403", description = "El usuario autenticado no tiene rol USER",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
-    ResponseEntity<List<AppointmentResponse>> findByDate(
-            @Parameter(description = "Día de la agenda", example = "2026-09-10") LocalDate date,
+    ResponseEntity<List<AppointmentResponse>> findByRange(
+            @Parameter(description = "Primer día del rango, inclusive", example = "2026-09-01") LocalDate from,
+            @Parameter(description = "Último día del rango, inclusive", example = "2026-09-30") LocalDate to,
+            @Parameter(hidden = true) AuthenticatedUser currentUser
+    );
+
+    @Operation(
+            summary = "Consultar un turno por identificador",
+            description = "La agenda se consulta por rango, pero reprogramar parte de un id."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Turno obtenido correctamente"),
+            @ApiResponse(responseCode = "401", description = "No autenticado",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "El usuario autenticado no tiene rol USER",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "El turno no existe en el taller",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    ResponseEntity<AppointmentResponse> findById(
+            @Parameter(description = "Identificador del turno", example = "1") Long id,
             @Parameter(hidden = true) AuthenticatedUser currentUser
     );
 

@@ -1,0 +1,150 @@
+<main class="appointment-form-page">
+  <section class="appointment-form-header">
+    <a class="appointment-form-header__back" routerLink="/appointments" aria-label="Volver a turnos">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="m15 18-6-6 6-6" />
+      </svg>
+      Volver
+    </a>
+
+    <p class="appointment-form-header__eyebrow">Taller</p>
+    <h1>{{ isEdit() ? 'Reprogramar turno' : 'Nuevo turno' }}</h1>
+    <p>
+      {{
+        isEdit()
+          ? 'Cambiá la fecha, la hora o las notas del turno agendado.'
+          : 'Agendá un turno sobre uno de los vehículos de tus clientes.'
+      }}
+    </p>
+  </section>
+
+  <section class="appointment-form-card" aria-labelledby="appointment-form-title">
+    <div class="appointment-form-card__header">
+      <div class="appointment-form-card__icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24">
+          <rect x="3" y="5" width="18" height="16" rx="2" />
+          <path d="M3 10h18M8 3v4M16 3v4" />
+        </svg>
+      </div>
+
+      <div>
+        <span class="appointment-form-card__mode">
+          {{ isEdit() ? 'Modo edición' : 'Modo alta' }}
+        </span>
+        <h2 id="appointment-form-title">Datos del turno</h2>
+        <p>Vehículo, fecha y hora son obligatorios.</p>
+      </div>
+    </div>
+
+    @if (errorMessage()) {
+      <p class="appointment-form__error" role="alert">{{ errorMessage() }}</p>
+    }
+
+    @if (loading()) {
+      <p class="appointment-form__loading">Cargando datos del turno...</p>
+    } @else {
+      <form class="appointment-form" [formGroup]="form" (ngSubmit)="onSubmit()" autocomplete="off">
+        <div class="form-grid">
+          <label class="field field--wide">
+            <span>Vehículo</span>
+
+            @if (isEdit()) {
+              <div class="vehicle-picker__selected vehicle-picker__selected--locked">
+                <span>{{ selectedVehicleLabel() }}</span>
+              </div>
+              <small class="field__hint">
+                El vehículo de un turno no se cambia. Si te equivocaste de auto, cancelá el
+                turno y creá uno nuevo.
+              </small>
+            } @else {
+              <div class="vehicle-picker">
+                @if (selectedVehicleLabel(); as vehicleLabel) {
+                  <div class="vehicle-picker__selected">
+                    <span>{{ vehicleLabel }}</span>
+                    <button type="button" (click)="changeVehicle()">Cambiar</button>
+                  </div>
+                } @else {
+                  <input
+                    type="search"
+                    [value]="vehicleSearch()"
+                    placeholder="Buscar por patente, marca, modelo o cliente"
+                    autocomplete="off"
+                    role="combobox"
+                    [attr.aria-expanded]="vehicleResultsOpen()"
+                    (input)="onVehicleSearch($any($event.target).value)"
+                    (focus)="openVehicleResults()"
+                  />
+
+                  @if (vehicleResultsOpen() && vehicleSearch().trim()) {
+                    <ul class="vehicle-picker__results" role="listbox">
+                      @for (vehicle of filteredVehicles(); track vehicle.id) {
+                        <li>
+                          <button type="button" (click)="selectVehicle(vehicle)">
+                            <strong>{{ vehicle.licensePlate }}</strong>
+                            <span>{{ vehicle.brand }} {{ vehicle.model }}</span>
+                            <small>
+                              {{ vehicle.customerFirstName }} {{ vehicle.customerLastName }}
+                            </small>
+                          </button>
+                        </li>
+                      } @empty {
+                        <li class="vehicle-picker__empty">No encontramos vehículos.</li>
+                      }
+                    </ul>
+                  }
+                }
+              </div>
+
+              @if (form.controls.vehicleId.touched && form.controls.vehicleId.invalid) {
+                <small class="field__error">Elegí un vehículo para el turno.</small>
+              }
+            }
+          </label>
+
+          <label class="field">
+            <span>Fecha</span>
+            <input type="date" formControlName="date" />
+            @if (form.controls.date.touched && form.controls.date.invalid) {
+              <small class="field__error">La fecha es obligatoria.</small>
+            }
+          </label>
+
+          <label class="field">
+            <span>Hora</span>
+            <input type="time" formControlName="time" />
+            @if (form.controls.time.touched && form.controls.time.invalid) {
+              <small class="field__error">La hora es obligatoria.</small>
+            }
+          </label>
+
+          <label class="field field--wide">
+            <span>Notas</span>
+            <textarea
+              formControlName="notes"
+              rows="4"
+              placeholder="Motivo del turno, comentarios del cliente, algo a tener en cuenta..."
+            ></textarea>
+            <small class="field__hint">
+              Opcional. El detalle de los trabajos se define después, en el presupuesto o la
+              orden de trabajo.
+            </small>
+            @if (form.controls.notes.invalid) {
+              <small class="field__error">Las notas no pueden superar los 1000 caracteres.</small>
+            }
+          </label>
+        </div>
+
+        <div class="appointment-form__actions">
+          <a class="appointment-form__cancel" routerLink="/appointments">Cancelar</a>
+          <button class="appointment-form__submit" type="submit" [disabled]="saving()">
+            @if (saving()) {
+              Guardando...
+            } @else {
+              {{ isEdit() ? 'Guardar cambios' : 'Agendar turno' }}
+            }
+          </button>
+        </div>
+      </form>
+    }
+  </section>
+</main>

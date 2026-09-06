@@ -14,7 +14,8 @@ import java.util.List;
 public class AppointmentService {
 
     private final CreateAppointmentUseCase createAppointmentUseCase;
-    private final ListAppointmentsByDateUseCase listAppointmentsByDateUseCase;
+    private final FindAppointmentUseCase findAppointmentUseCase;
+    private final ListAppointmentsByRangeUseCase listAppointmentsByRangeUseCase;
     private final UpdateAppointmentUseCase updateAppointmentUseCase;
     private final CompleteAppointmentUseCase completeAppointmentUseCase;
     private final CancelAppointmentUseCase cancelAppointmentUseCase;
@@ -23,8 +24,12 @@ public class AppointmentService {
         return createAppointmentUseCase.execute(userId, request);
     }
 
-    public List<AppointmentResponse> findByDate(Long userId, LocalDate date) {
-        return listAppointmentsByDateUseCase.execute(userId, date);
+    public AppointmentResponse findById(Long userId, Long appointmentId) {
+        return findAppointmentUseCase.execute(userId, appointmentId);
+    }
+
+    public List<AppointmentResponse> findByRange(Long userId, LocalDate from, LocalDate to) {
+        return listAppointmentsByRangeUseCase.execute(userId, from, to);
     }
 
     public AppointmentResponse update(

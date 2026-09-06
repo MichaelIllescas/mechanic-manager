@@ -1,0 +1,94 @@
+.agenda-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.agenda-list__day {
+  padding: 12px 16px 14px;
+  border-bottom: 1px solid #eaf2fb;
+}
+
+.agenda-list__date {
+  margin: 0 0 8px;
+  color: #5f708a;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.agenda-list__day--today .agenda-list__date {
+  color: #0069c9;
+}
+
+.agenda-list__empty {
+  margin: 0;
+  color: #93a3b8;
+  font-size: 0.86rem;
+}
+
+/* Fila completa y alta: en el celular se toca con el pulgar, no con el mouse. */
+.agenda-list__item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 52px;
+  margin-bottom: 8px;
+  padding: 8px 12px;
+  border: 1px solid transparent;
+  border-left: 5px solid #0069c9;
+  border-radius: 8px;
+  color: #06152d;
+  background: #cfe6fb;
+  text-align: left;
+  cursor: pointer;
+}
+
+.agenda-list__item:last-child {
+  margin-bottom: 0;
+}
+
+.agenda-list__item.is-selected {
+  border-color: #0088ff;
+}
+
+.agenda-list__item--completed {
+  border-left-color: #067647;
+  color: #054f31;
+  background: #b9ecd1;
+}
+
+.agenda-list__item--cancelled {
+  border-left-color: #667085;
+  color: #475467;
+  background: #dcdfe4;
+  text-decoration: line-through;
+}
+
+.agenda-list__time {
+  flex: 0 0 auto;
+  font-size: 0.94rem;
+  font-weight: 800;
+}
+
+.agenda-list__data {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.agenda-list__plate {
+  overflow: hidden;
+  font-weight: 700;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.agenda-list__vehicle {
+  overflow: hidden;
+  font-size: 0.8rem;
+  opacity: 0.75;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}

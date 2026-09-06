@@ -1,0 +1,582 @@
+.agenda-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 24px;
+  padding: 10px 2px 0;
+}
+
+.agenda-header__eyebrow {
+  margin: 0 0 10px;
+  color: #078cf0;
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.agenda-header h1 {
+  margin: 0;
+  color: #06152d;
+  font-size: clamp(2rem, 3.2vw, 3rem);
+  line-height: 1.04;
+}
+
+.agenda-header__copy {
+  max-width: 620px;
+  margin: 12px 0 0;
+  color: #5f708a;
+  line-height: 1.6;
+}
+
+.agenda-header__action {
+  min-height: 44px;
+  flex: 0 0 auto;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 8px;
+  color: #fff;
+  background: linear-gradient(135deg, #0088ff, #00c2ff);
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 14px 28px rgba(0, 136, 255, 0.24);
+}
+
+.agenda-panel {
+  border: 1px solid rgba(21, 156, 255, 0.16);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 24px 70px rgba(12, 27, 51, 0.12);
+}
+
+.agenda-toolbar {
+  /* El panel no puede recortar con overflow sin romper el encabezado sticky,
+   * así que las esquinas de arriba las redondea la barra. */
+  border-radius: 8px 8px 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 18px 24px;
+  border-bottom: 1px solid #d9e7f7;
+  background: linear-gradient(180deg, #fff, #f7fbff);
+}
+
+.agenda-nav {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.agenda-nav button {
+  min-width: 38px;
+  height: 38px;
+  padding: 0 10px;
+  border: 1px solid #d9e7f7;
+  border-radius: 8px;
+  color: #06152d;
+  background: #fff;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.agenda-nav button:hover {
+  border-color: #78c4ff;
+  background: #f2f9ff;
+}
+
+.agenda-nav__today {
+  font-size: 0.88rem !important;
+}
+
+.agenda-title {
+  flex: 1;
+  text-align: center;
+}
+
+.agenda-title h2 {
+  margin: 0;
+  color: #07182e;
+  font-size: 1.18rem;
+  text-transform: capitalize;
+}
+
+.agenda-title p {
+  margin: 4px 0 0;
+  color: #5f708a;
+  font-size: 0.86rem;
+}
+
+.agenda-views {
+  display: flex;
+  padding: 3px;
+  border: 1px solid #d9e7f7;
+  border-radius: 8px;
+  background: #f2f7fd;
+}
+
+.agenda-views button {
+  min-height: 32px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 6px;
+  color: #5f708a;
+  background: transparent;
+  font-weight: 700;
+  font-size: 0.86rem;
+  cursor: pointer;
+}
+
+.agenda-views button.is-active {
+  color: #fff;
+  background: linear-gradient(135deg, #0088ff, #00c2ff);
+  box-shadow: 0 6px 14px rgba(0, 136, 255, 0.24);
+}
+
+.agenda-panel__error {
+  margin: 0;
+  padding: 12px 24px;
+  border-bottom: 1px solid #ffd7d7;
+  color: #b42318;
+  background: #fff5f5;
+  font-size: 0.9rem;
+}
+
+/* ---------- Vista día y semana ---------- */
+
+/* Pegado bajo el navbar: scrolleando la página no se pierde qué día es cuál. */
+.timeline__head {
+  position: sticky;
+  top: var(--navbar-height, 4.5rem);
+  z-index: 2;
+  display: grid;
+  grid-template-columns: 64px repeat(7, 1fr);
+  border-bottom: 1px solid #d9e7f7;
+  background: #fbfdff;
+}
+
+.timeline--day .timeline__head,
+.timeline--day .timeline__body {
+  grid-template-columns: 64px 1fr;
+}
+
+.timeline__day-head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 10px 4px;
+  border-left: 1px solid #eaf2fb;
+}
+
+.timeline__weekday {
+  color: #5f708a;
+  font-size: 0.76rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.timeline__daynumber {
+  color: #06152d;
+  font-size: 1.1rem;
+  font-weight: 800;
+}
+
+.timeline__day-head.is-today .timeline__daynumber {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  border-radius: 50%;
+  color: #fff;
+  background: linear-gradient(135deg, #0088ff, #00c2ff);
+}
+
+.timeline__body {
+  position: relative;
+  display: grid;
+  grid-template-columns: 64px repeat(7, 1fr);
+}
+
+.timeline__gutter {
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid #eaf2fb;
+}
+
+/*
+ * La etiqueta marca el comienzo de su franja y no la línea divisoria: subirla
+ * para centrarla sobre la línea dejaba la de las 0:00 fuera del área visible
+ * del scroll, que la recortaba.
+ */
+.timeline__hour {
+  display: block;
+  padding: 4px 8px 0 0;
+  color: #93a3b8;
+  font-size: 0.72rem;
+  text-align: right;
+}
+
+.timeline__column {
+  position: relative;
+  border-left: 1px solid #eaf2fb;
+}
+
+.timeline__column.is-today {
+  background: rgba(0, 136, 255, 0.03);
+}
+
+.timeline__slot {
+  border-bottom: 1px solid #f0f6fc;
+}
+
+/*
+ * top y height los calcula el componente: los turnos simultáneos se apilan uno
+ * debajo del otro repartiéndose la franja, así ninguno pierde ancho y la
+ * patente se sigue leyendo.
+ */
+.event {
+  position: absolute;
+  left: 3px;
+  right: 3px;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 5px 8px;
+  border: 2px solid transparent;
+  border-left: 5px solid #0069c9;
+  border-radius: 6px;
+  line-height: 1.3;
+  color: #06152d;
+  background: #cfe6fb;
+  background-clip: padding-box;
+  text-align: left;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+/* Apilado con otros turnos no entra el vehículo: queda hora y patente. */
+.event--compact {
+  justify-content: center;
+  padding: 0 8px;
+}
+
+.event--compact .event__vehicle {
+  display: none;
+}
+
+/*
+ * La caja mide lo que dura el turno, así que el contenido no puede desbordarla:
+ * el vehículo se recorta con puntos suspensivos en vez de quedar cortado a la
+ * mitad por el overflow.
+ */
+.event * {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.event__head {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.event:hover {
+  background: #bcdcf8;
+}
+
+.event.is-selected {
+  outline: 2px solid #0088ff;
+  outline-offset: -1px;
+}
+
+.event--completed {
+  border-left-color: #067647;
+  color: #054f31;
+  background: #b9ecd1;
+}
+
+.event--completed:hover {
+  background: #a4e3c2;
+}
+
+/*
+ * El cancelado se apaga a propósito: sigue en la agenda como registro, pero no
+ * tiene que competir por atención con los turnos que sí hay que atender.
+ */
+.event--cancelled {
+  border-left-color: #667085;
+  color: #475467;
+  background: #dcdfe4;
+  text-decoration: line-through;
+}
+
+.event--cancelled:hover {
+  background: #cfd4da;
+}
+
+.event__time {
+  flex: 0 0 auto;
+  font-size: 0.74rem;
+  font-weight: 800;
+}
+
+.event__plate {
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
+.event__vehicle {
+  color: #40546f;
+  font-size: 0.74rem;
+}
+
+.event--completed .event__vehicle {
+  color: #085c39;
+}
+
+.event--cancelled .event__vehicle {
+  color: #667085;
+}
+
+/* ---------- Vista mes ---------- */
+
+.month__weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  border-bottom: 1px solid #d9e7f7;
+  background: #fbfdff;
+}
+
+.month__weekdays span {
+  padding: 10px 8px;
+  color: #5f708a;
+  font-size: 0.76rem;
+  font-weight: 700;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.month__grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  grid-auto-rows: minmax(104px, 1fr);
+}
+
+.month__cell {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 6px;
+  border-right: 1px solid #eaf2fb;
+  border-bottom: 1px solid #eaf2fb;
+  min-width: 0;
+}
+
+.month__cell--outside {
+  background: #fafcfe;
+}
+
+.month__cell--outside .month__daynumber {
+  color: #b6c2d2;
+}
+
+.month__day {
+  align-self: flex-start;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+/* El número va en su propio span porque en mobile el botón se estira a toda
+ * la celda para que el día se pueda tocar con el pulgar. */
+.month__daynumber {
+  display: grid;
+  min-width: 26px;
+  height: 26px;
+  place-items: center;
+  padding: 0 6px;
+  border-radius: 50%;
+  color: #06152d;
+  font-weight: 700;
+  font-size: 0.84rem;
+}
+
+.month__day:hover .month__daynumber {
+  background: #eaf4ff;
+}
+
+.month__cell--today .month__daynumber {
+  color: #fff;
+  background: linear-gradient(135deg, #0088ff, #00c2ff);
+}
+
+.month__items {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.chip {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  padding: 3px 6px;
+  border: 0;
+  border-left: 4px solid #0069c9;
+  border-radius: 4px;
+  color: #06152d;
+  background: #cfe6fb;
+  font-size: 0.74rem;
+  text-align: left;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.chip.is-selected {
+  outline: 2px solid #0088ff;
+  outline-offset: -1px;
+}
+
+.chip--completed {
+  border-left-color: #067647;
+  color: #054f31;
+  background: #b9ecd1;
+}
+
+.chip--cancelled {
+  border-left-color: #667085;
+  color: #475467;
+  background: #dcdfe4;
+  text-decoration: line-through;
+}
+
+.chip__time {
+  font-weight: 800;
+}
+
+.chip__plate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.month__more {
+  align-self: flex-start;
+  padding: 2px 4px;
+  border: 0;
+  color: #0088ff;
+  background: transparent;
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+@media (max-width: 900px) {
+  .agenda-toolbar {
+    flex-wrap: wrap;
+  }
+
+  .agenda-title {
+    order: -1;
+    width: 100%;
+  }
+
+  .month__grid {
+    grid-auto-rows: minmax(84px, 1fr);
+  }
+}
+
+@media (max-width: 700px) {
+  /*
+   * La celda del mes no da para texto en un teléfono: el turno queda como un
+   * punto de color por estado y el día entero se vuelve el área táctil, que
+   * lleva a la vista del día donde sí se lee todo.
+   */
+  .month__grid {
+    grid-auto-rows: minmax(64px, 1fr);
+  }
+
+  .month__day {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    padding: 4px;
+    text-align: left;
+  }
+
+  /* Los puntos van debajo del número, que lo dibuja el botón estirado. */
+  .month__items {
+    position: relative;
+    z-index: 2;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 28px;
+    pointer-events: none;
+  }
+
+  .chip {
+    width: 8px;
+    height: 8px;
+    padding: 0;
+    border-left: 0;
+    border-radius: 50%;
+    background: #0069c9;
+  }
+
+  .chip--completed {
+    background: #067647;
+  }
+
+  .chip--cancelled {
+    background: #98a2b3;
+  }
+
+  .chip span {
+    display: none;
+  }
+
+  /* Los puntos ya dicen que hay más de uno; el contador sólo roba lugar. */
+  .month__more {
+    display: none;
+  }
+
+  /*
+   * Sin sticky en mobile: la franja de días es alta en relación a la pantalla
+   * y, flotando sobre la grilla, tapaba los turnos mientras se scrollea.
+   */
+  .timeline__head {
+    position: static;
+  }
+
+  .agenda-toolbar {
+    gap: 12px;
+    padding: 14px 16px;
+  }
+
+  .agenda-title h2 {
+    font-size: 1rem;
+  }
+
+  .agenda-title p {
+    font-size: 0.8rem;
+  }
+
+  .agenda-views {
+    width: 100%;
+  }
+
+  .agenda-views button {
+    flex: 1;
+    padding: 0 8px;
+  }
+}

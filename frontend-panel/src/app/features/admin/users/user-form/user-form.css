@@ -136,7 +136,7 @@
   padding-bottom: 24px;
 }
 
-.field span {
+.field > span:first-child {
   color: #172a45;
   font-size: 0.9rem;
   font-weight: 800;
@@ -188,6 +188,7 @@
 .field__hint {
   color: #6d7f97;
   font-size: 0.82rem;
+  font-weight: 500;
 }
 
 .form-note {

@@ -1,0 +1,184 @@
+/*
+ * Panel lateral en vez de bloque al pie de la página: el detalle es contextual
+ * y tiene que convivir con la grilla, así se salta de un turno a otro sin
+ * perder de vista el calendario. Al fondo de la página pasaba desapercibido.
+ *
+ * Arranca debajo del navbar sticky, que si no le tapa el encabezado.
+ */
+.detail {
+  position: fixed;
+  top: var(--navbar-height, 4.5rem);
+  right: 0;
+  bottom: 0;
+  z-index: 90;
+  width: min(23.75rem, 100vw);
+  padding: 20px 24px 28px;
+  overflow-y: auto;
+  border-left: 1px solid #cfe0f2;
+  background: #fff;
+  box-shadow: -18px 0 48px rgba(12, 27, 51, 0.18);
+  /* La dirección de entrada cambia en mobile, donde el panel sube desde abajo. */
+  --detail-shift: translateX(24px);
+  animation: detail-in 180ms ease-out;
+}
+
+@keyframes detail-in {
+  from {
+    transform: var(--detail-shift);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .detail {
+    animation: none;
+  }
+}
+
+/* En escritorio el panel no bloquea nada, así que el fondo no se oscurece. */
+.detail__scrim {
+  display: none;
+}
+
+.detail__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.detail__head h3 {
+  margin: 8px 0 2px;
+  color: #06152d;
+  font-size: 1.3rem;
+}
+
+.detail__head p {
+  margin: 0;
+  color: #5f708a;
+}
+
+.detail__head > button {
+  border: 0;
+  color: #5f708a;
+  background: transparent;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  color: #0069c9;
+  background: #e8f4ff;
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.badge--completed {
+  color: #027a48;
+  background: #e7f8ef;
+}
+
+.badge--cancelled {
+  color: #667085;
+  background: #f2f4f7;
+}
+
+.detail__data {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin: 20px 0 0;
+}
+
+.detail__data dt {
+  color: #93a3b8;
+  font-size: 0.74rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.detail__data dd {
+  margin: 4px 0 0;
+  color: #06152d;
+  overflow-wrap: anywhere;
+}
+
+.detail__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+.detail__button {
+  min-height: 40px;
+  flex: 1 1 auto;
+  padding: 0 16px;
+  border: 1px solid #d9e7f7;
+  border-radius: 8px;
+  color: #06152d;
+  background: #fff;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.detail__button:hover {
+  border-color: #78c4ff;
+  background: #f2f9ff;
+}
+
+.detail__button--primary {
+  border: 0;
+  color: #fff;
+  background: linear-gradient(135deg, #0088ff, #00c2ff);
+  box-shadow: 0 10px 20px rgba(0, 136, 255, 0.22);
+}
+
+.detail__button--danger {
+  color: #b42318;
+  border-color: #fecdca;
+}
+
+.detail__button--danger:hover {
+  border-color: #f97066;
+  background: #fff5f5;
+}
+
+.detail__closed {
+  margin: 20px 0 0;
+  color: #5f708a;
+  font-size: 0.9rem;
+}
+
+@media (max-width: 900px) {
+  /*
+   * En pantallas chicas no hay lugar al costado: el panel sube desde abajo y
+   * ahí sí tapa el contenido, por eso aparece el fondo oscurecido.
+   */
+  .detail {
+    top: auto;
+    left: 0;
+    width: auto;
+    max-height: 82vh;
+    border-left: 0;
+    border-top-left-radius: 16px;
+    border-top-right-radius: 16px;
+    box-shadow: 0 -18px 60px rgba(12, 27, 51, 0.24);
+    --detail-shift: translateY(24px);
+  }
+
+  .detail__scrim {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 89;
+    background: rgba(6, 21, 45, 0.4);
+  }
+}

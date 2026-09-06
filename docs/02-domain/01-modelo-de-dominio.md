@@ -161,25 +161,27 @@ Atributos:
 
 - `id`
 - `userId`
-- `customerId`
 - `vehicleId`
 - `scheduledAt`
-- `reason`
-- `notes`
 - `status`
+- `notes` opcional
 
 Estados:
 
 - `SCHEDULED`
-- `CONFIRMED`
-- `ATTENDED`
+- `COMPLETED`
 - `CANCELLED`
 
 Reglas:
 
 - pertenece a un usuario;
-- cliente y vehículo deben pertenecer al mismo usuario;
-- puede reprogramarse mientras la regla de negocio lo permita.
+- se agenda contra un vehículo; el cliente se deduce del vehículo y no se almacena en el turno;
+- vehículo y turno deben pertenecer al mismo usuario;
+- `SCHEDULED` es el estado inicial; `COMPLETED` y `CANCELLED` son terminales;
+- reprogramar es modificar `scheduledAt` de un turno en `SCHEDULED`, no un estado propio;
+- el turno se completa cuando el vehículo ingresa al taller; a partir de ahí el estado del trabajo lo lleva la orden de trabajo;
+- la agenda no valida solapamiento de horarios: un taller puede atender varios vehículos en simultáneo;
+- el motivo del turno se registra como texto libre en `notes`; el detalle estructurado del trabajo surge del presupuesto o de la orden de trabajo.
 
 ---
 
@@ -191,6 +193,7 @@ Atributos de `Quote`:
 - `userId`
 - `customerId`
 - `vehicleId`
+- `appointmentId` opcional
 - `number`
 - `createdAt`
 - `validUntil`
@@ -218,6 +221,7 @@ Estados:
 Reglas:
 
 - el total surge de sus ítems;
+- puede originarse en un turno o crearse sin turno previo;
 - cliente y vehículo deben pertenecer al usuario autenticado;
 - un ítem puede originarse en un `ServiceType` del catálogo o describirse libremente;
 - `description` y `unitPrice` se copian al crear el ítem y no siguen cambiando con el catálogo;
@@ -347,6 +351,7 @@ User 1 ──────────── N Customer
 Customer 1 ─────── N Vehicle
 Vehicle 1 ───────── N Appointment
 Vehicle 1 ───────── N Quote
+Appointment 1 ───── 0..1 Quote
 Quote 1 ─────────── N QuoteItem
 User 1 ──────────── N ServiceType
 User 1 ──────────── N Supply

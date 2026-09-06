@@ -1,0 +1,69 @@
+<!-- Sólo tapa el calendario en mobile: en escritorio el panel convive con la grilla. -->
+<div class="detail__scrim" (click)="closed.emit()"></div>
+
+<aside class="detail" role="dialog" aria-label="Detalle del turno">
+  <header class="detail__head">
+    <div>
+      <span
+        class="badge"
+        [class.badge--completed]="appointment().status === 'COMPLETED'"
+        [class.badge--cancelled]="appointment().status === 'CANCELLED'"
+      >
+        @switch (appointment().status) {
+          @case ('SCHEDULED') {
+            Agendado
+          }
+          @case ('COMPLETED') {
+            Completado
+          }
+          @default {
+            Cancelado
+          }
+        }
+      </span>
+      <h3>{{ appointment().licensePlate }}</h3>
+      <p>{{ appointment().brand }} {{ appointment().model }}</p>
+    </div>
+
+    <button type="button" aria-label="Cerrar detalle" (click)="closed.emit()">&times;</button>
+  </header>
+
+  <dl class="detail__data">
+    <div>
+      <dt>Cliente</dt>
+      <dd>{{ appointment().customerFirstName }} {{ appointment().customerLastName }}</dd>
+    </div>
+    <div>
+      <dt>Notas</dt>
+      <dd>{{ appointment().notes || 'Sin notas' }}</dd>
+    </div>
+  </dl>
+
+  @if (appointment().status === 'SCHEDULED') {
+    <div class="detail__actions">
+      <button
+        class="detail__button detail__button--primary"
+        type="button"
+        (click)="completed.emit(appointment())"
+      >
+        Completar
+      </button>
+      <button
+        class="detail__button"
+        type="button"
+        [routerLink]="['/appointments', appointment().id, 'editar']"
+      >
+        Reprogramar
+      </button>
+      <button
+        class="detail__button detail__button--danger"
+        type="button"
+        (click)="cancelled.emit(appointment())"
+      >
+        Cancelar
+      </button>
+    </div>
+  } @else {
+    <p class="detail__closed">Este turno ya está cerrado y queda en el historial del vehículo.</p>
+  }
+</aside>

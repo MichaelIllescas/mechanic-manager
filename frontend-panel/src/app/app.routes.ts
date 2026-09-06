@@ -58,6 +58,13 @@ export const routes: Routes = [
           import('./features/vehicles/vehicles.routes').then((module) => module.VEHICLE_ROUTES),
       },
       {
+        path: 'appointments',
+        loadChildren: () =>
+          import('./features/appointments/appointments.routes').then(
+            (module) => module.APPOINTMENT_ROUTES,
+          ),
+      },
+      {
         path: 'servicios',
         loadChildren: () =>
           import('./features/service-types/service-types.routes').then(

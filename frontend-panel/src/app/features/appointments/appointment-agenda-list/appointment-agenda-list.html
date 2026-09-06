@@ -1,0 +1,30 @@
+<div class="agenda-list">
+  @for (day of days(); track day.isoDate) {
+    <section class="agenda-list__day" [class.agenda-list__day--today]="day.isToday">
+      <h3 class="agenda-list__date">{{ dayLabel(day.date) }}</h3>
+
+      @if (day.appointments.length === 0) {
+        <p class="agenda-list__empty">Sin turnos</p>
+      } @else {
+        @for (item of day.appointments; track item.appointment.id) {
+          <button
+            class="agenda-list__item"
+            type="button"
+            [class.agenda-list__item--completed]="item.appointment.status === 'COMPLETED'"
+            [class.agenda-list__item--cancelled]="item.appointment.status === 'CANCELLED'"
+            [class.is-selected]="selectedId() === item.appointment.id"
+            (click)="picked.emit(item.appointment)"
+          >
+            <span class="agenda-list__time">{{ item.time }}</span>
+            <span class="agenda-list__data">
+              <span class="agenda-list__plate">{{ item.appointment.licensePlate }}</span>
+              <span class="agenda-list__vehicle">
+                {{ item.appointment.brand }} {{ item.appointment.model }}
+              </span>
+            </span>
+          </button>
+        }
+      }
+    </section>
+  }
+</div>

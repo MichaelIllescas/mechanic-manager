@@ -117,19 +117,23 @@ Datos técnicos opcionales:
 
 Funciones:
 
-- crear turno;
+- crear turno sobre un vehículo;
 - consultar agenda por fecha;
 - reprogramar;
-- confirmar;
-- marcar como atendido;
+- completar;
 - cancelar.
 
 Estados iniciales:
 
 - `SCHEDULED`
-- `CONFIRMED`
-- `ATTENDED`
+- `COMPLETED`
 - `CANCELLED`
+
+No incluye:
+
+- validación de solapamiento de horarios;
+- confirmación previa del cliente ni recordatorios;
+- detalle de los trabajos a realizar: el motivo va como nota libre y el detalle surge del presupuesto o de la orden de trabajo.
 
 ### 3.6 Presupuestos
 

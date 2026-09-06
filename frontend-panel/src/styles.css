@@ -29,6 +29,8 @@ input {
 }
 
 html {
+  /* Alto del navbar sticky: lo usan los paneles fijos para no quedar debajo. */
+  --navbar-height: 4.5rem;
   min-width: 20rem;
   min-height: 100%;
   font-family:

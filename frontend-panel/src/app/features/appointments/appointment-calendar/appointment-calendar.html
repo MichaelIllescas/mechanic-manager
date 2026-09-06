@@ -1,0 +1,191 @@
+<main class="agenda-page">
+  <section class="agenda-header">
+    <div>
+      <p class="agenda-header__eyebrow">Taller</p>
+      <h1>Turnos</h1>
+      <p class="agenda-header__copy">
+        Organizá la agenda del taller y seguí qué vehículos tenés que atender.
+      </p>
+    </div>
+
+    <button
+      class="agenda-header__action"
+      type="button"
+      routerLink="/appointments/nuevo"
+      [queryParams]="{ date: newAppointmentDate() }"
+    >
+      Nuevo turno
+    </button>
+  </section>
+
+  <section class="agenda-panel" aria-label="Calendario de turnos">
+    <div class="agenda-toolbar">
+      <div class="agenda-nav">
+        <button type="button" aria-label="Período anterior" (click)="move(-1)">‹</button>
+        <button class="agenda-nav__today" type="button" (click)="goToToday()">Hoy</button>
+        <button type="button" aria-label="Período siguiente" (click)="move(1)">›</button>
+      </div>
+
+      <div class="agenda-title">
+        <h2>{{ title() }}</h2>
+        <p>
+          @if (loading()) {
+            Cargando agenda...
+          } @else {
+            {{ scheduledCount() }} turnos agendados
+          }
+        </p>
+      </div>
+
+      <div class="agenda-views" role="group" aria-label="Vista del calendario">
+        <button
+          type="button"
+          [class.is-active]="view() === 'day'"
+          [attr.aria-pressed]="view() === 'day'"
+          (click)="changeView('day')"
+        >
+          Día
+        </button>
+        <button
+          type="button"
+          [class.is-active]="view() === 'week'"
+          [attr.aria-pressed]="view() === 'week'"
+          (click)="changeView('week')"
+        >
+          Semana
+        </button>
+        <button
+          type="button"
+          [class.is-active]="view() === 'month'"
+          [attr.aria-pressed]="view() === 'month'"
+          (click)="changeView('month')"
+        >
+          Mes
+        </button>
+      </div>
+    </div>
+
+    @if (errorMessage()) {
+      <p class="agenda-panel__error" role="alert">{{ errorMessage() }}</p>
+    }
+
+    @if (view() === 'month') {
+      <div class="month">
+        <div class="month__weekdays" aria-hidden="true">
+          @for (name of weekdayNames; track name) {
+            <span>{{ name }}</span>
+          }
+        </div>
+
+        <div class="month__grid">
+          @for (cell of monthCells(); track cell.isoDate) {
+            <div
+              class="month__cell"
+              [class.month__cell--outside]="!cell.inCurrentMonth"
+              [class.month__cell--today]="cell.isToday"
+            >
+              <button
+                class="month__day"
+                type="button"
+                [attr.aria-label]="'Ver el día ' + cell.isoDate"
+                (click)="openDay(cell.date)"
+              >
+                <span class="month__daynumber">{{ cell.dayNumber }}</span>
+              </button>
+
+              <div class="month__items">
+                @for (item of cell.visible; track item.appointment.id) {
+                  <button
+                    class="chip"
+                    type="button"
+                    [class.chip--completed]="item.appointment.status === 'COMPLETED'"
+                    [class.chip--cancelled]="item.appointment.status === 'CANCELLED'"
+                    [class.is-selected]="selected()?.id === item.appointment.id"
+                    (click)="select(item.appointment)"
+                  >
+                    <span class="chip__time">{{ item.time }}</span>
+                    <span class="chip__plate">{{ item.appointment.licensePlate }}</span>
+                  </button>
+                }
+
+                @if (cell.hiddenCount > 0) {
+                  <button class="month__more" type="button" (click)="openDay(cell.date)">
+                    +{{ cell.hiddenCount }} más
+                  </button>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    } @else if (view() === 'week' && !isWide()) {
+      <app-appointment-agenda-list
+        [days]="columns()"
+        [selectedId]="selected()?.id ?? null"
+        (picked)="select($event)"
+      />
+    } @else {
+      <div class="timeline" [class.timeline--day]="view() === 'day'">
+        <div class="timeline__head">
+          <span class="timeline__gutter-head" aria-hidden="true"></span>
+
+          @for (column of columns(); track column.isoDate) {
+            <div class="timeline__day-head" [class.is-today]="column.isToday">
+              <span class="timeline__weekday">
+                {{ column.date.toLocaleDateString('es-AR', { weekday: 'short' }) }}
+              </span>
+              <span class="timeline__daynumber">{{ column.date.getDate() }}</span>
+            </div>
+          }
+        </div>
+
+        <div class="timeline__body" [style.height.px]="gridHeight()">
+          <div class="timeline__gutter">
+            @for (hour of hours(); track hour) {
+              <span class="timeline__hour" [style.height.px]="hourHeight">{{ hour }}:00</span>
+            }
+          </div>
+
+          @for (column of columns(); track column.isoDate) {
+            <div class="timeline__column" [class.is-today]="column.isToday">
+              @for (hour of hours(); track hour) {
+                <div class="timeline__slot" [style.height.px]="hourHeight"></div>
+              }
+
+              @for (item of column.appointments; track item.appointment.id) {
+                <button
+                  class="event"
+                  type="button"
+                  [style.top.px]="item.top - gridOffset()"
+                  [style.height.px]="item.height"
+                  [class.event--compact]="item.height < 36"
+                  [class.event--completed]="item.appointment.status === 'COMPLETED'"
+                  [class.event--cancelled]="item.appointment.status === 'CANCELLED'"
+                  [class.is-selected]="selected()?.id === item.appointment.id"
+                  (click)="select(item.appointment)"
+                >
+                  <span class="event__head">
+                    <span class="event__time">{{ item.time }}</span>
+                    <span class="event__plate">{{ item.appointment.licensePlate }}</span>
+                  </span>
+                  <span class="event__vehicle">
+                    {{ item.appointment.brand }} {{ item.appointment.model }}
+                  </span>
+                </button>
+              }
+            </div>
+          }
+        </div>
+      </div>
+    }
+  </section>
+
+  @if (selected(); as appointment) {
+    <app-appointment-detail
+      [appointment]="appointment"
+      (closed)="closeDetail()"
+      (completed)="complete($event)"
+      (cancelled)="cancel($event)"
+    />
+  }
+</main>

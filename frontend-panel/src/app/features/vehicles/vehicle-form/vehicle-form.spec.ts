@@ -202,6 +202,45 @@ describe('VehicleForm', () => {
     );
   });
 
+  it('opens the customer modal and closes it without selecting anybody', () => {
+    createComponent();
+
+    component.openCustomerModal();
+
+    expect(component.customerModalOpen()).toBe(true);
+    expect(component.customerResultsOpen()).toBe(false);
+
+    component.closeCustomerModal();
+
+    expect(component.customerModalOpen()).toBe(false);
+    expect(component.form.controls.customerId.value).toBeNull();
+  });
+
+  it('selects the customer created from the modal without losing the vehicle data', () => {
+    createComponent();
+    component.form.controls.licensePlate.setValue('XY987ZW');
+    component.onCustomerSearch('Rodríguez');
+    component.openCustomerModal();
+
+    const created: Customer = {
+      ...customer,
+      id: 21,
+      firstName: 'Carlos',
+      lastName: 'Rodríguez',
+      documentNumber: '28999111',
+      phone: '11 7777-8888',
+    };
+
+    component.onCustomerCreated(created);
+
+    expect(component.customerModalOpen()).toBe(false);
+    expect(component.form.controls.customerId.value).toBe(21);
+    expect(component.selectedCustomerLabel()).toBe('Carlos Rodríguez · 28999111 · 11 7777-8888');
+    expect(component.customerSearch()).toBe('');
+    expect(component.form.controls.licensePlate.value).toBe('XY987ZW');
+    expect(customerService.findAll).toHaveBeenCalledTimes(1);
+  });
+
   it('should load and update an existing vehicle', () => {
     routeId = '30';
     createComponent();

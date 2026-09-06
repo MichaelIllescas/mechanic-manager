@@ -118,3 +118,7 @@ img {
   color: #60728c;
   font-size: 0.84rem;
 }
+
+body.modal-open {
+  overflow: hidden;
+}

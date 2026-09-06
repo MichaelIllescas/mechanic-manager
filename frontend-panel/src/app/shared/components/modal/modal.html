@@ -1,0 +1,37 @@
+<div class="modal" (keydown.tab)="onTab($any($event))" (keydown.shift.tab)="onTab($any($event))">
+  <div class="modal__backdrop" (click)="onBackdropClick()" aria-hidden="true"></div>
+
+  <div
+    class="modal__dialog"
+    #dialog
+    role="dialog"
+    aria-modal="true"
+    [attr.aria-label]="title()"
+  >
+    <header class="modal__header">
+      <div>
+        <h2 class="modal__title">{{ title() }}</h2>
+        @if (subtitle()) {
+          <p class="modal__subtitle">{{ subtitle() }}</p>
+        }
+      </div>
+
+      @if (dismissible()) {
+        <button
+          class="modal__close"
+          type="button"
+          [attr.aria-label]="closeLabel()"
+          (click)="requestClose()"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M18 6 6 18M6 6l12 12" />
+          </svg>
+        </button>
+      }
+    </header>
+
+    <div class="modal__body">
+      <ng-content />
+    </div>
+  </div>
+</div>

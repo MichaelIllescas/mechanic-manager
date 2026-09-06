@@ -52,17 +52,26 @@
                   <button type="button" (click)="changeCustomer()">Cambiar</button>
                 </div>
               } @else {
-                <input
-                  type="search"
-                  [value]="customerSearch()"
-                  placeholder="Buscar por nombre, DNI, teléfono o email"
-                  autocomplete="off"
-                  role="combobox"
-                  aria-controls="customer-results"
-                  [attr.aria-expanded]="customerResultsOpen()"
-                  (focus)="openCustomerResults()"
-                  (input)="onCustomerSearch($any($event.target).value)"
-                />
+                <div class="customer-picker__search">
+                  <input
+                    type="search"
+                    [value]="customerSearch()"
+                    placeholder="Buscar por nombre, DNI, teléfono o email"
+                    autocomplete="off"
+                    role="combobox"
+                    aria-controls="customer-results"
+                    [attr.aria-expanded]="customerResultsOpen()"
+                    (focus)="openCustomerResults()"
+                    (input)="onCustomerSearch($any($event.target).value)"
+                  />
+                  <button
+                    type="button"
+                    class="customer-picker__new"
+                    (click)="openCustomerModal()"
+                  >
+                    + Nuevo cliente
+                  </button>
+                </div>
                 @if (customerResultsOpen()) {
                   <div class="customer-picker__results" id="customer-results" role="listbox">
                     @for (customer of filteredCustomers(); track customer.id) {
@@ -81,7 +90,12 @@
                         </span>
                       </button>
                     } @empty {
-                      <p>No encontramos clientes con esa búsqueda.</p>
+                      <div class="customer-picker__no-results">
+                        <p>No encontramos clientes con esa búsqueda.</p>
+                        <button type="button" (click)="openCustomerModal()">
+                          Registrar nuevo cliente
+                        </button>
+                      </div>
                     }
                   </div>
                 }
@@ -89,7 +103,8 @@
             </div>
             @if (customers().length === 0) {
               <span class="field__hint">
-                Primero tenés que registrar un cliente para asociarle el vehículo.
+                Todavía no tenés clientes registrados. Podés crear uno desde acá con
+                "+ Nuevo cliente".
               </span>
             }
             @if (form.controls.customerId.touched && form.controls.customerId.invalid) {
@@ -249,3 +264,17 @@
     }
   </section>
 </main>
+
+@if (customerModalOpen()) {
+  <app-modal
+    title="Nuevo cliente"
+    subtitle="Se va a seleccionar automáticamente en el vehículo."
+    (closed)="closeCustomerModal()"
+  >
+    <app-customer-form-fields
+      [showHeader]="false"
+      (saved)="onCustomerCreated($event)"
+      (cancelled)="closeCustomerModal()"
+    />
+  </app-modal>
+}

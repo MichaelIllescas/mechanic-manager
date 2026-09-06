@@ -11,6 +11,8 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 import { NotificationService } from '../../../core/notifications/notification-service';
+import { Modal } from '../../../shared/components/modal/modal';
+import { CustomerFormFields } from '../../customers/customer-form-fields/customer-form-fields';
 import { CustomerService } from '../../customers/customer-service';
 import { Customer } from '../../customers/customer.models';
 import { VehicleService } from '../vehicle-service';
@@ -18,7 +20,7 @@ import { CreateVehicleRequest, VehicleType } from '../vehicle.models';
 
 @Component({
   selector: 'app-vehicle-form',
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [CustomerFormFields, Modal, ReactiveFormsModule, RouterLink],
   templateUrl: './vehicle-form.html',
   styleUrl: './vehicle-form.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -43,6 +45,7 @@ export class VehicleForm implements OnInit {
   readonly customerSearch = signal('');
   readonly customerResultsOpen = signal(false);
   readonly selectedCustomerLabel = signal<string | null>(null);
+  readonly customerModalOpen = signal(false);
   readonly filteredCustomers = computed(() => {
     const search = this.normalizeSearch(this.customerSearch());
     const customers = this.customers();
@@ -149,6 +152,21 @@ export class VehicleForm implements OnInit {
     this.selectedCustomerLabel.set(this.formatCustomer(customer));
     this.customerSearch.set('');
     this.customerResultsOpen.set(false);
+  }
+
+  openCustomerModal(): void {
+    this.customerResultsOpen.set(false);
+    this.customerModalOpen.set(true);
+  }
+
+  closeCustomerModal(): void {
+    this.customerModalOpen.set(false);
+  }
+
+  onCustomerCreated(customer: Customer): void {
+    this.customers.update((customers) => [...customers, customer]);
+    this.selectCustomer(customer);
+    this.customerModalOpen.set(false);
   }
 
   changeCustomer(): void {

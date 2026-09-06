@@ -1,0 +1,144 @@
+<section class="customer-form-card" aria-labelledby="customer-form-title">
+  @if (showHeader()) {
+    <div class="customer-form-card__header">
+      <div class="customer-form-card__icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24">
+          <circle cx="12" cy="8" r="4" />
+          <path d="M4 21a8 8 0 0 1 16 0" />
+        </svg>
+      </div>
+
+      <div>
+        <span class="customer-form-card__mode">
+          {{ isEdit() ? 'Modo edición' : 'Modo alta' }}
+        </span>
+        <h2 id="customer-form-title">Datos del cliente</h2>
+        <p>Nombre, apellido y teléfono son obligatorios.</p>
+      </div>
+    </div>
+  }
+
+  @if (loading()) {
+    <p class="customer-form__loading">Cargando datos del cliente...</p>
+  } @else {
+    <form class="customer-form" [formGroup]="form" (ngSubmit)="onSubmit()" autocomplete="off">
+      <div class="form-grid">
+        <label class="field">
+          <span>Nombre</span>
+          <input type="text" formControlName="firstName" placeholder="Juan" autocomplete="off" />
+          @if (form.controls.firstName.touched && form.controls.firstName.invalid) {
+            <small>
+              @if (form.controls.firstName.hasError('required')) {
+                El nombre es obligatorio.
+              } @else {
+                El nombre no puede superar los 120 caracteres.
+              }
+            </small>
+          }
+        </label>
+
+        <label class="field">
+          <span>Apellido</span>
+          <input type="text" formControlName="lastName" placeholder="Pérez" autocomplete="off" />
+          @if (form.controls.lastName.touched && form.controls.lastName.invalid) {
+            <small>
+              @if (form.controls.lastName.hasError('required')) {
+                El apellido es obligatorio.
+              } @else {
+                El apellido no puede superar los 120 caracteres.
+              }
+            </small>
+          }
+        </label>
+
+        <label class="field">
+          <span>DNI o documento</span>
+          <input
+            type="text"
+            formControlName="documentNumber"
+            placeholder="30111222"
+            autocomplete="off"
+          />
+          <span class="field__hint">Opcional. Máximo 30 caracteres.</span>
+          @if (form.controls.documentNumber.touched && form.controls.documentNumber.invalid) {
+            <small>El documento no puede superar los 30 caracteres.</small>
+          }
+        </label>
+
+        <label class="field">
+          <span>Teléfono</span>
+          <input type="tel" formControlName="phone" placeholder="11 4444-5555" autocomplete="tel" />
+          @if (form.controls.phone.touched && form.controls.phone.invalid) {
+            <small>
+              @if (form.controls.phone.hasError('required')) {
+                El teléfono es obligatorio.
+              } @else {
+                Ingresá entre 6 y 30 caracteres válidos.
+              }
+            </small>
+          }
+        </label>
+
+        <label class="field">
+          <span>Email</span>
+          <input
+            type="email"
+            formControlName="email"
+            placeholder="cliente@email.com"
+            autocomplete="email"
+          />
+          <span class="field__hint">Opcional.</span>
+          @if (form.controls.email.touched && form.controls.email.invalid) {
+            <small>
+              @if (form.controls.email.hasError('email')) {
+                Ingresá un email válido.
+              } @else {
+                El email no puede superar los 255 caracteres.
+              }
+            </small>
+          }
+        </label>
+
+        <label class="field">
+          <span>Dirección</span>
+          <input
+            type="text"
+            formControlName="address"
+            placeholder="Av. Siempre Viva 742"
+            autocomplete="street-address"
+          />
+          <span class="field__hint">Opcional. Máximo 255 caracteres.</span>
+          @if (form.controls.address.touched && form.controls.address.invalid) {
+            <small>La dirección no puede superar los 255 caracteres.</small>
+          }
+        </label>
+
+        <label class="field field--wide">
+          <span>Observaciones</span>
+          <textarea
+            formControlName="notes"
+            rows="4"
+            placeholder="Preferencias, aclaraciones o información útil"
+          ></textarea>
+          <span class="field__hint">Opcional. Máximo 1000 caracteres.</span>
+          @if (form.controls.notes.touched && form.controls.notes.invalid) {
+            <small>Las observaciones no pueden superar los 1000 caracteres.</small>
+          }
+        </label>
+      </div>
+
+      @if (errorMessage()) {
+        <p class="customer-form__error" role="alert">{{ errorMessage() }}</p>
+      }
+
+      <div class="customer-form__actions">
+        <button class="button button--secondary" type="button" (click)="onCancel()">
+          {{ cancelLabel() }}
+        </button>
+        <button class="button button--primary" type="submit" [disabled]="form.invalid || saving()">
+          {{ saving() ? 'Guardando...' : isEdit() ? 'Guardar cambios' : 'Registrar cliente' }}
+        </button>
+      </div>
+    </form>
+  }
+</section>

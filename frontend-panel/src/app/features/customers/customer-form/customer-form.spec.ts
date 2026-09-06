@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ActivatedRoute, provideRouter } from '@angular/router';
+import { ActivatedRoute, Router, provideRouter } from '@angular/router';
 import { of } from 'rxjs';
 
 import { NotificationService } from '../../../core/notifications/notification-service';
@@ -45,10 +45,6 @@ describe('CustomerForm', () => {
     routeId = null;
     customerService.findFromListById.mockReset();
     customerService.findFromListById.mockReturnValue(of(customer));
-    customerService.create.mockReset();
-    customerService.create.mockReturnValue(of(customer));
-    customerService.update.mockReset();
-    customerService.update.mockReturnValue(of(customer));
     notifications.success.mockReset();
 
     await TestBed.configureTestingModule({
@@ -77,65 +73,44 @@ describe('CustomerForm', () => {
     fixture.detectChanges();
   }
 
-  function fillValidForm(): void {
-    component.form.setValue({
-      firstName: 'Juan',
-      lastName: 'Pérez',
-      documentNumber: '32111222',
-      phone: '11 5555-6666',
-      email: 'juan@email.com',
-      address: ' San Martín 123 ',
-      notes: '',
-    });
-  }
-
   it('should create', () => {
     createComponent();
 
     expect(component).toBeTruthy();
   });
 
-  it('does not submit an invalid form', () => {
+  it('does not load any customer in create mode', () => {
     createComponent();
 
-    component.onSubmit();
-
-    expect(customerService.create).not.toHaveBeenCalled();
+    expect(customerService.findFromListById).not.toHaveBeenCalled();
+    expect(component.customer()).toBeNull();
+    expect(component.isEdit()).toBe(false);
   });
 
-  it('creates a customer with normalized optional values', () => {
-    createComponent();
-    fillValidForm();
-
-    component.onSubmit();
-
-    expect(customerService.create).toHaveBeenCalledWith({
-      firstName: 'Juan',
-      lastName: 'Pérez',
-      documentNumber: '32111222',
-      phone: '11 5555-6666',
-      email: 'juan@email.com',
-      address: 'San Martín 123',
-      notes: null,
-    });
-    expect(notifications.success).toHaveBeenCalledWith('Cliente registrado correctamente');
-  });
-
-  it('loads and updates an existing customer', () => {
+  it('loads the customer to edit from the route', () => {
     routeId = '1';
     createComponent();
 
     expect(customerService.findFromListById).toHaveBeenCalledWith(1);
-    expect(component.form.controls.firstName.value).toBe('Ana');
-    expect(component.form.controls.address.value).toBe('Av. Siempre Viva 742');
+    expect(component.isEdit()).toBe(true);
+    expect(component.customer()).toEqual(customer);
+  });
 
-    component.form.controls.firstName.setValue('Andrea');
-    component.onSubmit();
+  it('reports an invalid route id', () => {
+    routeId = 'abc';
+    createComponent();
 
-    expect(customerService.update).toHaveBeenCalledWith(
-      1,
-      expect.objectContaining({ firstName: 'Andrea' }),
-    );
-    expect(notifications.success).toHaveBeenCalledWith('Cliente actualizado correctamente');
+    expect(customerService.findFromListById).not.toHaveBeenCalled();
+    expect(component.errorMessage()).toBe('El identificador del cliente no es válido');
+  });
+
+  it('navigates back to the list after saving', () => {
+    createComponent();
+    const router = TestBed.inject(Router);
+    const navigate = vi.spyOn(router, 'navigate').mockResolvedValue(true);
+
+    component.onSaved();
+
+    expect(navigate).toHaveBeenCalledWith(['/customers']);
   });
 });

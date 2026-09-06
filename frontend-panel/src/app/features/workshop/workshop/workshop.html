@@ -30,9 +30,19 @@
     @if (complete() && !showForm() && workshop(); as currentWorkshop) {
       <section class="workshop__detail">
         <div class="workshop__detail-header">
-          <div>
-            <p class="workshop__eyebrow">Taller registrado</p>
-            <h2>{{ currentWorkshop.name }}</h2>
+          <div class="workshop__identity">
+            <span class="workshop__identity-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24">
+                <path d="M3 21h18" />
+                <path d="M5 21V8l7-4 7 4v13" />
+                <path d="M10 21v-5h4v5" />
+              </svg>
+            </span>
+
+            <div>
+              <p class="workshop__eyebrow">Taller registrado</p>
+              <h2>{{ currentWorkshop.name }}</h2>
+            </div>
           </div>
 
           <button class="workshop__secondary-button" type="button" (click)="onEditClick()">
@@ -58,7 +68,7 @@
 
           <div>
             <dt>Estado</dt>
-            <dd>Datos completos</dd>
+            <dd><span class="workshop__badge">Datos completos</span></dd>
           </div>
 
           <div class="workshop__detail-notes">

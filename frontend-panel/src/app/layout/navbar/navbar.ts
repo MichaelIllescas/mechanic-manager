@@ -12,7 +12,6 @@ export interface NavbarLink {
 
 const APP_LINKS: NavbarLink[] = [
   { label: 'Inicio', path: '/dashboard', exact: true },
-  { label: 'Taller', path: '/workshop' },
   { label: 'Clientes', path: '/customers' },
   { label: 'Vehículos', path: '/vehicles' },
   { label: 'Turnos', path: '/appointments' },

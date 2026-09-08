@@ -1,0 +1,184 @@
+<main class="quotes-page">
+  <section class="quotes-header">
+    <div>
+      <p class="quotes-header__eyebrow">Taller</p>
+      <h1>Presupuestos</h1>
+      <p class="quotes-header__copy">
+        Creá, consultá y actualizá los presupuestos del taller.
+      </p>
+    </div>
+
+    <button class="quotes-header__action" type="button" routerLink="/quotes/nuevo">
+      Nuevo presupuesto
+    </button>
+  </section>
+
+  <section class="quotes-panel" aria-label="Listado de presupuestos">
+    <div class="quotes-panel__topbar">
+      <div>
+        <h2>Presupuestos registrados</h2>
+        <p>{{ totalElements() }} presupuestos encontrados</p>
+      </div>
+
+      <div class="search">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="11" cy="11" r="7" />
+          <path d="m20 20-4-4" />
+        </svg>
+        <input
+          type="search"
+          aria-label="Buscar presupuestos"
+          placeholder="Número, cliente o patente"
+          autocomplete="off"
+          [formControl]="searchControl"
+        />
+        @if (searchControl.value) {
+          <button type="button" aria-label="Limpiar búsqueda" (click)="clearSearch()">
+            &times;
+          </button>
+        }
+      </div>
+    </div>
+
+    <div class="status-filters" aria-label="Filtrar por estado">
+      <button
+        type="button"
+        [class.status-filters__button--active]="selectedStatus() === null"
+        [attr.aria-pressed]="selectedStatus() === null"
+        (click)="filterByStatus(null)"
+      >
+        Todos
+      </button>
+      <button
+        type="button"
+        [class.status-filters__button--active]="selectedStatus() === 'PENDING'"
+        [attr.aria-pressed]="selectedStatus() === 'PENDING'"
+        (click)="filterByStatus('PENDING')"
+      >
+        Pendientes
+      </button>
+      <button
+        type="button"
+        [class.status-filters__button--active]="selectedStatus() === 'APPROVED'"
+        [attr.aria-pressed]="selectedStatus() === 'APPROVED'"
+        (click)="filterByStatus('APPROVED')"
+      >
+        Aprobados
+      </button>
+      <button
+        type="button"
+        [class.status-filters__button--active]="selectedStatus() === 'REJECTED'"
+        [attr.aria-pressed]="selectedStatus() === 'REJECTED'"
+        (click)="filterByStatus('REJECTED')"
+      >
+        Rechazados
+      </button>
+    </div>
+
+    @if (errorMessage()) {
+      <p class="quotes-panel__error" role="alert">{{ errorMessage() }}</p>
+    }
+
+    <div class="quotes-table-wrap">
+      <table class="quotes-table">
+        <thead>
+          <tr>
+            <th>Presupuesto</th>
+            <th>Cliente</th>
+            <th>Vehículo</th>
+            <th>Válido hasta</th>
+            <th>Estado</th>
+            <th>Total</th>
+            <th class="quotes-table__actions-heading">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (loading()) {
+            <tr>
+              <td class="table-message" colspan="7">Cargando presupuestos...</td>
+            </tr>
+          } @else {
+            @for (quote of quotes(); track quote.id) {
+              <tr>
+                <td>
+                  <a class="quote-number" [routerLink]="['/quotes', quote.id]">
+                    #{{ quote.number }}
+                  </a>
+                  <span class="quote-created">{{ quote.createdAt | date: 'dd/MM/yyyy' }}</span>
+                </td>
+                <td>{{ quote.customerName }}</td>
+                <td>
+                  <span class="license-plate">{{ quote.vehicleLicensePlate }}</span>
+                </td>
+                <td>{{ quote.validUntil ? (quote.validUntil | date: 'dd/MM/yyyy') : 'Sin fecha' }}</td>
+                <td>
+                  <span
+                    class="quote-status"
+                    [class.quote-status--pending]="quote.status === 'PENDING'"
+                    [class.quote-status--approved]="quote.status === 'APPROVED'"
+                    [class.quote-status--rejected]="quote.status === 'REJECTED'"
+                  >
+                    {{ statusLabel(quote.status) }}
+                  </span>
+                </td>
+                <td class="quote-total">{{ quote.total | currency: 'ARS' : 'code' : '1.2-2' }}</td>
+                <td>
+                  <div class="actions">
+                    <button
+                      class="actions__button actions__button--secondary"
+                      type="button"
+                      aria-label="Ver presupuesto"
+                      title="Ver detalle"
+                      [routerLink]="['/quotes', quote.id]"
+                    >
+                      <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z" />
+                        <circle cx="12" cy="12" r="2.5" />
+                      </svg>
+                    </button>
+                    <button
+                      class="actions__button"
+                      type="button"
+                      aria-label="Editar presupuesto"
+                      title="Editar"
+                      [routerLink]="['/quotes', quote.id, 'editar']"
+                    >
+                      <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M4 20h4.6L19.2 9.4a2.6 2.6 0 0 0-3.7-3.7L4.9 16.3 4 20Z" />
+                        <path d="m14.2 7 2.8 2.8" />
+                      </svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td class="empty-state" colspan="7">
+                  @if (searchControl.value.trim() || selectedStatus()) {
+                    <strong>No encontramos presupuestos con esos filtros.</strong>
+                    <span>Probá con otro número, cliente, patente o estado.</span>
+                  } @else {
+                    <strong>Todavía no registraste ningún presupuesto.</strong>
+                    <span>Creá el primero para comenzar a cotizar trabajos e insumos.</span>
+                  }
+                </td>
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+
+    @if (totalPages() > 1) {
+      <nav class="pagination" aria-label="Paginación de presupuestos">
+        <button type="button" [disabled]="page() === 0" (click)="previousPage()">
+          Anterior
+        </button>
+        <span>Página {{ page() + 1 }} de {{ totalPages() }}</span>
+        <button type="button" [disabled]="page() + 1 >= totalPages()" (click)="nextPage()">
+          Siguiente
+        </button>
+      </nav>
+    }
+  </section>
+</main>

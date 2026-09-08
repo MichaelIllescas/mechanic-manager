@@ -1,0 +1,44 @@
+<div class="quick-create-backdrop" role="presentation">
+  <section class="quick-create-dialog" role="dialog" aria-modal="true">
+    <header class="quick-create-header">
+      <div>
+        <p>Nuevo registro</p>
+        <h2>Crear servicio</h2>
+      </div>
+      <button class="quick-create-close" type="button" aria-label="Cerrar" (click)="cancel()">
+        &times;
+      </button>
+    </header>
+    @if (errorMessage()) {
+      <p class="quick-error" role="alert">{{ errorMessage() }}</p>
+    }
+    <div class="quick-create-form" [formGroup]="form">
+      <label class="quick-field quick-field--wide"
+        ><span>Nombre</span><input formControlName="name" maxlength="120"
+      /></label>
+      <label class="quick-field quick-field--wide"
+        ><span>Descripción</span
+        ><textarea formControlName="description" maxlength="1000"></textarea>
+      </label>
+      <label class="quick-field"
+        ><span>Precio base</span
+        ><input type="number" formControlName="basePrice" min="0" step="0.01"
+      /></label>
+      <label class="quick-field"
+        ><span>Duración estimada (minutos)</span
+        ><input type="number" formControlName="estimatedMinutes" min="1"
+      /></label>
+    </div>
+    <footer class="quick-create-actions">
+      <button class="quick-create-actions__cancel" type="button" (click)="cancel()">Cancelar</button
+      ><button
+        class="quick-create-actions__save"
+        type="button"
+        [disabled]="saving()"
+        (click)="save()"
+      >
+        {{ saving() ? 'Guardando...' : 'Crear y agregar' }}
+      </button>
+    </footer>
+  </section>
+</div>

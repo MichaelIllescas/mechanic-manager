@@ -82,6 +82,11 @@ export const routes: Routes = [
           import('./features/supplies/supplies.routes').then((m) => m.SUPPLY_ROUTES),
       },
       {
+        path: 'quotes',
+        loadChildren: () =>
+          import('./features/quotes/quotes.routes').then((module) => module.QUOTE_ROUTES),
+      },
+      {
         path: '',
         pathMatch: 'full',
         redirectTo: 'dashboard',

@@ -1,0 +1,63 @@
+<div class="quick-create-backdrop" role="presentation">
+  <section class="quick-create-dialog" role="dialog" aria-modal="true">
+    <header class="quick-create-header">
+      <div>
+        <p>Nuevo registro</p>
+        <h2>Crear vehículo</h2>
+      </div>
+      <button class="quick-create-close" type="button" aria-label="Cerrar" (click)="cancel()">
+        &times;
+      </button>
+    </header>
+    @if (errorMessage()) {
+      <p class="quick-error" role="alert">{{ errorMessage() }}</p>
+    }
+    <div class="quick-create-form" [formGroup]="form">
+      <label class="quick-field"
+        ><span>Patente</span><input formControlName="licensePlate" maxlength="20"
+      /></label>
+      <label class="quick-field"
+        ><span>Marca</span><input formControlName="brand" maxlength="80"
+      /></label>
+      <label class="quick-field"
+        ><span>Modelo</span><input formControlName="model" maxlength="120"
+      /></label>
+      <label class="quick-field"
+        ><span>Año</span><input type="number" formControlName="year" min="1886" max="9999"
+      /></label>
+      <label class="quick-field"
+        ><span>Tipo</span
+        ><select formControlName="vehicleType">
+          @for (type of vehicleTypes; track type.value) {
+            <option [value]="type.value">{{ type.label }}</option>
+          }
+        </select></label
+      >
+      <label class="quick-field"
+        ><span>Kilometraje</span><input type="number" formControlName="mileage" min="0"
+      /></label>
+      <label class="quick-field"
+        ><span>Número de chasis</span><input formControlName="chassisNumber" maxlength="100"
+      /></label>
+      <label class="quick-field"
+        ><span>Número de motor</span><input formControlName="engineNumber" maxlength="100"
+      /></label>
+      <label class="quick-field quick-field--wide"
+        ><span>Notas</span><textarea formControlName="notes" maxlength="1000"></textarea>
+      </label>
+    </div>
+    <footer class="quick-create-actions">
+      <button class="quick-create-actions__cancel" type="button" (click)="cancel()">
+        Cancelar
+      </button>
+      <button
+        class="quick-create-actions__save"
+        type="button"
+        [disabled]="saving()"
+        (click)="save()"
+      >
+        {{ saving() ? 'Guardando...' : 'Crear y seleccionar' }}
+      </button>
+    </footer>
+  </section>
+</div>

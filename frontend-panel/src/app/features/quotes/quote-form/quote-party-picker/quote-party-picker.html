@@ -1,0 +1,117 @@
+<section class="party-section">
+  <header>
+    <span>1</span>
+    <div>
+      <h2>Cliente y vehículo</h2>
+      <p>Buscá registros existentes o crealos sin salir del presupuesto.</p>
+    </div>
+  </header>
+  @if (errorMessage()) {
+    <p class="party-error" role="alert">{{ errorMessage() }}</p>
+  }
+  <div class="party-grid">
+    <div class="party-field">
+      <div class="party-field__heading">
+        <label>Cliente</label
+        ><button type="button" (click)="creationMode.set('customer')">Crear cliente</button>
+      </div>
+      @if (customerId()) {
+        <div class="selected">
+          <div>
+            <span>Cliente seleccionado</span><strong>{{ customerLabel() }}</strong>
+          </div>
+          <button type="button" (click)="clearCustomer()">Cambiar</button>
+        </div>
+      } @else {
+        <div class="autocomplete">
+          <input
+            type="search"
+            placeholder="Nombre, DNI, teléfono o email"
+            autocomplete="off"
+            [formControl]="customerSearch"
+            (focus)="customerResultsOpen.set(true)"
+          />
+          @if (customerResultsOpen()) {
+            <div class="results">
+              @if (loadingCustomers()) {
+                <p>Buscando clientes...</p>
+              } @else {
+                @for (customer of customers(); track customer.id) {
+                  <button type="button" (click)="selectCustomer(customer)">
+                    <strong>{{ customer.firstName }} {{ customer.lastName }}</strong
+                    ><span
+                      >{{ customer.documentNumber || 'Sin documento' }} · {{ customer.phone }}</span
+                    >
+                  </button>
+                } @empty {
+                  <p>No encontramos clientes.</p>
+                }
+              }
+            </div>
+          }
+        </div>
+      }
+      @if (form().get('customerId')?.touched && form().get('customerId')?.invalid) {
+        <small>Seleccioná un cliente.</small>
+      }
+    </div>
+    <div class="party-field">
+      <div class="party-field__heading">
+        <label>Vehículo</label
+        ><button type="button" (click)="openVehicleCreation()">Crear vehículo</button>
+      </div>
+      @if (vehicleId()) {
+        <div class="selected">
+          <div>
+            <span>Vehículo seleccionado</span><strong>{{ vehicleLabel() }}</strong>
+          </div>
+          <button type="button" (click)="clearVehicle()">Cambiar</button>
+        </div>
+      } @else {
+        <div class="autocomplete">
+          <input
+            type="search"
+            placeholder="Buscar por patente"
+            autocomplete="off"
+            [formControl]="vehicleSearch"
+            (focus)="vehicleResultsOpen.set(true)"
+          />
+          @if (vehicleResultsOpen()) {
+            <div class="results">
+              @if (loadingVehicles()) {
+                <p>Buscando vehículos...</p>
+              } @else {
+                @for (vehicle of vehicles(); track vehicle.id) {
+                  <button type="button" (click)="selectVehicle(vehicle)">
+                    <strong
+                      >{{ vehicle.licensePlate }} · {{ vehicle.brand }} {{ vehicle.model }}</strong
+                    ><span>{{ vehicle.customerFirstName }} {{ vehicle.customerLastName }}</span>
+                  </button>
+                } @empty {
+                  <p>No encontramos vehículos.</p>
+                }
+              }
+            </div>
+          }
+        </div>
+      }
+      @if (form().get('vehicleId')?.touched && form().get('vehicleId')?.invalid) {
+        <small>Seleccioná un vehículo.</small>
+      }
+    </div>
+  </div>
+</section>
+
+@if (creationMode() === 'customer') {
+  <app-customer-quick-create
+    (saved)="customerCreated($event)"
+    (cancelled)="creationMode.set(null)"
+  />
+}
+@if (creationMode() === 'vehicle' && customerId(); as id) {
+  <app-vehicle-quick-create
+    [customerId]="id"
+    (saved)="vehicleCreated($event)"
+    (cancelled)="creationMode.set(null)"
+  />
+}

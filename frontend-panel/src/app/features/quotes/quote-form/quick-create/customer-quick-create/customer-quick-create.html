@@ -1,0 +1,52 @@
+<div class="quick-create-backdrop" role="presentation">
+  <section class="quick-create-dialog" role="dialog" aria-modal="true">
+    <header class="quick-create-header">
+      <div>
+        <p>Nuevo registro</p>
+        <h2>Crear cliente</h2>
+      </div>
+      <button class="quick-create-close" type="button" aria-label="Cerrar" (click)="cancel()">
+        &times;
+      </button>
+    </header>
+    @if (errorMessage()) {
+      <p class="quick-error" role="alert">{{ errorMessage() }}</p>
+    }
+    <div class="quick-create-form" [formGroup]="form">
+      <label class="quick-field"
+        ><span>Nombre</span><input formControlName="firstName" maxlength="120"
+      /></label>
+      <label class="quick-field"
+        ><span>Apellido</span><input formControlName="lastName" maxlength="120"
+      /></label>
+      <label class="quick-field"
+        ><span>Documento</span><input formControlName="documentNumber" maxlength="30"
+      /></label>
+      <label class="quick-field"
+        ><span>Teléfono</span><input type="tel" formControlName="phone" maxlength="30"
+      /></label>
+      <label class="quick-field"
+        ><span>Email</span><input type="email" formControlName="email" maxlength="255"
+      /></label>
+      <label class="quick-field"
+        ><span>Dirección</span><input formControlName="address" maxlength="255"
+      /></label>
+      <label class="quick-field quick-field--wide"
+        ><span>Notas</span><textarea formControlName="notes" maxlength="1000"></textarea>
+      </label>
+    </div>
+    <footer class="quick-create-actions">
+      <button class="quick-create-actions__cancel" type="button" (click)="cancel()">
+        Cancelar
+      </button>
+      <button
+        class="quick-create-actions__save"
+        type="button"
+        [disabled]="saving()"
+        (click)="save()"
+      >
+        {{ saving() ? 'Guardando...' : 'Crear y seleccionar' }}
+      </button>
+    </footer>
+  </section>
+</div>

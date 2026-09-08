@@ -1,0 +1,148 @@
+.party-section {
+  padding: 24px;
+  border: 1px solid rgba(21, 156, 255, 0.16);
+  border-radius: 10px;
+  background: #fff;
+}
+header {
+  display: flex;
+  gap: 14px;
+  margin-bottom: 24px;
+}
+header > span {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  color: #fff;
+  background: #078cf0;
+  font-weight: 800;
+}
+h2 {
+  margin: 0;
+  color: #07182e;
+  font-size: 1.22rem;
+}
+header p {
+  margin: 6px 0 0;
+  color: #6d7f97;
+}
+.party-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+.party-field__heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.party-field__heading label {
+  color: #243a57;
+  font-weight: 800;
+}
+.party-field__heading button {
+  border: 0;
+  color: #078cf0;
+  background: transparent;
+  font-weight: 800;
+  cursor: pointer;
+}
+.autocomplete {
+  position: relative;
+}
+.autocomplete > input {
+  width: 100%;
+  min-height: 46px;
+  padding: 0 13px;
+  border: 1px solid #c8d7eb;
+  border-radius: 8px;
+  outline: 0;
+}
+.autocomplete > input:focus {
+  border-color: #159cff;
+  box-shadow: 0 0 0 4px rgba(21, 156, 255, 0.14);
+}
+.results {
+  position: absolute;
+  z-index: 20;
+  top: calc(100% + 6px);
+  right: 0;
+  left: 0;
+  padding: 6px;
+  border: 1px solid #c8d7eb;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 18px 45px rgba(12, 27, 51, 0.18);
+}
+.results > button {
+  width: 100%;
+  display: block;
+  padding: 11px 12px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+.results > button:hover {
+  background: #eef7ff;
+}
+.results strong,
+.results span {
+  display: block;
+}
+.results span {
+  margin-top: 4px;
+  color: #6d7f97;
+}
+.results p {
+  padding: 10px;
+  color: #60728c;
+  text-align: center;
+}
+.selected {
+  min-height: 58px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 12px;
+  border: 1px solid #9dcdf3;
+  border-radius: 8px;
+  background: #f1f8ff;
+}
+.selected span,
+.selected strong {
+  display: block;
+}
+.selected span {
+  color: #60728c;
+  font-size: 0.76rem;
+}
+.selected button {
+  padding: 7px 10px;
+  border: 1px solid #b6d9f5;
+  border-radius: 7px;
+  color: #067bd2;
+  background: #fff;
+  cursor: pointer;
+}
+small,
+.party-error {
+  color: #b3261e;
+}
+.party-error {
+  padding: 10px;
+  background: #fdecea;
+}
+@media (max-width: 760px) {
+  .party-section {
+    padding: 18px;
+  }
+  .party-grid {
+    grid-template-columns: 1fr;
+  }
+}

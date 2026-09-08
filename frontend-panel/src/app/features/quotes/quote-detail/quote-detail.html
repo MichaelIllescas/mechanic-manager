@@ -1,0 +1,169 @@
+<main class="quote-detail-page">
+  <section class="quote-detail-toolbar no-print">
+    <a class="toolbar-back" routerLink="/quotes">Volver a presupuestos</a>
+
+    <div class="toolbar-actions">
+      @if (quote(); as currentQuote) {
+        <a [routerLink]="['/quotes', currentQuote.id, 'editar']">Editar</a>
+        <button type="button" (click)="downloadQuote()">Descargar PDF</button>
+      }
+    </div>
+  </section>
+
+  @if (errorMessage()) {
+    <p class="detail-alert no-print" role="alert">{{ errorMessage() }}</p>
+  }
+
+  @if (loading()) {
+    <section class="quote-document quote-document--loading">Cargando presupuesto...</section>
+  } @else if (quote(); as currentQuote) {
+    <section class="quote-document">
+      <header class="document-header">
+        <div class="document-brand">
+          <img class="document-brand__logo" src="/brand/logo-mechanic.jpeg" alt="Logo del taller" />
+          <div>
+            <span>Presupuesto de reparación</span>
+          </div>
+        </div>
+
+        <div class="document-number">
+          <span>Presupuesto</span>
+          <strong>#{{ currentQuote.number }}</strong>
+        </div>
+      </header>
+
+      <div class="document-meta">
+        <div>
+          <span>Fecha de emisión</span>
+          <strong>{{ localDateTime(currentQuote.createdAt) | date: 'dd/MM/yyyy' }}</strong>
+        </div>
+        <div>
+          <span>Válido hasta</span>
+          <strong>
+            {{
+              currentQuote.validUntil ? (currentQuote.validUntil | date: 'dd/MM/yyyy') : 'Sin fecha'
+            }}
+          </strong>
+        </div>
+        <div>
+          <span>Estado</span>
+          <strong
+            class="quote-status"
+            [class.quote-status--pending]="currentQuote.status === 'PENDING'"
+            [class.quote-status--approved]="currentQuote.status === 'APPROVED'"
+            [class.quote-status--rejected]="currentQuote.status === 'REJECTED'"
+          >
+            {{ statusLabel(currentQuote.status) }}
+          </strong>
+        </div>
+      </div>
+
+      <div class="party-summary">
+        <article>
+          <span>Cliente</span>
+          <strong>{{ currentQuote.customerName }}</strong>
+          <small>Cliente #{{ currentQuote.customerId }}</small>
+        </article>
+        <article>
+          <span>Vehículo</span>
+          <strong>{{ currentQuote.vehicleLicensePlate }}</strong>
+          <small>{{ currentQuote.vehicleDescription }}</small>
+        </article>
+      </div>
+
+      <div class="document-items-wrap">
+        <table class="document-items">
+          <thead>
+            <tr>
+              <th>Descripción</th>
+              <th>Cantidad</th>
+              <th>Precio unitario</th>
+              <th>Subtotal</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of currentQuote.items; track item.id) {
+              <tr>
+                <td>
+                  <strong>{{ item.description }}</strong>
+                  @if (item.serviceTypeId) {
+                    <span>Servicio</span>
+                  } @else if (item.supplyId) {
+                    <span>Insumo</span>
+                  } @else {
+                    <span>Ítem personalizado</span>
+                  }
+                </td>
+                <td>{{ item.quantity }}</td>
+                <td>{{ item.unitPrice | currency: 'ARS' : 'code' : '1.2-2' }}</td>
+                <td>{{ item.subtotal | currency: 'ARS' : 'code' : '1.2-2' }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <div class="document-total">
+        <span>Total estimado</span>
+        <strong>{{ currentQuote.total | currency: 'ARS' : 'code' : '1.2-2' }}</strong>
+      </div>
+
+      @if (currentQuote.notes) {
+        <section class="document-notes">
+          <h2>Observaciones</h2>
+          <p>{{ currentQuote.notes }}</p>
+        </section>
+      }
+
+      <footer class="document-footer">
+        <p>
+          Este presupuesto corresponde a los trabajos e insumos detallados y puede modificarse
+          posteriormente.
+        </p>
+        <span>
+          Última actualización:
+          {{ localDateTime(currentQuote.updatedAt) | date: 'dd/MM/yyyy HH:mm' }}
+        </span>
+        @if (downloadedAt(); as downloadDate) {
+          <span class="download-date">
+            Descargado el {{ downloadDate | date: 'dd/MM/yyyy HH:mm' }}
+          </span>
+        }
+      </footer>
+    </section>
+
+    <section class="status-panel no-print" aria-label="Cambiar estado del presupuesto">
+      <div>
+        <h2>Estado del presupuesto</h2>
+        <p>Podés corregir o editar el presupuesto independientemente de su estado.</p>
+      </div>
+
+      <div class="status-actions">
+        <button
+          type="button"
+          [class.status-actions__button--active]="currentQuote.status === 'PENDING'"
+          [disabled]="updatingStatus() || currentQuote.status === 'PENDING'"
+          (click)="updateStatus('PENDING')"
+        >
+          Pendiente
+        </button>
+        <button
+          type="button"
+          [class.status-actions__button--approved]="currentQuote.status === 'APPROVED'"
+          [disabled]="updatingStatus() || currentQuote.status === 'APPROVED'"
+          (click)="updateStatus('APPROVED')"
+        >
+          Aprobado
+        </button>
+        <button
+          type="button"
+          [class.status-actions__button--rejected]="currentQuote.status === 'REJECTED'"
+          [disabled]="updatingStatus() || currentQuote.status === 'REJECTED'"
+          (click)="updateStatus('REJECTED')"
+        >
+          Rechazado
+        </button>
+      </div>
+    </section>
+  }
+</main>

@@ -1,0 +1,55 @@
+<main class="quote-form-page">
+  <header class="page-header">
+    <div>
+      <p>Presupuestos</p>
+      <h1>{{ isEdit() ? 'Editar presupuesto' : 'Nuevo presupuesto' }}</h1>
+      <span>Completá el cliente, vehículo y los trabajos a presupuestar.</span>
+    </div>
+    <a routerLink="/quotes">Volver al listado</a>
+  </header>
+
+  @if (errorMessage()) {
+    <p class="form-alert" role="alert">{{ errorMessage() }}</p>
+  }
+  @if (loading()) {
+    <section class="loading">Cargando presupuesto...</section>
+  } @else {
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <app-quote-party-picker
+        [form]="$any(form)"
+        [initialCustomerLabel]="customerLabel()"
+        [initialVehicleLabel]="vehicleLabel()"
+      />
+      <app-quote-items-editor [items]="$any(items)" />
+
+      <section class="metadata-card">
+        <header>
+          <span>3</span>
+          <div>
+            <h2>Vigencia y observaciones</h2>
+            <p>Estos datos son opcionales y pueden modificarse después.</p>
+          </div>
+        </header>
+        <div class="metadata-grid">
+          <label><span>Válido hasta</span><input type="date" formControlName="validUntil" /></label>
+          <label class="notes"
+            ><span>Observaciones</span
+            ><textarea
+              formControlName="notes"
+              rows="4"
+              maxlength="2000"
+              placeholder="Condiciones o aclaraciones"
+            ></textarea>
+          </label>
+        </div>
+      </section>
+
+      <footer class="form-actions">
+        <a routerLink="/quotes">Cancelar</a>
+        <button type="submit" [disabled]="saving()">
+          {{ saving() ? 'Guardando...' : isEdit() ? 'Guardar cambios' : 'Crear presupuesto' }}
+        </button>
+      </footer>
+    </form>
+  }
+</main>

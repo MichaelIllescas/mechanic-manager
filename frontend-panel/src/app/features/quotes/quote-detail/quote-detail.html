@@ -94,9 +94,9 @@
                     <span>Ítem personalizado</span>
                   }
                 </td>
-                <td>{{ item.quantity }}</td>
-                <td>{{ item.unitPrice | currency: 'ARS' : 'code' : '1.2-2' }}</td>
-                <td>{{ item.subtotal | currency: 'ARS' : 'code' : '1.2-2' }}</td>
+                <td data-label="Cantidad">{{ item.quantity }}</td>
+                <td data-label="Precio unitario">{{ item.unitPrice | currency: 'ARS' : 'code' : '1.2-2' }}</td>
+                <td data-label="Subtotal">{{ item.subtotal | currency: 'ARS' : 'code' : '1.2-2' }}</td>
               </tr>
             }
           </tbody>

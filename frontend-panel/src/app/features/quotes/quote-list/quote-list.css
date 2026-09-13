@@ -396,4 +396,96 @@
   .pagination {
     justify-content: space-between;
   }
+
+  .search input {
+    font-size: 16px;
+  }
+
+  /* En celular cada presupuesto es una tarjeta: sin scroll horizontal. */
+  .quotes-table {
+    min-width: 0;
+  }
+
+  .quotes-table thead {
+    display: none;
+  }
+
+  .quotes-table tbody {
+    display: grid;
+    gap: 12px;
+    padding: 14px;
+  }
+
+  .quotes-table tbody tr {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 10px 12px;
+    padding: 14px;
+    border: 1px solid #d9e7f7;
+    border-radius: 8px;
+    background: #fff;
+  }
+
+  .quotes-table tbody tr:hover {
+    background: #fff;
+  }
+
+  .quotes-table td,
+  .quotes-table td:last-child {
+    width: auto;
+    padding: 0;
+    border: 0;
+    text-align: left;
+  }
+
+  .quotes-table td[data-label] {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .quotes-table td[data-label]::before {
+    content: attr(data-label);
+    color: #60728c;
+    font-size: 0.78rem;
+    font-weight: 800;
+  }
+
+  .quotes-table .quote-cell--number {
+    grid-row: 1;
+    grid-column: 1;
+  }
+
+  .quotes-table .quote-cell--status {
+    grid-row: 1;
+    grid-column: 2;
+    align-self: start;
+    justify-self: end;
+  }
+
+  .quotes-table .quote-cell--actions {
+    grid-column: 1 / -1;
+    padding-top: 10px;
+    border-top: 1px solid #e5eef9;
+  }
+
+  .quotes-table .actions {
+    justify-content: flex-end;
+  }
+
+  .quotes-table .table-message,
+  .quotes-table .empty-state {
+    grid-column: 1 / -1;
+    height: auto;
+    padding: 24px 8px;
+    text-align: center;
+  }
+
+  .quotes-table tbody tr:has(.table-message),
+  .quotes-table tbody tr:has(.empty-state) {
+    display: block;
+    border: 0;
+  }
 }

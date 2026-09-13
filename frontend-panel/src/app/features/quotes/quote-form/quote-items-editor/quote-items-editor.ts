@@ -8,6 +8,7 @@ import {
   inject,
   input,
   signal,
+  WritableSignal,
 } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import {
@@ -105,6 +106,12 @@ export class QuoteItemsEditor implements OnInit {
     this.creationMode.set(null);
     this.supplies.update((items) => [supply, ...items]);
     this.addSupply(supply);
+  }
+
+  /** Cierra el desplegable cuando el foco sale del autocomplete (click afuera o Tab). */
+  closeOnFocusOut(event: FocusEvent, open: WritableSignal<boolean>): void {
+    const container = event.currentTarget as HTMLElement;
+    if (!container.contains(event.relatedTarget as Node | null)) open.set(false);
   }
 
   addManualItem(): void {

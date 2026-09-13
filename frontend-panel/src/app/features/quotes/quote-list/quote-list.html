@@ -100,18 +100,18 @@
           } @else {
             @for (quote of quotes(); track quote.id) {
               <tr>
-                <td>
+                <td class="quote-cell--number">
                   <a class="quote-number" [routerLink]="['/quotes', quote.id]">
                     #{{ quote.number }}
                   </a>
                   <span class="quote-created">{{ quote.createdAt | date: 'dd/MM/yyyy' }}</span>
                 </td>
-                <td>{{ quote.customerName }}</td>
-                <td>
+                <td data-label="Cliente">{{ quote.customerName }}</td>
+                <td data-label="Vehículo">
                   <span class="license-plate">{{ quote.vehicleLicensePlate }}</span>
                 </td>
-                <td>{{ quote.validUntil ? (quote.validUntil | date: 'dd/MM/yyyy') : 'Sin fecha' }}</td>
-                <td>
+                <td data-label="Válido hasta">{{ quote.validUntil ? (quote.validUntil | date: 'dd/MM/yyyy') : 'Sin fecha' }}</td>
+                <td class="quote-cell--status">
                   <span
                     class="quote-status"
                     [class.quote-status--pending]="quote.status === 'PENDING'"
@@ -121,8 +121,8 @@
                     {{ statusLabel(quote.status) }}
                   </span>
                 </td>
-                <td class="quote-total">{{ quote.total | currency: 'ARS' : 'code' : '1.2-2' }}</td>
-                <td>
+                <td class="quote-total" data-label="Total">{{ quote.total | currency: 'ARS' : 'code' : '1.2-2' }}</td>
+                <td class="quote-cell--actions">
                   <div class="actions">
                     <button
                       class="actions__button actions__button--secondary"

@@ -75,6 +75,19 @@ describe('QuotePartyPicker', () => {
     expect(component.vehicleLabel()).toContain('AB123CD');
   });
 
+  it('closes the customer suggestions when clicking outside', async () => {
+    const input: HTMLInputElement = fixture.nativeElement.querySelector('.autocomplete input');
+    input.dispatchEvent(new FocusEvent('focus'));
+    fixture.detectChanges();
+    expect(component.customerResultsOpen()).toBe(true);
+
+    input.dispatchEvent(new FocusEvent('focusout', { bubbles: true, relatedTarget: document.body }));
+    fixture.detectChanges();
+
+    expect(component.customerResultsOpen()).toBe(false);
+    expect(fixture.nativeElement.querySelector('.results')).toBeNull();
+  });
+
   it('requires a customer before creating a vehicle', () => {
     component.openVehicleCreation();
     expect(component.creationMode()).toBeNull();

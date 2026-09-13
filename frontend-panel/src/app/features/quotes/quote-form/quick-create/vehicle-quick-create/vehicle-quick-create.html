@@ -3,7 +3,7 @@
     <header class="quick-create-header">
       <div>
         <p>Nuevo registro</p>
-        <h2>Crear vehículo</h2>
+        <h2>Registrar vehículo</h2>
       </div>
       <button class="quick-create-close" type="button" aria-label="Cerrar" (click)="cancel()">
         &times;
@@ -56,7 +56,7 @@
         [disabled]="saving()"
         (click)="save()"
       >
-        {{ saving() ? 'Guardando...' : 'Crear y seleccionar' }}
+        {{ saving() ? 'Guardando...' : 'Registrar y seleccionar' }}
       </button>
     </footer>
   </section>

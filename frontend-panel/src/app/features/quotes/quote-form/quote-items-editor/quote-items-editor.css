@@ -175,9 +175,77 @@ td input {
   .catalog-grid {
     grid-template-columns: 1fr;
   }
+  .catalog-field > div {
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 4px 12px;
+  }
+  .autocomplete > input,
+  td input {
+    font-size: 16px;
+  }
   .items-heading {
     align-items: start;
     flex-direction: column;
     gap: 12px;
+  }
+
+  /* En celular cada ítem es una tarjeta: sin scroll horizontal. */
+  .table-wrap {
+    border: 0;
+    overflow: visible;
+  }
+  table {
+    min-width: 0;
+  }
+  thead {
+    display: none;
+  }
+  tbody tr {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    margin-bottom: 12px;
+    padding: 14px;
+    border: 1px solid #d9e7f7;
+    border-radius: 8px;
+    background: #fbfdff;
+  }
+  td,
+  td:first-child {
+    width: auto;
+    padding: 0;
+    border: 0;
+  }
+  td[data-label]::before {
+    content: attr(data-label);
+    display: block;
+    margin-bottom: 6px;
+    color: #60728c;
+    font-size: 0.78rem;
+    font-weight: 800;
+  }
+  td[data-label='Descripción'] {
+    grid-column: 1 / -1;
+    padding-right: 42px;
+  }
+  .remove-cell {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+  }
+  tbody tr:has(.empty) {
+    display: block;
+    padding: 0;
+    border-style: dashed;
+  }
+  .empty {
+    display: grid;
+    place-items: center;
+    padding: 16px;
+  }
+  .total {
+    justify-content: space-between;
   }
 }

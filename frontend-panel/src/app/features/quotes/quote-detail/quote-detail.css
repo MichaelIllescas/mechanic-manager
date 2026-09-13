@@ -453,6 +453,61 @@
   .status-actions {
     grid-template-columns: 1fr;
   }
+
+  /* En pantalla chica los ítems se apilan; la impresión mantiene la tabla. */
+  .document-items-wrap {
+    border: 0;
+    overflow: visible;
+  }
+
+  .document-items {
+    min-width: 0;
+  }
+
+  .document-items thead {
+    display: none;
+  }
+
+  .document-items tbody tr {
+    display: block;
+    margin-bottom: 10px;
+    padding: 14px;
+    border: 1px solid #d9e7f7;
+    border-radius: 8px;
+  }
+
+  .document-items td,
+  .document-items td:first-child {
+    width: auto;
+    display: block;
+    padding: 0;
+    border: 0;
+  }
+
+  .document-items td:first-child {
+    margin-bottom: 10px;
+  }
+
+  .document-items td[data-label] {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding-top: 6px;
+  }
+
+  .document-items td[data-label]::before {
+    content: attr(data-label);
+    color: #60728c;
+    font-size: 0.78rem;
+    font-weight: 800;
+  }
+
+  .document-items td[data-label='Subtotal'] {
+    margin-top: 6px;
+    padding-top: 10px;
+    border-top: 1px solid #e5eef9;
+    font-weight: 800;
+  }
 }
 
 @media print {

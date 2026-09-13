@@ -145,4 +145,23 @@ small,
   .party-grid {
     grid-template-columns: 1fr;
   }
+  .party-field__heading {
+    flex-wrap: wrap;
+    gap: 4px 12px;
+  }
+  .autocomplete > input {
+    font-size: 16px;
+  }
+  .selected {
+    gap: 12px;
+  }
+  .selected > div {
+    min-width: 0;
+  }
+  .selected strong {
+    overflow-wrap: anywhere;
+  }
+  .selected button {
+    flex: 0 0 auto;
+  }
 }

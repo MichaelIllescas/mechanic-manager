@@ -3,7 +3,7 @@
     <span>1</span>
     <div>
       <h2>Cliente y vehículo</h2>
-      <p>Buscá registros existentes o crealos sin salir del presupuesto.</p>
+      <p>Buscá registros existentes o registralos sin salir del presupuesto.</p>
     </div>
   </header>
   @if (errorMessage()) {
@@ -13,7 +13,7 @@
     <div class="party-field">
       <div class="party-field__heading">
         <label>Cliente</label
-        ><button type="button" (click)="creationMode.set('customer')">Crear cliente</button>
+        ><button type="button" (click)="creationMode.set('customer')">Registrar cliente</button>
       </div>
       @if (customerId()) {
         <div class="selected">
@@ -23,16 +23,18 @@
           <button type="button" (click)="clearCustomer()">Cambiar</button>
         </div>
       } @else {
-        <div class="autocomplete">
+        <div class="autocomplete" (focusout)="closeOnFocusOut($event, customerResultsOpen)">
           <input
             type="search"
             placeholder="Nombre, DNI, teléfono o email"
             autocomplete="off"
             [formControl]="customerSearch"
             (focus)="customerResultsOpen.set(true)"
+            (input)="customerResultsOpen.set(true)"
+            (keydown.escape)="customerResultsOpen.set(false)"
           />
           @if (customerResultsOpen()) {
-            <div class="results">
+            <div class="results" (mousedown)="$event.preventDefault()">
               @if (loadingCustomers()) {
                 <p>Buscando clientes...</p>
               } @else {
@@ -58,7 +60,7 @@
     <div class="party-field">
       <div class="party-field__heading">
         <label>Vehículo</label
-        ><button type="button" (click)="openVehicleCreation()">Crear vehículo</button>
+        ><button type="button" (click)="openVehicleCreation()">Registrar vehículo</button>
       </div>
       @if (vehicleId()) {
         <div class="selected">
@@ -68,16 +70,18 @@
           <button type="button" (click)="clearVehicle()">Cambiar</button>
         </div>
       } @else {
-        <div class="autocomplete">
+        <div class="autocomplete" (focusout)="closeOnFocusOut($event, vehicleResultsOpen)">
           <input
             type="search"
             placeholder="Buscar por patente"
             autocomplete="off"
             [formControl]="vehicleSearch"
             (focus)="vehicleResultsOpen.set(true)"
+            (input)="vehicleResultsOpen.set(true)"
+            (keydown.escape)="vehicleResultsOpen.set(false)"
           />
           @if (vehicleResultsOpen()) {
-            <div class="results">
+            <div class="results" (mousedown)="$event.preventDefault()">
               @if (loadingVehicles()) {
                 <p>Buscando vehículos...</p>
               } @else {

@@ -52,6 +52,33 @@ describe('QuoteItemsEditor', () => {
     expect(component.total()).toBe(12000);
   });
 
+  it('closes the suggestions when focus leaves the autocomplete', () => {
+    const container = document.createElement('section');
+    const outside = document.createElement('button');
+    component.supplyResultsOpen.set(true);
+
+    component.closeOnFocusOut(
+      { currentTarget: container, relatedTarget: outside } as unknown as FocusEvent,
+      component.supplyResultsOpen,
+    );
+
+    expect(component.supplyResultsOpen()).toBe(false);
+  });
+
+  it('keeps the suggestions open when focus moves inside the autocomplete', () => {
+    const container = document.createElement('section');
+    const option = document.createElement('button');
+    container.appendChild(option);
+    component.supplyResultsOpen.set(true);
+
+    component.closeOnFocusOut(
+      { currentTarget: container, relatedTarget: option } as unknown as FocusEvent,
+      component.supplyResultsOpen,
+    );
+
+    expect(component.supplyResultsOpen()).toBe(true);
+  });
+
   it('increments an existing catalog item instead of duplicating it', () => {
     component.addService(services[0]);
     component.addService(services[0]);

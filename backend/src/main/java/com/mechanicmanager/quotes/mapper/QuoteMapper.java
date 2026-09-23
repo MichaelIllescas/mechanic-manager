@@ -16,6 +16,7 @@ public class QuoteMapper {
                 quote.getNumber(),
                 quote.getCustomer().getId(),
                 customerName(quote),
+                quote.getCustomer().getDocumentNumber(),
                 quote.getVehicle().getId(),
                 quote.getVehicle().getLicensePlate(),
                 vehicleDescription(quote),

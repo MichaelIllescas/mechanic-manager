@@ -3,7 +3,7 @@
     <span>1</span>
     <div>
       <h2>Cliente y vehículo</h2>
-      <p>Buscá registros existentes o registralos sin salir del presupuesto.</p>
+      <p>Elegí un cliente y un vehículo, o registralos al instante.</p>
     </div>
   </header>
   @if (errorMessage()) {
@@ -13,7 +13,9 @@
     <div class="party-field">
       <div class="party-field__heading">
         <label>Cliente</label
-        ><button type="button" (click)="creationMode.set('customer')">Registrar cliente</button>
+        ><button type="button" class="new-btn" (click)="creationMode.set('customer')">
+          <span aria-hidden="true">+</span>Nuevo cliente
+        </button>
       </div>
       @if (customerId()) {
         <div class="selected">
@@ -60,7 +62,9 @@
     <div class="party-field">
       <div class="party-field__heading">
         <label>Vehículo</label
-        ><button type="button" (click)="openVehicleCreation()">Registrar vehículo</button>
+        ><button type="button" class="new-btn" (click)="openVehicleCreation()">
+          <span aria-hidden="true">+</span>Nuevo vehículo
+        </button>
       </div>
       @if (vehicleId()) {
         <div class="selected">

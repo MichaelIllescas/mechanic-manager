@@ -4,6 +4,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   DestroyRef,
+  HostListener,
   OnInit,
   inject,
   signal,
@@ -22,6 +23,7 @@ import {
   tap,
 } from 'rxjs';
 
+import { NotificationService } from '../../../core/notifications/notification-service';
 import { QuoteService } from '../quote-service';
 import { QuotePage, QuoteStatus, QuoteSummary } from '../quote.models';
 
@@ -40,6 +42,7 @@ interface QuoteSearchRequest {
 })
 export class QuoteList implements OnInit {
   private readonly quoteService = inject(QuoteService);
+  private readonly notifications = inject(NotificationService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly requests = new Subject<QuoteSearchRequest>();
 
@@ -51,6 +54,9 @@ export class QuoteList implements OnInit {
   readonly loading = signal(false);
   readonly errorMessage = signal<string | null>(null);
   readonly searchControl = new FormControl('', { nonNullable: true });
+  readonly openMenuId = signal<number | null>(null);
+  readonly menuPosition = signal<{ top?: number; bottom?: number; right: number } | null>(null);
+  readonly updatingStatusId = signal<number | null>(null);
 
   ngOnInit(): void {
     this.requests
@@ -106,6 +112,69 @@ export class QuoteList implements OnInit {
     if (this.page() + 1 < this.totalPages()) {
       this.loadPage(this.page() + 1);
     }
+  }
+
+  toggleMenu(quoteId: number, event: MouseEvent): void {
+    if (this.openMenuId() === quoteId) {
+      this.closeMenu();
+      return;
+    }
+
+    const button = event.currentTarget as HTMLElement;
+    const rect = button.getBoundingClientRect();
+    const dropdownHeight = 160;
+    const right = window.innerWidth - rect.right;
+
+    if (rect.bottom + 8 + dropdownHeight > window.innerHeight) {
+      this.menuPosition.set({ bottom: window.innerHeight - rect.top + 8, right });
+    } else {
+      this.menuPosition.set({ top: rect.bottom + 8, right });
+    }
+
+    this.openMenuId.set(quoteId);
+  }
+
+  closeMenu(): void {
+    this.openMenuId.set(null);
+    this.menuPosition.set(null);
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    if (this.openMenuId() === null) {
+      return;
+    }
+
+    const target = event.target as HTMLElement;
+    if (!target.closest('.status-menu')) {
+      this.closeMenu();
+    }
+  }
+
+  changeStatus(quote: QuoteSummary, status: QuoteStatus): void {
+    this.closeMenu();
+
+    if (quote.status === status || this.updatingStatusId()) {
+      return;
+    }
+
+    this.updatingStatusId.set(quote.id);
+
+    this.quoteService.updateStatus(quote.id, { status }).subscribe({
+      next: (updated) => {
+        this.quotes.update((list) =>
+          list.map((item) => (item.id === updated.id ? { ...item, status: updated.status } : item)),
+        );
+        this.updatingStatusId.set(null);
+        this.notifications.success(
+          `Presupuesto marcado como ${this.statusLabel(status).toLowerCase()}`,
+        );
+      },
+      error: (error: HttpErrorResponse) => {
+        this.updatingStatusId.set(null);
+        this.notifications.error(error.error?.message ?? 'No se pudo actualizar el estado');
+      },
+    });
   }
 
   statusLabel(status: QuoteStatus): string {

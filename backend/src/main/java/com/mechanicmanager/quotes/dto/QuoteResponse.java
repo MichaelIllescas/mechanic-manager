@@ -12,6 +12,7 @@ public record QuoteResponse(
         Long number,
         Long customerId,
         String customerName,
+        String customerDocumentNumber,
         Long vehicleId,
         String vehicleLicensePlate,
         String vehicleDescription,

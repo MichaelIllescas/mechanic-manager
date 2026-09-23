@@ -148,6 +148,52 @@
                         <path d="m14.2 7 2.8 2.8" />
                       </svg>
                     </button>
+                    <div class="status-menu">
+                      <button
+                        class="actions__button"
+                        type="button"
+                        aria-label="Cambiar estado"
+                        title="Cambiar estado"
+                        [disabled]="updatingStatusId() === quote.id"
+                        (click)="toggleMenu(quote.id, $event)"
+                      >
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                          <circle cx="5" cy="12" r="1.6" />
+                          <circle cx="12" cy="12" r="1.6" />
+                          <circle cx="19" cy="12" r="1.6" />
+                        </svg>
+                      </button>
+                      @if (openMenuId() === quote.id && menuPosition(); as position) {
+                        <div
+                          class="status-menu__dropdown"
+                          [style.top.px]="position.top ?? null"
+                          [style.bottom.px]="position.bottom ?? null"
+                          [style.right.px]="position.right"
+                        >
+                          <button
+                            type="button"
+                            [disabled]="quote.status === 'PENDING'"
+                            (click)="changeStatus(quote, 'PENDING')"
+                          >
+                            Marcar pendiente
+                          </button>
+                          <button
+                            type="button"
+                            [disabled]="quote.status === 'APPROVED'"
+                            (click)="changeStatus(quote, 'APPROVED')"
+                          >
+                            Marcar aprobado
+                          </button>
+                          <button
+                            type="button"
+                            [disabled]="quote.status === 'REJECTED'"
+                            (click)="changeStatus(quote, 'REJECTED')"
+                          >
+                            Marcar rechazado
+                          </button>
+                        </div>
+                      }
+                    </div>
                   </div>
                 </td>
               </tr>

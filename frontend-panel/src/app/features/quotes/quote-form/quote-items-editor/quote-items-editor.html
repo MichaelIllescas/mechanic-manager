@@ -13,7 +13,9 @@
     <div class="catalog-field">
       <div>
         <label>Agregar servicio</label
-        ><button type="button" (click)="creationMode.set('service')">Crear servicio</button>
+        ><button type="button" class="new-btn" (click)="creationMode.set('service')">
+          <span aria-hidden="true">+</span>Nuevo servicio
+        </button>
       </div>
       <section class="autocomplete" (focusout)="closeOnFocusOut($event, serviceResultsOpen)">
         <input
@@ -46,7 +48,9 @@
     <div class="catalog-field">
       <div>
         <label>Agregar insumo</label
-        ><button type="button" (click)="creationMode.set('supply')">Crear insumo</button>
+        ><button type="button" class="new-btn" (click)="creationMode.set('supply')">
+          <span aria-hidden="true">+</span>Nuevo insumo
+        </button>
       </div>
       <section class="autocomplete" (focusout)="closeOnFocusOut($event, supplyResultsOpen)">
         <input
@@ -82,7 +86,9 @@
       <h3>Detalle del presupuesto</h3>
       <p>Podés ajustar descripción, cantidad y precio.</p>
     </div>
-    <button type="button" (click)="addManualItem()">Agregar ítem manual</button>
+    <button type="button" class="new-btn" (click)="addManualItem()">
+      <span aria-hidden="true">+</span>Ítem manual
+    </button>
   </div>
   <div class="table-wrap">
     <table>

@@ -11,6 +11,8 @@ import {
 import { ActivatedRoute, RouterLink } from '@angular/router';
 
 import { NotificationService } from '../../../core/notifications/notification-service';
+import { Workshop } from '../../workshop/workshop.models';
+import { WorkshopService } from '../../workshop/workshop-service';
 import { QuoteService } from '../quote-service';
 import { Quote, QuoteStatus } from '../quote.models';
 
@@ -24,10 +26,12 @@ import { Quote, QuoteStatus } from '../quote.models';
 export class QuoteDetail implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly quoteService = inject(QuoteService);
+  private readonly workshopService = inject(WorkshopService);
   private readonly notifications = inject(NotificationService);
   private readonly changeDetector = inject(ChangeDetectorRef);
 
   readonly quote = signal<Quote | null>(null);
+  readonly workshop = signal<Workshop | null>(null);
   readonly loading = signal(false);
   readonly updatingStatus = signal(false);
   readonly errorMessage = signal<string | null>(null);
@@ -42,6 +46,10 @@ export class QuoteDetail implements OnInit {
     }
 
     this.loadQuote(quoteId);
+    this.workshopService.findMine().subscribe({
+      next: (workshop) => this.workshop.set(workshop),
+      error: () => this.workshop.set(null),
+    });
   }
 
   updateStatus(status: QuoteStatus): void {
@@ -76,6 +84,10 @@ export class QuoteDetail implements OnInit {
     document.title = '';
     window.print();
     document.title = previousTitle;
+  }
+
+  formatNumber(number: number): string {
+    return number.toString().padStart(4, '0');
   }
 
   statusLabel(status: QuoteStatus): string {

@@ -44,12 +44,27 @@ header p {
   color: #243a57;
   font-weight: 800;
 }
-.party-field__heading button {
-  border: 0;
-  color: #078cf0;
-  background: transparent;
-  font-weight: 800;
+.party-field__heading .new-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  border: 1px solid #b6d9f5;
+  border-radius: 999px;
+  color: #067bd2;
+  background: #f1f8ff;
+  font-size: 0.82rem;
+  font-weight: 700;
   cursor: pointer;
+  transition: background 0.15s ease;
+}
+.party-field__heading .new-btn:hover {
+  background: #e0f0ff;
+}
+.party-field__heading .new-btn span {
+  font-size: 1rem;
+  font-weight: 800;
+  line-height: 1;
 }
 .autocomplete {
   position: relative;

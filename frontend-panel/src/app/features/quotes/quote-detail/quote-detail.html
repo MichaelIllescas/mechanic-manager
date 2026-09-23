@@ -20,15 +20,30 @@
     <section class="quote-document">
       <header class="document-header">
         <div class="document-brand">
-          <img class="document-brand__logo" src="/brand/logo-mechanic.jpeg" alt="Logo del taller" />
-          <div>
-            <span>Presupuesto de reparación</span>
+          <div class="document-brand__logo-wrap">
+            <img class="document-brand__logo" src="/brand/logo-mechanic.jpeg" alt="Logo del taller" />
           </div>
+          @if (workshop(); as currentWorkshop) {
+            <div class="document-workshop">
+              @if (currentWorkshop.name) {
+                <strong>{{ currentWorkshop.name }}</strong>
+              }
+              @if (currentWorkshop.address) {
+                <span>{{ currentWorkshop.address }}</span>
+              }
+              @if (currentWorkshop.phone) {
+                <span>Tel: {{ currentWorkshop.phone }}</span>
+              }
+              @if (currentWorkshop.email) {
+                <span>{{ currentWorkshop.email }}</span>
+              }
+            </div>
+          }
         </div>
 
         <div class="document-number">
-          <span>Presupuesto</span>
-          <strong>#{{ currentQuote.number }}</strong>
+          <span>Presupuesto de reparación</span>
+          <strong>N.° {{ formatNumber(currentQuote.number) }}</strong>
         </div>
       </header>
 
@@ -62,7 +77,9 @@
         <article>
           <span>Cliente</span>
           <strong>{{ currentQuote.customerName }}</strong>
-          <small>Cliente #{{ currentQuote.customerId }}</small>
+          @if (currentQuote.customerDocumentNumber) {
+            <small>DNI {{ currentQuote.customerDocumentNumber }}</small>
+          }
         </article>
         <article>
           <span>Vehículo</span>
@@ -116,18 +133,37 @@
       }
 
       <footer class="document-footer">
-        <p>
-          Este presupuesto corresponde a los trabajos e insumos detallados y puede modificarse
-          posteriormente.
-        </p>
-        <span>
-          Última actualización:
-          {{ localDateTime(currentQuote.updatedAt) | date: 'dd/MM/yyyy HH:mm' }}
-        </span>
-        @if (downloadedAt(); as downloadDate) {
-          <span class="download-date">
-            Descargado el {{ downloadDate | date: 'dd/MM/yyyy HH:mm' }}
+        <div class="document-footer__legal">
+          <p>
+            Este presupuesto corresponde a los trabajos e insumos detallados y puede modificarse
+            posteriormente.
+          </p>
+          <span class="no-print">
+            Última actualización:
+            {{ localDateTime(currentQuote.updatedAt) | date: 'dd/MM/yyyy HH:mm' }}
           </span>
+          @if (downloadedAt(); as downloadDate) {
+            <span class="download-date no-print">
+              Descargado el {{ downloadDate | date: 'dd/MM/yyyy HH:mm' }}
+            </span>
+          }
+        </div>
+        @if (workshop(); as currentWorkshop) {
+          <div class="document-footer__thanks">
+            <strong>¡Gracias por confiar en {{ currentWorkshop.name || 'nosotros' }}!</strong>
+            <span>
+              Consultas:
+              @if (currentWorkshop.phone) {
+                {{ currentWorkshop.phone }}
+              }
+              @if (currentWorkshop.phone && currentWorkshop.email) {
+                ·
+              }
+              @if (currentWorkshop.email) {
+                {{ currentWorkshop.email }}
+              }
+            </span>
+          </div>
         }
       </footer>
     </section>

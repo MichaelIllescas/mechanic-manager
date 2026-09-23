@@ -183,7 +183,7 @@
   font-size: 0.76rem;
   font-weight: 800;
   letter-spacing: 0.08em;
-  text-align: left;
+  text-align: center;
   text-transform: uppercase;
 }
 
@@ -191,6 +191,7 @@
   padding: 18px 20px;
   border-top: 1px solid #e5eef9;
   color: #10233d;
+  text-align: center;
   vertical-align: middle;
 }
 
@@ -200,7 +201,12 @@
 
 .quotes-table__actions-heading,
 .quotes-table td:last-child {
-  width: 100px;
+  width: 130px;
+  text-align: center;
+}
+
+.quotes-table th:nth-child(5),
+.quotes-table .quote-cell--status {
   text-align: center;
 }
 
@@ -311,6 +317,48 @@
 .pagination button:focus-visible {
   outline: 3px solid rgba(21, 156, 255, 0.22);
   outline-offset: 2px;
+}
+
+.status-menu {
+  position: relative;
+}
+
+.status-menu > .actions__button svg circle {
+  fill: currentColor;
+  stroke: none;
+}
+
+.status-menu__dropdown {
+  position: fixed;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  width: 190px;
+  padding: 6px;
+  border: 1px solid #d9e7f7;
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 18px 45px rgba(12, 27, 51, 0.18);
+}
+
+.status-menu__dropdown button {
+  padding: 10px 12px;
+  border: 0;
+  border-radius: 7px;
+  color: #243a57;
+  background: transparent;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+}
+
+.status-menu__dropdown button:hover:not(:disabled) {
+  background: #eef7ff;
+}
+
+.status-menu__dropdown button:disabled {
+  color: #a9b8ca;
+  cursor: default;
 }
 
 .actions__button svg {

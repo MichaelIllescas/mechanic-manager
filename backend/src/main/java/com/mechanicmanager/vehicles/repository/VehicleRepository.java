@@ -28,4 +28,6 @@ public interface VehicleRepository extends
             String licensePlate,
             Long id
     );
+
+    long countByUserId(Long userId);
 }

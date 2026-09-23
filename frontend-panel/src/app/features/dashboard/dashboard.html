@@ -2,79 +2,128 @@
   <header class="dashboard__header">
     <div>
       <p class="dashboard__eyebrow">Panel del taller</p>
-      <h1>Resumen de la operación</h1>
-      <p>Consultá el estado actual y accedé rápidamente a las tareas principales.</p>
+      <h1>{{ userName ? 'Buen día, ' + userName : 'Resumen de la operación' }}</h1>
+      <p>Una vista rápida de lo que necesita atención hoy.</p>
     </div>
 
-    <a class="dashboard__primary-action" routerLink="/appointments/new">
-      Nuevo turno
-    </a>
+    <div class="dashboard__header-actions">
+      <button type="button" class="button button--secondary" (click)="loadSummary()" [disabled]="loading()">
+        Actualizar
+      </button>
+      <a class="button button--primary" routerLink="/appointments/nuevo">Nuevo turno</a>
+    </div>
   </header>
 
-  <section class="dashboard__summary" aria-label="Resumen del taller">
-    <article class="summary-card">
-      <span class="summary-card__label">Turnos de hoy</span>
-      <strong class="summary-card__value">0</strong>
-      <a routerLink="/appointments">Ver agenda</a>
-    </article>
+  @if (errorMessage()) {
+    <div class="dashboard__error" role="alert">
+      <span>{{ errorMessage() }}</span>
+      <button type="button" (click)="loadSummary()">Reintentar</button>
+    </div>
+  }
 
-    <article class="summary-card">
-      <span class="summary-card__label">Servicios abiertos</span>
-      <strong class="summary-card__value">0</strong>
-      <a routerLink="/services">Ver servicios</a>
-    </article>
+  @if (loading() && !summary()) {
+    <section class="dashboard__summary" aria-label="Cargando resumen">
+      @for (item of [1, 2, 3, 4, 5]; track item) {
+        <article class="summary-card summary-card--loading" aria-hidden="true">
+          <span></span>
+          <strong></strong>
+        </article>
+      }
+    </section>
+  } @else if (summary(); as data) {
+    <section class="dashboard__summary" aria-label="Resumen del taller">
+      <article class="summary-card summary-card--appointments">
+        <span class="summary-card__label">Turnos de hoy</span>
+        <strong class="summary-card__value">{{ data.metrics.todayAppointments }}</strong>
+        <a routerLink="/appointments">Ver agenda</a>
+      </article>
 
-    <article class="summary-card">
-      <span class="summary-card__label">Presupuestos pendientes</span>
-      <strong class="summary-card__value">0</strong>
-      <a routerLink="/quotes">Ver presupuestos</a>
-    </article>
-  </section>
+      <article class="summary-card summary-card--quotes">
+        <span class="summary-card__label">Presupuestos pendientes</span>
+        <strong class="summary-card__value">{{ data.metrics.pendingQuotes }}</strong>
+        <a routerLink="/quotes">Revisar presupuestos</a>
+      </article>
 
-  <section class="dashboard__section">
-    <div class="dashboard__section-header">
-      <div>
-        <p class="dashboard__eyebrow">Accesos directos</p>
-        <h2>Acciones rápidas</h2>
-      </div>
+      <article class="summary-card summary-card--orders">
+        <span class="summary-card__label">Trabajos del mes</span>
+        <strong class="summary-card__value">{{ data.metrics.completedWorkOrdersThisMonth }}</strong>
+        <a routerLink="/work-orders">Ver trabajos</a>
+      </article>
+
+      <article class="summary-card summary-card--vehicles">
+        <span class="summary-card__label">Vehículos registrados</span>
+        <strong class="summary-card__value">{{ data.metrics.registeredVehicles }}</strong>
+        <a routerLink="/vehicles">Ver vehículos</a>
+      </article>
+    </section>
+
+    @if (data.alerts.expiredPendingQuotes > 0) {
+      <a class="dashboard__alert" routerLink="/quotes">
+        <span class="dashboard__alert-count">{{ data.alerts.expiredPendingQuotes }}</span>
+        <span>
+          <strong>Presupuestos pendientes vencidos</strong>
+          <small>Revisalos para mantener la lista comercial al día.</small>
+        </span>
+        <span class="dashboard__alert-action">Revisar</span>
+      </a>
+    }
+
+    <div class="dashboard__workspace">
+      <section class="dashboard__agenda">
+        <div class="dashboard__section-header">
+          <div>
+            <p class="dashboard__eyebrow">Agenda</p>
+            <h2>Actividad de hoy</h2>
+          </div>
+          <a routerLink="/appointments">Ver agenda completa</a>
+        </div>
+
+        @if (data.todayAppointments.length === 0) {
+          <div class="dashboard__empty-state">
+            <h3>No hay turnos programados para hoy</h3>
+            <p>Podés usar este espacio para adelantar presupuestos o registrar trabajos.</p>
+            <a routerLink="/appointments/nuevo">Agendar un turno</a>
+          </div>
+        } @else {
+          <div class="agenda-list">
+            @for (appointment of data.todayAppointments; track appointment.id) {
+              <a class="agenda-row" routerLink="/appointments">
+                <time [attr.datetime]="appointment.scheduledAt">
+                  {{ appointment.scheduledAt | date: 'HH:mm' }}
+                </time>
+                <span class="agenda-row__vehicle">
+                  <strong>{{ appointment.licensePlate }}</strong>
+                  <small>{{ appointment.vehicleDescription }}</small>
+                </span>
+                <span class="agenda-row__customer">{{ appointment.customerName }}</span>
+                <span class="status" [class]="'status status--' + appointment.status.toLowerCase()">
+                  {{ statusLabel(appointment.status) }}
+                </span>
+              </a>
+            }
+          </div>
+        }
+      </section>
+
+      <aside class="dashboard__quick-actions" aria-labelledby="quick-actions-title">
+        <div class="dashboard__section-header">
+          <div>
+            <p class="dashboard__eyebrow">Atajos</p>
+            <h2 id="quick-actions-title">Acciones rápidas</h2>
+          </div>
+        </div>
+
+        <nav class="quick-actions" aria-label="Acciones rápidas">
+          <a routerLink="/customers/nuevo"><strong>Nuevo cliente</strong><span>Registrar datos de contacto</span></a>
+          <a routerLink="/vehicles/nuevo"><strong>Nuevo vehículo</strong><span>Asociarlo con un cliente</span></a>
+          <a routerLink="/quotes/nuevo"><strong>Nuevo presupuesto</strong><span>Cotizar servicios e insumos</span></a>
+          <a routerLink="/work-orders/nuevo"><strong>Registrar trabajo</strong><span>Agregarlo al historial</span></a>
+        </nav>
+      </aside>
     </div>
 
-    <div class="quick-actions">
-      <a class="quick-action" routerLink="/customers/new">
-        <strong>Nuevo cliente</strong>
-        <span>Registrar los datos de un cliente.</span>
-      </a>
-
-      <a class="quick-action" routerLink="/vehicles/new">
-        <strong>Nuevo vehículo</strong>
-        <span>Asociar un vehículo a un cliente.</span>
-      </a>
-
-      <a class="quick-action" routerLink="/quotes/new">
-        <strong>Nuevo presupuesto</strong>
-        <span>Crear un presupuesto para un vehículo.</span>
-      </a>
-
-      <a class="quick-action" routerLink="/services/new">
-        <strong>Registrar ingreso</strong>
-        <span>Iniciar un nuevo servicio mecánico.</span>
-      </a>
-    </div>
-  </section>
-
-  <section class="dashboard__section">
-    <div class="dashboard__section-header">
-      <div>
-        <p class="dashboard__eyebrow">Agenda</p>
-        <h2>Actividad de hoy</h2>
-      </div>
-
-      <a routerLink="/appointments">Ver agenda completa</a>
-    </div>
-
-    <div class="dashboard__empty-state">
-      <h3>No hay turnos programados para hoy</h3>
-      <p>Los próximos turnos aparecerán en esta sección.</p>
-    </div>
-  </section>
+    <p class="dashboard__updated">
+      Actualizado {{ data.generatedAt | date: 'dd/MM/yyyy, HH:mm' }}
+    </p>
+  }
 </section>

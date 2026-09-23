@@ -19,6 +19,19 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
             LocalDateTime to
     );
 
+    long countByUserIdAndScheduledAtGreaterThanEqualAndScheduledAtLessThan(
+            Long userId,
+            LocalDateTime from,
+            LocalDateTime to
+    );
+
+    @EntityGraph(attributePaths = {"vehicle", "vehicle.customer"})
+    List<Appointment> findTop6ByUserIdAndScheduledAtGreaterThanEqualAndScheduledAtLessThanOrderByScheduledAtAsc(
+            Long userId,
+            LocalDateTime from,
+            LocalDateTime to
+    );
+
     @EntityGraph(attributePaths = {"vehicle", "vehicle.customer", "quote"})
     Optional<Appointment> findByIdAndUserId(Long id, Long userId);
 

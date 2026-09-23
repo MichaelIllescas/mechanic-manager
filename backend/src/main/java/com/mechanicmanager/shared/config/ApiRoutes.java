@@ -8,6 +8,7 @@ public final class ApiRoutes {
     
     public static final String API = "/api/v1";
     public static final String ADMIN = API + "/admin";
+    public static final String DASHBOARD = API + "/dashboard";
     
     private ApiRoutes() {
     }

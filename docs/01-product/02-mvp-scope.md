@@ -166,7 +166,6 @@ Funciones:
 - crear servicio;
 - registrar nombre y descripción;
 - registrar precio de referencia;
-- registrar duración estimada;
 - activar y desactivar;
 - consultar servicios activos.
 

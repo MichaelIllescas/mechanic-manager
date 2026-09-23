@@ -22,7 +22,7 @@ La confusión entre ambos conceptos tenía consecuencias concretas:
 
 Separar el concepto en tres entidades:
 
-- **`ServiceType`** — catálogo de prestaciones del taller: `name`, `basePrice`, `estimatedMinutes`, `active`.
+- **`ServiceType`** — catálogo de prestaciones del taller: `name`, `basePrice`, `active`.
 - **`WorkOrder`** — el ingreso concreto del vehículo. Es la entidad antes llamada `Service`, sin `workPerformed` y con `total`.
 - **`WorkOrderItem`** — cada servicio o repuesto efectivamente realizado dentro de una orden.
 

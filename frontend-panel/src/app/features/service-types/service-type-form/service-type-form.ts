@@ -30,7 +30,6 @@ export class ServiceTypeForm implements OnInit {
     name: ['', [Validators.required, Validators.maxLength(120)]],
     description: ['', [Validators.maxLength(500)]],
     basePrice: [null as number | null, [Validators.required, Validators.min(0)]],
-    estimatedMinutes: [null as number | null, [Validators.min(1)]],
   });
 
   ngOnInit(): void {
@@ -49,7 +48,6 @@ export class ServiceTypeForm implements OnInit {
           name: serviceType.name,
           description: serviceType.description ?? '',
           basePrice: serviceType.basePrice,
-          estimatedMinutes: serviceType.estimatedMinutes,
         }),
       error: (err: HttpErrorResponse) =>
         this.errorMessage.set(err.error?.message ?? 'No se pudo cargar el servicio'),
@@ -94,13 +92,12 @@ export class ServiceTypeForm implements OnInit {
    * descripciones vacias en lugar de ausentes.
    */
   private payload() {
-    const { name, description, basePrice, estimatedMinutes } = this.form.getRawValue();
+    const { name, description, basePrice } = this.form.getRawValue();
 
     return {
       name: name!.trim(),
       description: description?.trim() ? description.trim() : null,
       basePrice: basePrice!,
-      estimatedMinutes: estimatedMinutes ?? null,
     };
   }
 }

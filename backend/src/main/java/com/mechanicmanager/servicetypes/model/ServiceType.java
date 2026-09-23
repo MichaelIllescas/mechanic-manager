@@ -7,7 +7,6 @@ import org.hibernate.generator.EventType;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -57,10 +56,6 @@ public class ServiceType {
     @DecimalMin(value = "0.0", message = "El precio no puede ser negativo")
     @Column(name = "base_price", nullable = false, precision = 12, scale = 2)
     private BigDecimal basePrice;
-    
-    @Positive(message = "La duración estimada debe ser mayor a cero")
-    @Column(name = "estimated_minutes")
-    private Integer estimatedMinutes;
     
     /**
      * Un servicio ya utilizado no se elimina: se desactiva, para no romper

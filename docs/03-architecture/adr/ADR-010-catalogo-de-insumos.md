@@ -28,7 +28,7 @@ Reglas asociadas:
 - un cambio de precio no altera presupuestos ni órdenes ya registrados;
 - un insumo no se elimina nunca: se marca `active = false`.
 
-Es deliberadamente el mismo contrato que `ServiceType`. `Supply` no tiene `estimatedMinutes`, que sólo aplica a mano de obra, ni cantidad en existencia.
+Es deliberadamente el mismo contrato que `ServiceType`. `Supply` no tiene cantidad en existencia.
 
 El control de stock permanece Post-MVP (`PB-36`).
 
@@ -42,7 +42,7 @@ El control de stock permanece Post-MVP (`PB-36`).
 ## Trade-offs
 
 - una tabla y un módulo más en el MVP;
-- se agrega un segundo catálogo en lugar de unificar ambos en una entidad genérica. La unificación se descartó: los atributos divergen (`estimatedMinutes` sólo aplica a servicios) y el stock, cuando llegue, colgará únicamente de `Supply`;
+- se agrega un segundo catálogo en lugar de unificar ambos en una entidad genérica. La unificación se descartó: el stock, cuando llegue, colgará únicamente de `Supply`;
 - un catálogo sin existencias puede leerse como funcionalidad incompleta por parte del usuario del taller. Es el recorte consciente que separa esta decisión de `PB-36`.
 
 ## Pendiente

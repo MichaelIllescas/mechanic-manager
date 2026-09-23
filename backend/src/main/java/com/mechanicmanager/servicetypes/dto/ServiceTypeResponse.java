@@ -8,7 +8,6 @@ public record ServiceTypeResponse(
         String name,
         String description,
         BigDecimal basePrice,
-        Integer estimatedMinutes,
         boolean active,
         LocalDateTime createdAt,
         LocalDateTime updatedAt

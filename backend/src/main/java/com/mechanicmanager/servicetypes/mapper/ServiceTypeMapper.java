@@ -13,7 +13,6 @@ public class ServiceTypeMapper {
                 serviceType.getName(),
                 serviceType.getDescription(),
                 serviceType.getBasePrice(),
-                serviceType.getEstimatedMinutes(),
                 serviceType.isActive(),
                 serviceType.getCreatedAt(),
                 serviceType.getUpdatedAt()

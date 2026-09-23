@@ -28,7 +28,6 @@ export class ServiceQuickCreate {
     name: ['', [Validators.required, Validators.maxLength(120)]],
     description: ['', Validators.maxLength(1000)],
     basePrice: [null as number | null, [Validators.required, Validators.min(0)]],
-    estimatedMinutes: [null as number | null, Validators.min(1)],
   });
 
   save(): void {
@@ -61,7 +60,6 @@ export class ServiceQuickCreate {
       name: value.name!.trim(),
       description: value.description?.trim() || null,
       basePrice: Number(value.basePrice),
-      estimatedMinutes: value.estimatedMinutes,
     };
   }
 }

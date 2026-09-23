@@ -19,10 +19,18 @@ import { Vehicle } from '../../vehicles/vehicle.models';
 import { AppointmentService } from '../appointment-service';
 import { parseLocalDateTime, toIsoDate } from '../calendar.utils';
 import { QuoteQuickCreate } from './quote-quick-create/quote-quick-create';
+import { VehicleQuickCreate } from './vehicle-quick-create/vehicle-quick-create';
 
 @Component({
   selector: 'app-appointment-form',
-  imports: [ReactiveFormsModule, RouterLink, CurrencyPipe, DatePipe, QuoteQuickCreate],
+  imports: [
+    ReactiveFormsModule,
+    RouterLink,
+    CurrencyPipe,
+    DatePipe,
+    QuoteQuickCreate,
+    VehicleQuickCreate,
+  ],
   templateUrl: './appointment-form.html',
   styleUrl: './appointment-form.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -58,6 +66,7 @@ export class AppointmentForm implements OnInit {
     this.approvedQuotes().filter((quote) => quote.vehicleId === this.selectedVehicleId()),
   );
   readonly showQuoteQuickCreate = signal(false);
+  readonly showVehicleQuickCreate = signal(false);
 
   readonly filteredVehicles = computed(() => {
     const search = this.vehicleSearch().trim().toLowerCase();
@@ -175,6 +184,21 @@ export class AppointmentForm implements OnInit {
     this.selectedCustomerId.set(null);
     this.vehicleSearch.set('');
     this.vehicleResultsOpen.set(false);
+  }
+
+  openVehicleQuickCreate(): void {
+    this.vehicleResultsOpen.set(false);
+    this.showVehicleQuickCreate.set(true);
+  }
+
+  closeVehicleQuickCreate(): void {
+    this.showVehicleQuickCreate.set(false);
+  }
+
+  vehicleQuickCreated(vehicle: Vehicle): void {
+    this.vehicles.update((vehicles) => [...vehicles, vehicle]);
+    this.selectVehicle(vehicle);
+    this.showVehicleQuickCreate.set(false);
   }
 
   openQuoteQuickCreate(): void {

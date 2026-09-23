@@ -11,7 +11,7 @@
     <p>
       {{
         isEdit()
-          ? 'Actualiza el nombre, el precio de referencia y la duracion estimada.'
+          ? 'Actualiza el nombre, el precio de referencia y la descripcion.'
           : 'Carga un trabajo que ofrece el taller para poder usarlo en presupuestos y ordenes.'
       }}
     </p>
@@ -75,15 +75,6 @@
                 El precio no puede ser negativo.
               }
             </small>
-          }
-        </label>
-
-        <label class="field">
-          <span>Duracion estimada (minutos)</span>
-          <input type="number" formControlName="estimatedMinutes" placeholder="Opcional" min="1" />
-          <span class="field__hint">Sirve para dimensionar la agenda. Podes dejarlo vacio.</span>
-          @if (form.controls.estimatedMinutes.touched && form.controls.estimatedMinutes.invalid) {
-            <small>La duracion debe ser mayor a cero.</small>
           }
         </label>
 

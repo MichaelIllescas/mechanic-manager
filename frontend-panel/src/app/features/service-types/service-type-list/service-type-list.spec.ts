@@ -72,7 +72,6 @@ function serviceType(overrides: Partial<ServiceType>): ServiceType {
     name: 'Servicio',
     description: null,
     basePrice: 1000,
-    estimatedMinutes: null,
     active: true,
     createdAt: '2026-01-01T00:00:00Z',
     updatedAt: '2026-01-01T00:00:00Z',

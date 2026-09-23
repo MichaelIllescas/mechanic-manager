@@ -1,0 +1,243 @@
+.quick-vehicle {
+  padding: 22px 24px 24px;
+}
+
+.quick-vehicle__error {
+  margin: 0 0 18px;
+  padding: 11px 13px;
+  color: #9d2f3f;
+  background: #fdecef;
+  border-radius: 8px;
+}
+
+.quick-section + .quick-section {
+  margin-top: 22px;
+  padding-top: 22px;
+  border-top: 1px solid #e1eaf4;
+}
+
+.quick-section__heading {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  margin-bottom: 16px;
+}
+
+.quick-section__heading > span {
+  width: 26px;
+  height: 26px;
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  color: #fff;
+  background: #087bd3;
+  border-radius: 50%;
+  font-size: 0.78rem;
+  font-weight: 900;
+}
+
+.quick-section h3,
+.quick-section p {
+  margin: 0;
+}
+
+.quick-section h3 {
+  color: #122944;
+  font-size: 1rem;
+}
+
+.quick-section h3 + p {
+  margin-top: 3px;
+  color: #6d7f97;
+  font-size: 0.84rem;
+}
+
+.quick-vehicle__loading {
+  padding: 16px;
+  color: #6d7f97;
+  text-align: center;
+}
+
+.customer-search {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+}
+
+.customer-search input,
+.quick-customer-form input,
+.quick-vehicle-form input,
+.quick-vehicle-form select {
+  min-height: 44px;
+  width: 100%;
+  padding: 0 12px;
+  color: #07182e;
+  background: #fbfdff;
+  border: 1px solid #c8d7eb;
+  border-radius: 8px;
+  outline: none;
+}
+
+.customer-search input::placeholder,
+.quick-customer-form input::placeholder,
+.quick-vehicle-form input::placeholder {
+  color: #9aa9bb;
+  font-weight: 400;
+  opacity: 1;
+}
+
+.customer-search input:focus,
+.quick-customer-form input:focus,
+.quick-vehicle-form input:focus,
+.quick-vehicle-form select:focus {
+  background: #fff;
+  border-color: #159cff;
+  box-shadow: 0 0 0 3px rgb(21 156 255 / 13%);
+}
+
+.customer-search > button,
+.selected-customer button,
+.customer-results__empty button {
+  color: #067bd2;
+  background: transparent;
+  border: 0;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.customer-search > button {
+  padding: 0 14px;
+  background: #f2f9ff;
+  border: 1px solid #9ccbf3;
+  border-radius: 8px;
+}
+
+.customer-results {
+  margin-top: 6px;
+  padding: 5px;
+  background: #fff;
+  border: 1px solid #c8d7eb;
+  border-radius: 8px;
+}
+
+.customer-results > button {
+  width: 100%;
+  display: grid;
+  gap: 3px;
+  padding: 9px 11px;
+  color: #10233d;
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.customer-results > button:hover,
+.customer-results > button:focus-visible {
+  background: #eaf5ff;
+}
+
+.customer-results small,
+.selected-customer small {
+  display: block;
+  color: #60728c;
+}
+
+.customer-results__empty,
+.selected-customer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+}
+
+.selected-customer {
+  background: #f3f8fd;
+  border: 1px solid #c8d7eb;
+  border-radius: 8px;
+}
+
+.quick-customer-form,
+.quick-vehicle-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px 16px;
+}
+
+.quick-customer-form label,
+.quick-vehicle-form label {
+  display: grid;
+  align-content: start;
+  gap: 6px;
+  color: #243a57;
+  font-size: 0.86rem;
+  font-weight: 800;
+}
+
+.quick-customer-form small,
+.quick-vehicle-form small {
+  color: #b72d43;
+  font-weight: 700;
+}
+
+.quick-customer-form__actions {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.quick-vehicle__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 24px;
+  padding-top: 18px;
+  border-top: 1px solid #e1eaf4;
+}
+
+.button-primary,
+.button-secondary {
+  min-height: 42px;
+  padding: 0 16px;
+  border-radius: 8px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.button-primary {
+  color: #fff;
+  background: #087bd3;
+  border: 0;
+}
+
+.button-secondary {
+  color: #29415f;
+  background: #fff;
+  border: 1px solid #c8d7eb;
+}
+
+.button-primary:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+@media (max-width: 640px) {
+  .quick-vehicle {
+    padding: 18px;
+  }
+
+  .customer-search,
+  .quick-customer-form,
+  .quick-vehicle-form {
+    grid-template-columns: 1fr;
+  }
+
+  .quick-customer-form__actions,
+  .quick-vehicle__actions {
+    grid-column: auto;
+    flex-direction: column-reverse;
+  }
+}

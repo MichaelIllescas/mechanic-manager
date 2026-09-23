@@ -16,7 +16,6 @@ describe('QuoteItemsEditor', () => {
     name: `Servicio ${index + 1}`,
     description: null,
     basePrice: 10000,
-    estimatedMinutes: null,
     active: true,
     createdAt: '',
     updatedAt: '',

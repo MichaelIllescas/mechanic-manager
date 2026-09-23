@@ -11,9 +11,11 @@
   right: 0;
   bottom: 0;
   z-index: 90;
-  width: min(23.75rem, 100vw);
-  padding: 20px 24px 28px;
-  overflow-y: auto;
+  display: flex;
+  width: min(28rem, 100vw);
+  padding: 20px 24px;
+  overflow: hidden;
+  flex-direction: column;
   border-left: 1px solid #cfe0f2;
   background: #fff;
   box-shadow: -18px 0 48px rgba(12, 27, 51, 0.18);
@@ -90,10 +92,10 @@
 }
 
 .detail__data {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  margin: 20px 0 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px 24px;
+  margin: 18px 0 0;
 }
 
 .detail__data dt {
@@ -112,15 +114,15 @@
 
 .detail__actions {
   display: flex;
-  flex-wrap: wrap;
   gap: 10px;
-  margin-top: 24px;
+  margin-top: 20px;
 }
 
 .detail__button {
   min-height: 40px;
-  flex: 1 1 auto;
-  padding: 0 16px;
+  min-width: 0;
+  flex: 1 1 0;
+  padding: 0 12px;
   border: 1px solid #d9e7f7;
   border-radius: 8px;
   color: #06152d;
@@ -193,7 +195,7 @@
 
 .detail__divider {
   height: 1px;
-  margin: 20px 0 16px;
+  margin: auto 0 12px;
   background: #e5eef9;
 }
 
@@ -394,14 +396,17 @@
 
 @media (max-width: 900px) {
   /*
-   * En pantallas chicas no hay lugar al costado: el panel sube desde abajo y
-   * ahí sí tapa el contenido, por eso aparece el fondo oscurecido.
+   * En pantallas chicas el detalle ocupa el área completa bajo el navbar. La
+   * grilla compacta evita un segundo scroll dentro del panel.
    */
   .detail {
-    top: auto;
+    top: var(--navbar-height, 4.5rem);
     left: 0;
-    width: auto;
-    max-height: 82vh;
+    bottom: auto;
+    width: 100%;
+    height: calc(100dvh - var(--navbar-height, 4.5rem));
+    max-height: none;
+    padding: 16px 20px 12px;
     border-left: 0;
     border-top-left-radius: 16px;
     border-top-right-radius: 16px;
@@ -415,5 +420,45 @@
     inset: 0;
     z-index: 89;
     background: rgba(6, 21, 45, 0.4);
+  }
+
+  .detail__actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    margin-top: 16px;
+  }
+
+  .detail__button--primary,
+  .detail__button--work-order {
+    grid-column: 1 / -1;
+  }
+
+  .detail__button--work-order {
+    justify-content: center;
+  }
+
+  .detail__data {
+    gap: 12px 16px;
+    margin-top: 14px;
+  }
+
+  .detail__button {
+    width: 100%;
+    min-height: 38px;
+    padding: 4px 8px;
+    font-size: 0.88rem;
+    line-height: 1.15;
+    overflow-wrap: anywhere;
+    white-space: normal;
+  }
+
+  .detail__divider {
+    margin: auto 0 6px;
+  }
+
+  .detail__delete {
+    min-height: 36px;
+    padding: 4px 0;
   }
 }

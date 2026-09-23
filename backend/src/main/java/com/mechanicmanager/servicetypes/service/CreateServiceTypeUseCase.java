@@ -32,7 +32,6 @@ public class CreateServiceTypeUseCase {
                 .name(name)
                 .description(trimToNull(request.description()))
                 .basePrice(request.basePrice())
-                .estimatedMinutes(request.estimatedMinutes())
                 .active(true)
                 .build();
 

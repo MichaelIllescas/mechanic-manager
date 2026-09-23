@@ -241,7 +241,6 @@ Atributos:
 - `name`
 - `description`
 - `basePrice`
-- `estimatedMinutes` opcional
 - `active`
 - `createdAt`
 - `updatedAt`

@@ -1,11 +1,11 @@
 :host {
   display: block;
-}
-
-.navbar {
   position: sticky;
   top: 0;
   z-index: 100;
+}
+
+.navbar {
   display: flex;
   align-items: center;
   gap: 2rem;
@@ -194,7 +194,6 @@
 
 @media (max-width: 75rem) {
   .navbar {
-    position: sticky;
     padding: 0.75rem 1rem;
   }
 

@@ -3,7 +3,6 @@ package com.mechanicmanager.servicetypes.dto;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 
 import java.math.BigDecimal;
@@ -24,9 +23,6 @@ public record UpdateServiceTypeRequest(
         
         @NotNull(message = "El precio es obligatorio")
         @DecimalMin(value = "0.0", message = "El precio no puede ser negativo")
-        BigDecimal basePrice,
-        
-        @Positive(message = "La duración estimada debe ser mayor a cero")
-        Integer estimatedMinutes
+        BigDecimal basePrice
 ) {
 }

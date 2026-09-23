@@ -59,7 +59,6 @@
           <tr>
             <th>Servicio</th>
             <th>Precio</th>
-            <th>Duracion</th>
             <th>Estado</th>
             <th class="services-table__actions-heading">Acciones</th>
           </tr>
@@ -77,13 +76,6 @@
               </td>
               <td class="services-table__price">
                 $ {{ serviceType.basePrice | number: '1.2-2' }}
-              </td>
-              <td class="services-table__muted">
-                @if (serviceType.estimatedMinutes) {
-                  {{ serviceType.estimatedMinutes }} min
-                } @else {
-                  &mdash;
-                }
               </td>
               <td>
                 <span

@@ -226,6 +226,31 @@
   position: relative;
 }
 
+.vehicle-picker__search {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+}
+
+.vehicle-picker__search > button {
+  min-height: 48px;
+  padding: 0 16px;
+  color: #067bd2;
+  background: #f2f9ff;
+  border: 1px solid #9ccbf3;
+  border-radius: 8px;
+  font-weight: 800;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.vehicle-picker__search > button:hover,
+.vehicle-picker__search > button:focus-visible {
+  background: #e6f4ff;
+  border-color: #159cff;
+  outline: none;
+}
+
 .vehicle-picker__selected {
   min-height: 48px;
   display: flex;
@@ -304,8 +329,20 @@
 }
 
 .vehicle-picker__empty {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
   padding: 10px 12px;
   color: #6d7f97;
+}
+
+.vehicle-picker__empty button {
+  width: auto;
+  flex: 0 0 auto;
+  padding: 0;
+  color: #067bd2;
+  font-weight: 800;
 }
 
 .quote-picker {
@@ -411,6 +448,15 @@
 
   .field--wide {
     grid-column: auto;
+  }
+
+  .vehicle-picker__search {
+    grid-template-columns: 1fr;
+  }
+
+  .vehicle-picker__empty {
+    align-items: flex-start;
+    flex-direction: column;
   }
 
   .appointment-form-card__header,

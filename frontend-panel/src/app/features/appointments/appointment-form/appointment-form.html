@@ -68,17 +68,22 @@
                     <button type="button" (click)="changeVehicle()">Cambiar</button>
                   </div>
                 } @else {
-                  <input
-                    id="appointment-vehicle-search"
-                    type="search"
-                    [value]="vehicleSearch()"
-                    placeholder="Buscar por patente, marca, modelo o cliente"
-                    autocomplete="off"
-                    role="combobox"
-                    [attr.aria-expanded]="vehicleResultsOpen()"
-                    (input)="onVehicleSearch($any($event.target).value)"
-                    (focus)="openVehicleResults()"
-                  />
+                  <div class="vehicle-picker__search">
+                    <input
+                      id="appointment-vehicle-search"
+                      type="search"
+                      [value]="vehicleSearch()"
+                      placeholder="Buscar por patente, marca, modelo o cliente"
+                      autocomplete="off"
+                      role="combobox"
+                      [attr.aria-expanded]="vehicleResultsOpen()"
+                      (input)="onVehicleSearch($any($event.target).value)"
+                      (focus)="openVehicleResults()"
+                    />
+                    <button type="button" (click)="openVehicleQuickCreate()">
+                      Registrar vehículo
+                    </button>
+                  </div>
 
                   @if (vehicleResultsOpen() && vehicleSearch().trim()) {
                     <ul class="vehicle-picker__results" role="listbox">
@@ -93,12 +98,23 @@
                           </button>
                         </li>
                       } @empty {
-                        <li class="vehicle-picker__empty">No encontramos vehículos.</li>
+                        <li class="vehicle-picker__empty">
+                          <span>No encontramos vehículos.</span>
+                          <button type="button" (click)="openVehicleQuickCreate()">
+                            Registrar vehículo
+                          </button>
+                        </li>
                       }
                     </ul>
                   }
                 }
               </div>
+
+              @if (vehicles().length === 0) {
+                <small class="field__hint">
+                  Todavía no tenés vehículos registrados. Podés crear uno sin salir del turno.
+                </small>
+              }
 
               @if (form.controls.vehicleId.touched && form.controls.vehicleId.invalid) {
                 <small class="field__error">Elegí un vehículo para el turno.</small>
@@ -182,6 +198,13 @@
       [vehicleLabel]="selectedVehicleLabel() ?? ''"
       (saved)="quoteQuickCreated($event)"
       (cancelled)="closeQuoteQuickCreate()"
+    />
+  }
+
+  @if (showVehicleQuickCreate()) {
+    <app-vehicle-quick-create
+      (saved)="vehicleQuickCreated($event)"
+      (cancelled)="closeVehicleQuickCreate()"
     />
   }
 </main>

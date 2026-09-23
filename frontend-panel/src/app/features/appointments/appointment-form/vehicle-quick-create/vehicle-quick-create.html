@@ -1,0 +1,154 @@
+<app-modal
+  title="Registrar vehículo"
+  subtitle="Completá lo mínimo necesario para continuar con el turno."
+  [dismissible]="!savingCustomer() && !savingVehicle()"
+  (closed)="cancel()"
+>
+  <div class="quick-vehicle">
+    @if (errorMessage()) {
+      <p class="quick-vehicle__error" role="alert">{{ errorMessage() }}</p>
+    }
+
+    <section class="quick-section" aria-labelledby="quick-customer-title">
+      <div class="quick-section__heading">
+        <span>1</span>
+        <div>
+          <h3 id="quick-customer-title">Cliente</h3>
+          <p>Buscá uno existente o registralo sin salir de acá.</p>
+        </div>
+      </div>
+
+      @if (loadingCustomers()) {
+        <p class="quick-vehicle__loading">Cargando clientes...</p>
+      } @else if (creatingCustomer()) {
+        <form class="quick-customer-form" [formGroup]="customerForm" (ngSubmit)="saveCustomer()">
+          <label>
+            <span>Nombre</span>
+            <input type="text" formControlName="firstName" autocomplete="off" />
+            @if (
+              customerForm.controls.firstName.touched && customerForm.controls.firstName.invalid
+            ) {
+              <small>Ingresá el nombre.</small>
+            }
+          </label>
+          <label>
+            <span>Apellido</span>
+            <input type="text" formControlName="lastName" autocomplete="off" />
+            @if (customerForm.controls.lastName.touched && customerForm.controls.lastName.invalid) {
+              <small>Ingresá el apellido.</small>
+            }
+          </label>
+          <label>
+            <span>Teléfono</span>
+            <input type="tel" formControlName="phone" autocomplete="tel" />
+            @if (customerForm.controls.phone.touched && customerForm.controls.phone.invalid) {
+              <small>Ingresá un teléfono válido.</small>
+            }
+          </label>
+          <div class="quick-customer-form__actions">
+            @if (customers().length > 0) {
+              <button type="button" class="button-secondary" (click)="cancelCustomerCreation()">
+                Elegir existente
+              </button>
+            }
+            <button type="submit" class="button-primary" [disabled]="savingCustomer()">
+              {{ savingCustomer() ? 'Guardando...' : 'Guardar cliente' }}
+            </button>
+          </div>
+        </form>
+      } @else if (selectedCustomer(); as customer) {
+        <div class="selected-customer">
+          <span>
+            <strong>{{ customer.firstName }} {{ customer.lastName }}</strong>
+            <small>{{ customer.phone }}</small>
+          </span>
+          <button type="button" (click)="changeCustomer()">Cambiar</button>
+        </div>
+      } @else {
+        <div class="customer-search">
+          <input
+            type="search"
+            placeholder="Buscar por nombre, documento o teléfono"
+            [value]="customerSearch()"
+            [attr.aria-expanded]="customerResultsOpen()"
+            (focus)="customerResultsOpen.set(true)"
+            (input)="onCustomerSearch($any($event.target).value)"
+          />
+          <button type="button" (click)="startCustomerCreation()">Nuevo cliente</button>
+        </div>
+
+        @if (customerResultsOpen() && customerSearch().trim()) {
+          <div class="customer-results" role="listbox">
+            @for (customer of filteredCustomers(); track customer.id) {
+              <button type="button" role="option" (click)="selectCustomer(customer)">
+                <strong>{{ customer.firstName }} {{ customer.lastName }}</strong>
+                <small>{{ customer.phone }}</small>
+              </button>
+            } @empty {
+              <div class="customer-results__empty">
+                <span>No encontramos clientes.</span>
+                <button type="button" (click)="startCustomerCreation()">Registrar cliente</button>
+              </div>
+            }
+          </div>
+        }
+      }
+    </section>
+
+    <section class="quick-section" aria-labelledby="quick-vehicle-title">
+      <div class="quick-section__heading">
+        <span>2</span>
+        <div>
+          <h3 id="quick-vehicle-title">Vehículo</h3>
+          <p>Después podés completar kilometraje, chasis y observaciones.</p>
+        </div>
+      </div>
+
+      <form class="quick-vehicle-form" [formGroup]="vehicleForm" (ngSubmit)="saveVehicle()">
+        <label>
+          <span>Patente</span>
+          <input type="text" formControlName="licensePlate" maxlength="20" placeholder="AB123CD" />
+          @if (
+            vehicleForm.controls.licensePlate.touched && vehicleForm.controls.licensePlate.invalid
+          ) {
+            <small>La patente es obligatoria.</small>
+          }
+        </label>
+        <label>
+          <span>Tipo</span>
+          <select formControlName="vehicleType">
+            @for (type of vehicleTypes; track type.value) {
+              <option [value]="type.value">{{ type.label }}</option>
+            }
+          </select>
+        </label>
+        <label>
+          <span>Marca</span>
+          <input type="text" formControlName="brand" maxlength="80" placeholder="Toyota" />
+          @if (vehicleForm.controls.brand.touched && vehicleForm.controls.brand.invalid) {
+            <small>La marca es obligatoria.</small>
+          }
+        </label>
+        <label>
+          <span>Modelo</span>
+          <input type="text" formControlName="model" maxlength="120" placeholder="Corolla" />
+          @if (vehicleForm.controls.model.touched && vehicleForm.controls.model.invalid) {
+            <small>El modelo es obligatorio.</small>
+          }
+        </label>
+      </form>
+    </section>
+
+    <footer class="quick-vehicle__actions">
+      <button type="button" class="button-secondary" (click)="cancel()">Cancelar</button>
+      <button
+        type="button"
+        class="button-primary"
+        [disabled]="savingVehicle() || creatingCustomer()"
+        (click)="saveVehicle()"
+      >
+        {{ savingVehicle() ? 'Guardando...' : 'Registrar y seleccionar' }}
+      </button>
+    </footer>
+  </div>
+</app-modal>

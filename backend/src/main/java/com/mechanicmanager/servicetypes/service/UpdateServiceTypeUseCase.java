@@ -35,7 +35,6 @@ public class UpdateServiceTypeUseCase {
         serviceType.setName(name);
         serviceType.setDescription(trimToNull(request.description()));
         serviceType.setBasePrice(request.basePrice());
-        serviceType.setEstimatedMinutes(request.estimatedMinutes());
 
         return serviceTypeMapper.toResponse(serviceTypeRepository.save(serviceType));
     }

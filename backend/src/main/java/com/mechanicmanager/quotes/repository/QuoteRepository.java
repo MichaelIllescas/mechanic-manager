@@ -21,4 +21,7 @@ public interface QuoteRepository extends
     Optional<Quote> findByIdAndUserId(Long id, Long userId);
 
     Optional<Quote> findTopByUserIdOrderByNumberDesc(Long userId);
+
+    @EntityGraph(attributePaths = {"items", "items.serviceType", "items.supply"})
+    Optional<Quote> findByAppointmentIdAndUserId(Long appointmentId, Long userId);
 }

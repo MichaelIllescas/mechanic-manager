@@ -1,0 +1,123 @@
+<main class="work-order-form-page">
+  <header class="page-header">
+    <div>
+      <p>Trabajos realizados</p>
+      <h1>{{ isEdit() ? 'Editar trabajo realizado' : 'Registrar trabajo realizado' }}</h1>
+      <span>Registrá el vehículo, la fecha y los trabajos realizados.</span>
+    </div>
+    <a routerLink="/work-orders">Volver al listado</a>
+  </header>
+
+  @if (errorMessage()) {
+    <p class="form-alert" role="alert">{{ errorMessage() }}</p>
+  }
+  @if (loading()) {
+    <section class="loading">Cargando trabajo realizado...</section>
+  } @else {
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <section class="metadata-card">
+        <header>
+          <span>1</span>
+          <div>
+            <h2>Vehículo y fecha</h2>
+            <p>El cliente se deduce del vehículo seleccionado.</p>
+          </div>
+        </header>
+
+        <div class="metadata-grid">
+          <label class="wide">
+            <span>Vehículo</span>
+
+            @if (isEdit()) {
+              <div class="vehicle-picker__selected vehicle-picker__selected--locked">
+                <span>{{ selectedVehicleLabel() }}</span>
+              </div>
+            } @else {
+              <div class="vehicle-picker">
+                @if (selectedVehicleLabel(); as vehicleLabel) {
+                  <div class="vehicle-picker__selected">
+                    <span>{{ vehicleLabel }}</span>
+                    <button type="button" (click)="changeVehicle()">Cambiar</button>
+                  </div>
+                } @else {
+                  <input
+                    type="search"
+                    [value]="vehicleSearch()"
+                    placeholder="Buscar por patente, marca, modelo o cliente"
+                    autocomplete="off"
+                    role="combobox"
+                    [attr.aria-expanded]="vehicleResultsOpen()"
+                    (input)="onVehicleSearch($any($event.target).value)"
+                    (focus)="openVehicleResults()"
+                  />
+
+                  @if (vehicleResultsOpen() && vehicleSearch().trim()) {
+                    <ul class="vehicle-picker__results" role="listbox">
+                      @for (vehicle of filteredVehicles(); track vehicle.id) {
+                        <li>
+                          <button type="button" (click)="selectVehicle(vehicle)">
+                            <strong>{{ vehicle.licensePlate }}</strong>
+                            <span>{{ vehicle.brand }} {{ vehicle.model }}</span>
+                            <small>
+                              {{ vehicle.customerFirstName }} {{ vehicle.customerLastName }}
+                            </small>
+                          </button>
+                        </li>
+                      } @empty {
+                        <li class="vehicle-picker__empty">No encontramos vehículos.</li>
+                      }
+                    </ul>
+                  }
+                }
+              </div>
+
+              @if (form.controls.vehicleId.touched && form.controls.vehicleId.invalid) {
+                <small class="field__error">Elegí un vehículo.</small>
+              }
+            }
+          </label>
+
+          <label>
+            <span>Fecha del trabajo</span>
+            <input type="date" formControlName="performedAt" />
+          </label>
+
+          <label>
+            <span>Kilometraje</span>
+            <input type="number" formControlName="mileage" min="0" placeholder="Opcional" />
+          </label>
+        </div>
+      </section>
+
+      <app-work-order-items-editor [items]="$any(items)" />
+
+      <section class="metadata-card">
+        <header>
+          <span>3</span>
+          <div>
+            <h2>Observaciones</h2>
+            <p>Opcional, podés modificarlo después.</p>
+          </div>
+        </header>
+        <div class="metadata-grid">
+          <label class="wide notes">
+            <span>Notas</span>
+            <textarea
+              formControlName="notes"
+              rows="4"
+              maxlength="2000"
+              placeholder="Detalles del trabajo, diagnóstico, aclaraciones"
+            ></textarea>
+          </label>
+        </div>
+      </section>
+
+      <footer class="form-actions">
+        <a routerLink="/work-orders">Cancelar</a>
+        <button type="submit" [disabled]="saving()">
+          {{ saving() ? 'Guardando...' : isEdit() ? 'Guardar cambios' : 'Registrar trabajo' }}
+        </button>
+      </footer>
+    </form>
+  }
+</main>

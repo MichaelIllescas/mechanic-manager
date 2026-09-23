@@ -14,11 +14,11 @@ const APP_LINKS: NavbarLink[] = [
   { label: 'Inicio', path: '/dashboard', exact: true },
   { label: 'Clientes', path: '/customers' },
   { label: 'Vehículos', path: '/vehicles' },
-  { label: 'Turnos', path: '/appointments' },
-  { label: 'Presupuestos', path: '/quotes' },
   { label: 'Servicios', path: '/servicios' },
   { label: 'Insumos', path: '/insumos' },
-  { label: 'Historial', path: '/history' },
+  { label: 'Presupuestos', path: '/quotes' },
+  { label: 'Turnos', path: '/appointments' },
+  { label: 'Trabajos', path: '/work-orders' },
 ];
 
 const ADMIN_LINKS: NavbarLink[] = [{ label: 'Usuarios', path: '/admin/usuarios' }];

@@ -4,8 +4,8 @@
       <p class="supplies-header__eyebrow">Taller</p>
       <h1>Catalogo de insumos</h1>
       <p class="supplies-header__copy">
-        Materiales y repuestos del taller con precio de referencia. No administra stock:
-        solo mantiene la fuente de precio para presupuestos y ordenes.
+        Materiales y repuestos del taller con precio de referencia. No administra stock: solo
+        mantiene la fuente de precio para presupuestos y ordenes.
       </p>
     </div>
 
@@ -18,18 +18,39 @@
     <div class="supplies-panel__topbar">
       <div>
         <h2>Insumos cargados</h2>
-        <p>{{ supplies().length }} insumos encontrados</p>
+        <p>{{ filteredSupplies().length }} insumos encontrados</p>
       </div>
 
-      <button
-        class="filter"
-        type="button"
-        [class.filter--on]="onlyActive()"
-        [attr.aria-pressed]="onlyActive()"
-        (click)="toggleFilter()"
-      >
-        Solo activos
-      </button>
+      <div class="supplies-panel__tools">
+        <div class="search">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="11" cy="11" r="7" />
+            <path d="m20 20-4-4" />
+          </svg>
+          <input
+            type="search"
+            aria-label="Buscar insumos"
+            placeholder="Nombre del insumo"
+            autocomplete="off"
+            [formControl]="searchControl"
+          />
+          @if (searchControl.value) {
+            <button type="button" aria-label="Limpiar búsqueda" (click)="clearSearch()">
+              &times;
+            </button>
+          }
+        </div>
+
+        <button
+          class="filter"
+          type="button"
+          [class.filter--on]="onlyActive()"
+          [attr.aria-pressed]="onlyActive()"
+          (click)="toggleFilter()"
+        >
+          Solo activos
+        </button>
+      </div>
     </div>
 
     <div class="supplies-table-wrap">
@@ -43,7 +64,7 @@
           </tr>
         </thead>
         <tbody>
-          @for (supply of supplies(); track supply.id) {
+          @for (supply of filteredSupplies(); track supply.id) {
             <tr>
               <td>
                 <span class="supply-cell__name">{{ supply.name }}</span>
@@ -99,8 +120,15 @@
           } @empty {
             <tr>
               <td class="empty-state" colspan="4">
-                <strong>Todavia no cargaste ningun insumo.</strong>
-                <span>Empeza por materiales frecuentes: aceite, filtros, bujias o pastillas.</span>
+                @if (searchControl.value.trim()) {
+                  <strong>No encontramos insumos con esa búsqueda.</strong>
+                  <span>Probá con otro nombre.</span>
+                } @else {
+                  <strong>Todavia no cargaste ningun insumo.</strong>
+                  <span
+                    >Empeza por materiales frecuentes: aceite, filtros, bujias o pastillas.</span
+                  >
+                }
               </td>
             </tr>
           }

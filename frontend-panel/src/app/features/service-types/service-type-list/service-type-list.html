@@ -18,18 +18,39 @@
     <div class="services-panel__topbar">
       <div>
         <h2>Servicios cargados</h2>
-        <p>{{ serviceTypes().length }} servicios encontrados</p>
+        <p>{{ filteredServiceTypes().length }} servicios encontrados</p>
       </div>
 
-      <button
-        class="filter"
-        type="button"
-        [class.filter--on]="onlyActive()"
-        [attr.aria-pressed]="onlyActive()"
-        (click)="toggleFilter()"
-      >
-        Solo activos
-      </button>
+      <div class="services-panel__tools">
+        <div class="search">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="11" cy="11" r="7" />
+            <path d="m20 20-4-4" />
+          </svg>
+          <input
+            type="search"
+            aria-label="Buscar servicios"
+            placeholder="Nombre o descripcion"
+            autocomplete="off"
+            [formControl]="searchControl"
+          />
+          @if (searchControl.value) {
+            <button type="button" aria-label="Limpiar búsqueda" (click)="clearSearch()">
+              &times;
+            </button>
+          }
+        </div>
+
+        <button
+          class="filter"
+          type="button"
+          [class.filter--on]="onlyActive()"
+          [attr.aria-pressed]="onlyActive()"
+          (click)="toggleFilter()"
+        >
+          Solo activos
+        </button>
+      </div>
     </div>
 
     <div class="services-table-wrap">
@@ -44,7 +65,7 @@
           </tr>
         </thead>
         <tbody>
-          @for (serviceType of serviceTypes(); track serviceType.id) {
+          @for (serviceType of filteredServiceTypes(); track serviceType.id) {
             <tr>
               <td>
                 <div class="service-cell">
@@ -116,11 +137,16 @@
           } @empty {
             <tr>
               <td class="empty-state" colspan="5">
-                <strong>Todavia no cargaste ningun servicio.</strong>
-                <span>
-                  Empeza por los trabajos mas comunes del taller: cambio de aceite,
-                  alineacion, cambio de pastillas.
-                </span>
+                @if (searchControl.value.trim()) {
+                  <strong>No encontramos servicios con esa búsqueda.</strong>
+                  <span>Probá con otro nombre o descripción.</span>
+                } @else {
+                  <strong>Todavia no cargaste ningun servicio.</strong>
+                  <span>
+                    Empeza por los trabajos mas comunes del taller: cambio de aceite,
+                    alineacion, cambio de pastillas.
+                  </span>
+                }
               </td>
             </tr>
           }

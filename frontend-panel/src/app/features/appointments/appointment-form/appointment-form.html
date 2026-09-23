@@ -98,6 +98,21 @@
               @if (form.controls.vehicleId.touched && form.controls.vehicleId.invalid) {
                 <small class="field__error">Elegí un vehículo para el turno.</small>
               }
+
+              @if (availableQuotes().length > 0) {
+                <select class="quote-picker" formControlName="quoteId">
+                  <option [ngValue]="null">Sin presupuesto vinculado</option>
+                  @for (quote of availableQuotes(); track quote.id) {
+                    <option [ngValue]="quote.id">
+                      Presupuesto N.° {{ formatNumber(quote.number) }} ({{ quote.createdAt | date: 'dd/MM/yyyy' }}) — {{ quote.total | currency: 'ARS' : 'code' : '1.2-2' }}
+                    </option>
+                  }
+                </select>
+                <small class="field__hint">
+                  Vinculá el presupuesto aprobado de este trabajo: al completar el turno se
+                  genera el trabajo realizado con esos ítems.
+                </small>
+              }
             }
           </label>
 
@@ -125,8 +140,8 @@
               placeholder="Motivo del turno, comentarios del cliente, algo a tener en cuenta..."
             ></textarea>
             <small class="field__hint">
-              Opcional. El detalle de los trabajos se define después, en el presupuesto o la
-              orden de trabajo.
+              Opcional. El detalle de los trabajos se define después, en el presupuesto o al
+              registrar el trabajo realizado.
             </small>
             @if (form.controls.notes.invalid) {
               <small class="field__error">Las notas no pueden superar los 1000 caracteres.</small>

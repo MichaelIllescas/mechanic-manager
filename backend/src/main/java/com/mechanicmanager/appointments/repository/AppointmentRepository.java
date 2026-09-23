@@ -12,14 +12,14 @@ import java.util.Optional;
 @Repository
 public interface AppointmentRepository extends JpaRepository<Appointment, Long> {
     
-    @EntityGraph(attributePaths = {"vehicle", "vehicle.customer"})
+    @EntityGraph(attributePaths = {"vehicle", "vehicle.customer", "quote"})
     List<Appointment> findAllByUserIdAndScheduledAtGreaterThanEqualAndScheduledAtLessThanOrderByScheduledAtAsc(
             Long userId,
             LocalDateTime from,
             LocalDateTime to
     );
-    
-    @EntityGraph(attributePaths = {"vehicle", "vehicle.customer"})
+
+    @EntityGraph(attributePaths = {"vehicle", "vehicle.customer", "quote"})
     Optional<Appointment> findByIdAndUserId(Long id, Long userId);
 
 }

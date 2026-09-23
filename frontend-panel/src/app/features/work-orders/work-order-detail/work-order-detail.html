@@ -1,0 +1,199 @@
+<main class="work-order-detail-page">
+  <section class="work-order-detail-toolbar no-print">
+    <a class="toolbar-back" routerLink="/work-orders">Volver a trabajos realizados</a>
+
+    @if (workOrder(); as current) {
+      <div class="toolbar-actions">
+        <a [routerLink]="['/work-orders', current.id, 'editar']">Editar</a>
+        <button type="button" (click)="downloadWorkOrder()">Descargar PDF</button>
+      </div>
+    }
+  </section>
+
+  @if (errorMessage()) {
+    <p class="detail-alert no-print" role="alert">{{ errorMessage() }}</p>
+  }
+
+  @if (loading()) {
+    <section class="document document--loading">Cargando trabajo realizado...</section>
+  } @else if (workOrder(); as current) {
+    <section class="document">
+      <header class="document-header">
+        <div class="document-brand">
+          <div class="document-brand__logo-wrap">
+            <img class="document-brand__logo" src="/brand/logo-mechanic.jpeg" alt="Logo del taller" />
+          </div>
+          @if (workshop(); as currentWorkshop) {
+            <div class="document-workshop">
+              @if (currentWorkshop.name) {
+                <strong>{{ currentWorkshop.name }}</strong>
+              }
+              @if (currentWorkshop.address) {
+                <span>{{ currentWorkshop.address }}</span>
+              }
+              @if (currentWorkshop.phone) {
+                <span>Tel: {{ currentWorkshop.phone }}</span>
+              }
+              @if (currentWorkshop.email) {
+                <span>{{ currentWorkshop.email }}</span>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="document-number">
+          <span>Comprobante de trabajo realizado</span>
+          <strong>N.° {{ formatNumber(current.id) }}</strong>
+          <small>{{ current.performedAt | date: 'dd/MM/yyyy' }}</small>
+        </div>
+      </header>
+
+      <div class="document-meta">
+        <div>
+          <span>Estado</span>
+          <strong
+            class="wo-status"
+            [class.wo-status--completed]="current.status === 'COMPLETED'"
+            [class.wo-status--cancelled]="current.status === 'CANCELLED'"
+          >
+            {{ statusLabel(current.status) }}
+          </strong>
+        </div>
+        <div>
+          <span>Kilometraje</span>
+          <strong>{{ current.mileage ?? 'Sin registrar' }}</strong>
+        </div>
+      </div>
+
+      <div class="party-summary">
+        <article>
+          <span>Cliente</span>
+          <strong>{{ current.customerName }}</strong>
+        </article>
+        <article>
+          <span>Vehículo</span>
+          <strong>{{ current.vehicleLicensePlate }}</strong>
+          <small>{{ current.vehicleDescription }}</small>
+        </article>
+      </div>
+
+      @if (current.appointmentId || current.quoteId) {
+        <div class="origin-summary no-print">
+          @if (current.appointmentId) {
+            <a [routerLink]="['/appointments', current.appointmentId]">Ver turno de origen</a>
+          }
+          @if (current.quoteId) {
+            <a [routerLink]="['/quotes', current.quoteId]">
+              Ver presupuesto #{{ current.quoteNumber }}
+            </a>
+          }
+        </div>
+      }
+
+      <div class="document-items-wrap">
+        <table class="document-items">
+          <thead>
+            <tr>
+              <th>Descripción</th>
+              <th>Cantidad</th>
+              <th>Precio unitario</th>
+              <th>Subtotal</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of current.items; track item.id) {
+              <tr>
+                <td>
+                  <strong>{{ item.description }}</strong>
+                  @if (item.serviceTypeId) {
+                    <span>Servicio</span>
+                  } @else if (item.supplyId) {
+                    <span>Insumo</span>
+                  } @else {
+                    <span>Ítem personalizado</span>
+                  }
+                </td>
+                <td data-label="Cantidad">{{ item.quantity }}</td>
+                <td data-label="Precio unitario">{{ item.unitPrice | currency: 'ARS' : 'code' : '1.2-2' }}</td>
+                <td data-label="Subtotal">{{ item.subtotal | currency: 'ARS' : 'code' : '1.2-2' }}</td>
+              </tr>
+            } @empty {
+              <tr>
+                <td class="empty" colspan="4">Todavía no se cargaron ítems.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <div class="document-total">
+        <span>Total</span>
+        <strong>{{ current.total | currency: 'ARS' : 'code' : '1.2-2' }}</strong>
+      </div>
+
+      @if (current.notes) {
+        <section class="document-notes">
+          <h2>Observaciones</h2>
+          <p>{{ current.notes }}</p>
+        </section>
+      }
+
+      <footer class="document-footer">
+        <div class="document-footer__legal">
+          <p>Este comprobante detalla los trabajos e insumos realizados sobre el vehículo.</p>
+          <span class="no-print">
+            Última actualización: {{ current.updatedAt | date: 'dd/MM/yyyy HH:mm' }}
+          </span>
+          @if (downloadedAt(); as downloadDate) {
+            <span class="download-date no-print">
+              Descargado el {{ downloadDate | date: 'dd/MM/yyyy HH:mm' }}
+            </span>
+          }
+        </div>
+        @if (workshop(); as currentWorkshop) {
+          <div class="document-footer__thanks">
+            <strong>¡Gracias por confiar en {{ currentWorkshop.name || 'nosotros' }}!</strong>
+            <span>
+              Consultas:
+              @if (currentWorkshop.phone) {
+                {{ currentWorkshop.phone }}
+              }
+              @if (currentWorkshop.phone && currentWorkshop.email) {
+                ·
+              }
+              @if (currentWorkshop.email) {
+                {{ currentWorkshop.email }}
+              }
+            </span>
+          </div>
+        }
+      </footer>
+    </section>
+
+    <section class="status-panel no-print" aria-label="Cambiar estado del trabajo realizado">
+      <div>
+        <h2>Estado del trabajo</h2>
+        <p>Marcalo como cancelado si el trabajo no se llegó a realizar.</p>
+      </div>
+
+      <div class="status-actions">
+        <button
+          type="button"
+          [class.status-actions__button--completed]="current.status === 'COMPLETED'"
+          [disabled]="updatingStatus() || current.status === 'COMPLETED'"
+          (click)="updateStatus('COMPLETED')"
+        >
+          Completado
+        </button>
+        <button
+          type="button"
+          [class.status-actions__button--cancelled]="current.status === 'CANCELLED'"
+          [disabled]="updatingStatus() || current.status === 'CANCELLED'"
+          (click)="updateStatus('CANCELLED')"
+        >
+          Cancelado
+        </button>
+      </div>
+    </section>
+  }
+</main>

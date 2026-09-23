@@ -30,13 +30,31 @@
 
   <dl class="detail__data">
     <div>
+      <dt>Fecha y hora</dt>
+      <dd>{{ appointment().scheduledAt | date: "dd/MM/yyyy 'a las' HH:mm" }}</dd>
+    </div>
+    <div>
       <dt>Cliente</dt>
       <dd>{{ appointment().customerFirstName }} {{ appointment().customerLastName }}</dd>
+    </div>
+    <div>
+      <dt>Teléfono</dt>
+      <dd>{{ appointment().customerPhone || 'Sin registrar' }}</dd>
     </div>
     <div>
       <dt>Notas</dt>
       <dd>{{ appointment().notes || 'Sin notas' }}</dd>
     </div>
+    @if (appointment().quoteId; as quoteId) {
+      <div>
+        <dt>Presupuesto</dt>
+        <dd>
+          <button type="button" class="quote-link" (click)="openQuotePreview(quoteId)">
+            N.° {{ formatNumber(appointment().quoteNumber!) }}
+          </button>
+        </dd>
+      </div>
+    }
   </dl>
 
   @if (appointment().status === 'SCHEDULED') {
@@ -65,5 +83,81 @@
     </div>
   } @else {
     <p class="detail__closed">Este turno ya está cerrado y queda en el historial del vehículo.</p>
+
+    @if (appointment().status === 'COMPLETED') {
+      <div class="detail__actions">
+        <a
+          class="detail__button detail__button--work-order"
+          [routerLink]="['/work-orders']"
+          [queryParams]="{ vehicleId: appointment().vehicleId }"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M9 12.5 11 14.5 15 9.5" />
+            <rect x="4" y="4" width="16" height="16" rx="3" />
+          </svg>
+          Ver trabajo realizado
+        </a>
+      </div>
+    }
   }
 </aside>
+
+@if (loadingQuotePreview() || quotePreview() || quotePreviewError()) {
+  <div class="quote-preview__scrim" (click)="closeQuotePreview()"></div>
+
+  <aside class="quote-preview" role="dialog" aria-label="Vista previa del presupuesto">
+    <header class="quote-preview__head">
+      <h3>Presupuesto</h3>
+      <button type="button" aria-label="Cerrar vista previa" (click)="closeQuotePreview()">
+        &times;
+      </button>
+    </header>
+
+    @if (loadingQuotePreview()) {
+      <p class="quote-preview__status">Cargando presupuesto...</p>
+    } @else if (quotePreviewError()) {
+      <p class="quote-preview__status quote-preview__status--error">{{ quotePreviewError() }}</p>
+    } @else if (quotePreview(); as quote) {
+      <div class="quote-preview__meta">
+        <div>
+          <span>Número</span>
+          <strong>N.° {{ formatNumber(quote.number) }}</strong>
+        </div>
+        <div>
+          <span>Cliente</span>
+          <strong>{{ quote.customerName }}</strong>
+        </div>
+        <div>
+          <span>Vehículo</span>
+          <strong>{{ quote.vehicleLicensePlate }}</strong>
+        </div>
+        <div>
+          <span>Válido hasta</span>
+          <strong>{{ quote.validUntil ? (quote.validUntil | date: 'dd/MM/yyyy') : 'Sin fecha' }}</strong>
+        </div>
+      </div>
+
+      <ul class="quote-preview__items">
+        @for (item of quote.items; track item.id) {
+          <li>
+            <span>{{ item.description }} × {{ item.quantity }}</span>
+            <strong>{{ item.subtotal | currency: 'ARS' : 'code' : '1.2-2' }}</strong>
+          </li>
+        }
+      </ul>
+
+      <div class="quote-preview__total">
+        <span>Total</span>
+        <strong>{{ quote.total | currency: 'ARS' : 'code' : '1.2-2' }}</strong>
+      </div>
+
+      @if (quote.notes) {
+        <p class="quote-preview__notes">{{ quote.notes }}</p>
+      }
+
+      <a class="quote-preview__link" [routerLink]="['/quotes', quote.id]">
+        Ver presupuesto completo
+      </a>
+    }
+  </aside>
+}

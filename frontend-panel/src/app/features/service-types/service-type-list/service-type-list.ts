@@ -1,7 +1,10 @@
-import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import { startWith } from 'rxjs';
 
 import { NotificationService } from '../../../core/notifications/notification-service';
 import { ServiceTypeService } from '../service-type-service';
@@ -9,7 +12,7 @@ import { ServiceType } from '../service-type.models';
 
 @Component({
   selector: 'app-service-type-list',
-  imports: [RouterLink, DecimalPipe],
+  imports: [RouterLink, DecimalPipe, ReactiveFormsModule],
   templateUrl: './service-type-list.html',
   styleUrl: './service-type-list.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -21,6 +24,26 @@ export class ServiceTypeList implements OnInit {
   readonly serviceTypes = signal<ServiceType[]>([]);
   readonly updatingId = signal<number | null>(null);
   readonly onlyActive = signal(false);
+  readonly searchControl = new FormControl('', { nonNullable: true });
+  private readonly searchQuery = toSignal(
+    this.searchControl.valueChanges.pipe(startWith(this.searchControl.value)),
+    { initialValue: '' },
+  );
+  readonly filteredServiceTypes = computed(() => {
+    const query = this.normalizeSearch(this.searchQuery());
+
+    if (!query) {
+      return this.serviceTypes();
+    }
+
+    return this.serviceTypes().filter((serviceType) => {
+      const searchableText = this.normalizeSearch(
+        `${serviceType.name} ${serviceType.description ?? ''}`,
+      );
+
+      return searchableText.includes(query);
+    });
+  });
 
   ngOnInit(): void {
     this.load();
@@ -29,6 +52,10 @@ export class ServiceTypeList implements OnInit {
   toggleFilter(): void {
     this.onlyActive.update((value) => !value);
     this.load();
+  }
+
+  clearSearch(): void {
+    this.searchControl.setValue('');
   }
 
   toggleStatus(serviceType: ServiceType): void {
@@ -72,5 +99,9 @@ export class ServiceTypeList implements OnInit {
     this.serviceTypes.update((list) =>
       list.map((item) => (item.id === updated.id ? updated : item)),
     );
+  }
+
+  private normalizeSearch(value: string): string {
+    return value.trim().toLocaleLowerCase('es');
   }
 }

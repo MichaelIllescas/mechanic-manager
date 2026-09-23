@@ -7,6 +7,7 @@ import com.mechanicmanager.appointments.model.Appointment;
 import com.mechanicmanager.appointments.model.AppointmentStatus;
 import com.mechanicmanager.appointments.repository.AppointmentRepository;
 import com.mechanicmanager.shared.exception.ResourceNotFoundException;
+import com.mechanicmanager.workorders.service.CreateWorkOrderFromAppointmentUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,10 +18,13 @@ public class CompleteAppointmentUseCase {
 
     private final AppointmentRepository appointmentRepository;
     private final AppointmentMapper appointmentMapper;
+    private final CreateWorkOrderFromAppointmentUseCase createWorkOrderFromAppointmentUseCase;
 
     /**
      * El turno se completa cuando el vehículo ingresa al taller. A partir de
-     * ahí el estado del trabajo lo lleva la orden de trabajo, no el turno.
+     * ahí el estado del trabajo lo lleva la orden de trabajo, no el turno: se
+     * crea automáticamente acá, precargada desde el presupuesto aprobado del
+     * turno si existe.
      */
     @Transactional
     public AppointmentResponse execute(Long userId, Long appointmentId) {
@@ -37,7 +41,10 @@ public class CompleteAppointmentUseCase {
         }
 
         appointment.setStatus(AppointmentStatus.COMPLETED);
+        appointment = appointmentRepository.save(appointment);
 
-        return appointmentMapper.toResponse(appointmentRepository.save(appointment));
+        createWorkOrderFromAppointmentUseCase.execute(userId, appointment);
+
+        return appointmentMapper.toResponse(appointment);
     }
 }

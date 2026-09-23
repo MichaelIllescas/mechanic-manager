@@ -20,6 +20,9 @@ public record AppointmentResponse(
         Long customerId,
         String customerFirstName,
         String customerLastName,
+        String customerPhone,
+        Long quoteId,
+        Long quoteNumber,
         LocalDateTime createdAt,
         LocalDateTime updatedAt
 ) {

@@ -1,3 +1,4 @@
+import { CurrencyPipe, DatePipe } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import {
   ChangeDetectionStrategy,
@@ -11,6 +12,8 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 import { NotificationService } from '../../../core/notifications/notification-service';
+import { QuoteService } from '../../quotes/quote-service';
+import { QuoteSummary } from '../../quotes/quote.models';
 import { VehicleService } from '../../vehicles/vehicle-service';
 import { Vehicle } from '../../vehicles/vehicle.models';
 import { AppointmentService } from '../appointment-service';
@@ -18,7 +21,7 @@ import { parseLocalDateTime, toIsoDate } from '../calendar.utils';
 
 @Component({
   selector: 'app-appointment-form',
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, CurrencyPipe, DatePipe],
   templateUrl: './appointment-form.html',
   styleUrl: './appointment-form.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -27,6 +30,7 @@ export class AppointmentForm implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly appointmentService = inject(AppointmentService);
   private readonly vehicleService = inject(VehicleService);
+  private readonly quoteService = inject(QuoteService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly notifications = inject(NotificationService);
@@ -45,6 +49,13 @@ export class AppointmentForm implements OnInit {
   readonly vehicleResultsOpen = signal(false);
   readonly selectedVehicleLabel = signal<string | null>(null);
 
+  /** Presupuestos aprobados sin turno asignado todavía, para poder vincular uno al agendar. */
+  readonly approvedQuotes = signal<QuoteSummary[]>([]);
+  readonly selectedVehicleId = signal<number | null>(null);
+  readonly availableQuotes = computed(() =>
+    this.approvedQuotes().filter((quote) => quote.vehicleId === this.selectedVehicleId()),
+  );
+
   readonly filteredVehicles = computed(() => {
     const search = this.vehicleSearch().trim().toLowerCase();
 
@@ -59,6 +70,7 @@ export class AppointmentForm implements OnInit {
 
   readonly form = this.fb.group({
     vehicleId: [null as number | null, [Validators.required, Validators.min(1)]],
+    quoteId: [null as number | null],
     date: ['', [Validators.required]],
     time: ['', [Validators.required]],
     notes: ['', [Validators.maxLength(1000)]],
@@ -66,6 +78,7 @@ export class AppointmentForm implements OnInit {
 
   ngOnInit(): void {
     this.loadVehicles();
+    this.loadApprovedQuotes();
 
     const routeId = this.route.snapshot.paramMap.get('id');
 
@@ -95,7 +108,7 @@ export class AppointmentForm implements OnInit {
     this.saving.set(true);
     this.errorMessage.set(null);
 
-    const { vehicleId, date, time, notes } = this.form.getRawValue();
+    const { vehicleId, quoteId, date, time, notes } = this.form.getRawValue();
     const scheduledAt = `${date}T${time}:00`;
     const trimmedNotes = notes?.trim() ? notes.trim() : null;
 
@@ -106,6 +119,7 @@ export class AppointmentForm implements OnInit {
         })
       : this.appointmentService.create({
           vehicleId: vehicleId!,
+          quoteId,
           scheduledAt,
           notes: trimmedNotes,
         });
@@ -141,7 +155,9 @@ export class AppointmentForm implements OnInit {
   selectVehicle(vehicle: Vehicle): void {
     this.form.controls.vehicleId.setValue(vehicle.id);
     this.form.controls.vehicleId.markAsTouched();
+    this.form.controls.quoteId.setValue(null);
     this.selectedVehicleLabel.set(this.formatVehicle(vehicle));
+    this.selectedVehicleId.set(vehicle.id);
     this.vehicleSearch.set('');
     this.vehicleResultsOpen.set(false);
   }
@@ -149,7 +165,9 @@ export class AppointmentForm implements OnInit {
   changeVehicle(): void {
     this.form.controls.vehicleId.setValue(null);
     this.form.controls.vehicleId.markAsTouched();
+    this.form.controls.quoteId.setValue(null);
     this.selectedVehicleLabel.set(null);
+    this.selectedVehicleId.set(null);
     this.vehicleSearch.set('');
     this.vehicleResultsOpen.set(false);
   }
@@ -166,6 +184,13 @@ export class AppointmentForm implements OnInit {
         this.loadingVehicles.set(false);
         this.errorMessage.set(error.error?.message ?? 'No se pudieron cargar los vehículos');
       },
+    });
+  }
+
+  private loadApprovedQuotes(): void {
+    this.quoteService.search(undefined, 'APPROVED', 0, 50).subscribe({
+      next: (page) => this.approvedQuotes.set(page.content),
+      error: () => this.approvedQuotes.set([]),
     });
   }
 
@@ -207,6 +232,10 @@ export class AppointmentForm implements OnInit {
       date: date ?? toIsoDate(new Date()),
       time: '09:00',
     });
+  }
+
+  formatNumber(number: number): string {
+    return number.toString().padStart(4, '0');
   }
 
   private vehicleMatchesSearch(vehicle: Vehicle, search: string): boolean {

@@ -19,6 +19,9 @@ public record CreateAppointmentRequest(
         @Positive(message = "El identificador del vehículo debe ser mayor a cero")
         Long vehicleId,
 
+        @Positive(message = "El identificador del presupuesto debe ser mayor a cero")
+        Long quoteId,
+
         @NotNull(message = "La fecha y hora del turno son obligatorias")
         LocalDateTime scheduledAt,
 

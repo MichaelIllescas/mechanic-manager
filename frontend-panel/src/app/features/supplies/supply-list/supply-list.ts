@@ -1,7 +1,17 @@
 import { DecimalPipe } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
-import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  OnInit,
+  computed,
+  inject,
+  signal,
+} from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import { startWith } from 'rxjs';
 
 import { NotificationService } from '../../../core/notifications/notification-service';
 import { SupplyService } from '../supply-service';
@@ -9,7 +19,7 @@ import { Supply } from '../supply.models';
 
 @Component({
   selector: 'app-supply-list',
-  imports: [RouterLink, DecimalPipe],
+  imports: [RouterLink, DecimalPipe, ReactiveFormsModule],
   templateUrl: './supply-list.html',
   styleUrl: './supply-list.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -21,6 +31,20 @@ export class SupplyList implements OnInit {
   readonly supplies = signal<Supply[]>([]);
   readonly updatingId = signal<number | null>(null);
   readonly onlyActive = signal(false);
+  readonly searchControl = new FormControl('', { nonNullable: true });
+  private readonly searchQuery = toSignal(
+    this.searchControl.valueChanges.pipe(startWith(this.searchControl.value)),
+    { initialValue: '' },
+  );
+  readonly filteredSupplies = computed(() => {
+    const query = this.normalizeSearch(this.searchQuery());
+
+    if (!query) {
+      return this.supplies();
+    }
+
+    return this.supplies().filter((supply) => this.normalizeSearch(supply.name).includes(query));
+  });
 
   ngOnInit(): void {
     this.load();
@@ -29,6 +53,10 @@ export class SupplyList implements OnInit {
   toggleFilter(): void {
     this.onlyActive.update((value) => !value);
     this.load();
+  }
+
+  clearSearch(): void {
+    this.searchControl.setValue('');
   }
 
   toggleStatus(supply: Supply): void {
@@ -41,9 +69,7 @@ export class SupplyList implements OnInit {
         this.updatingId.set(null);
         this.applyUpdate(updated);
         this.notifications.success(
-          updated.active
-            ? `${updated.name} fue activado`
-            : `${updated.name} fue desactivado`,
+          updated.active ? `${updated.name} fue activado` : `${updated.name} fue desactivado`,
         );
       },
       error: (err: HttpErrorResponse) => {
@@ -67,8 +93,10 @@ export class SupplyList implements OnInit {
       return;
     }
 
-    this.supplies.update((list) =>
-      list.map((item) => (item.id === updated.id ? updated : item)),
-    );
+    this.supplies.update((list) => list.map((item) => (item.id === updated.id ? updated : item)));
+  }
+
+  private normalizeSearch(value: string): string {
+    return value.trim().toLocaleLowerCase('es');
   }
 }

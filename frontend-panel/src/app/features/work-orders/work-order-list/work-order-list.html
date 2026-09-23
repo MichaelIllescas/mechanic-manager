@@ -1,0 +1,218 @@
+<main class="quotes-page">
+  <section class="quotes-header">
+    <div>
+      <p class="quotes-header__eyebrow">Taller</p>
+      <h1>Trabajos realizados</h1>
+      <p class="quotes-header__copy">
+        Historial de los trabajos hechos sobre los vehículos del taller.
+      </p>
+    </div>
+
+    <button class="quotes-header__action" type="button" routerLink="/work-orders/nuevo">
+      Registrar trabajo realizado
+    </button>
+  </section>
+
+  <section class="quotes-panel" aria-label="Listado de trabajos realizados">
+    <div class="quotes-panel__topbar">
+      <div>
+        <h2>Trabajos registrados</h2>
+        <p>{{ totalElements() }} trabajos encontrados</p>
+      </div>
+
+      <div class="search">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="11" cy="11" r="7" />
+          <path d="m20 20-4-4" />
+        </svg>
+        <input
+          type="search"
+          aria-label="Buscar trabajos realizados"
+          placeholder="Cliente o patente"
+          autocomplete="off"
+          [formControl]="searchControl"
+        />
+        @if (searchControl.value) {
+          <button type="button" aria-label="Limpiar búsqueda" (click)="clearSearch()">
+            &times;
+          </button>
+        }
+      </div>
+    </div>
+
+    @if (vehicleFilter(); as filter) {
+      <div class="vehicle-filter-banner" role="status">
+        <span>Mostrando el historial del vehículo seleccionado</span>
+        <button type="button" (click)="clearVehicleFilter()">Ver todos</button>
+      </div>
+    }
+
+    <div class="status-filters" aria-label="Filtrar por estado">
+      <button
+        type="button"
+        [class.status-filters__button--active]="selectedStatus() === null"
+        [attr.aria-pressed]="selectedStatus() === null"
+        (click)="filterByStatus(null)"
+      >
+        Todos
+      </button>
+      <button
+        type="button"
+        [class.status-filters__button--active]="selectedStatus() === 'COMPLETED'"
+        [attr.aria-pressed]="selectedStatus() === 'COMPLETED'"
+        (click)="filterByStatus('COMPLETED')"
+      >
+        Completados
+      </button>
+      <button
+        type="button"
+        [class.status-filters__button--active]="selectedStatus() === 'CANCELLED'"
+        [attr.aria-pressed]="selectedStatus() === 'CANCELLED'"
+        (click)="filterByStatus('CANCELLED')"
+      >
+        Cancelados
+      </button>
+    </div>
+
+    @if (errorMessage()) {
+      <p class="quotes-panel__error" role="alert">{{ errorMessage() }}</p>
+    }
+
+    <div class="quotes-table-wrap">
+      <table class="quotes-table">
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Cliente</th>
+            <th>Vehículo</th>
+            <th>Estado</th>
+            <th>Total</th>
+            <th class="quotes-table__actions-heading">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (loading()) {
+            <tr>
+              <td class="table-message" colspan="6">Cargando trabajos realizados...</td>
+            </tr>
+          } @else {
+            @for (workOrder of workOrders(); track workOrder.id) {
+              <tr>
+                <td class="quote-cell--number">
+                  <a class="quote-number" [routerLink]="['/work-orders', workOrder.id]">
+                    {{ workOrder.performedAt | date: 'dd/MM/yyyy' }}
+                  </a>
+                </td>
+                <td data-label="Cliente">{{ workOrder.customerName }}</td>
+                <td data-label="Vehículo">
+                  <span class="license-plate">{{ workOrder.vehicleLicensePlate }}</span>
+                </td>
+                <td class="quote-cell--status">
+                  <span
+                    class="quote-status"
+                    [class.quote-status--approved]="workOrder.status === 'COMPLETED'"
+                    [class.quote-status--rejected]="workOrder.status === 'CANCELLED'"
+                  >
+                    {{ statusLabel(workOrder.status) }}
+                  </span>
+                </td>
+                <td class="quote-total" data-label="Total">{{ workOrder.total | currency: 'ARS' : 'code' : '1.2-2' }}</td>
+                <td class="quote-cell--actions">
+                  <div class="actions">
+                    <button
+                      class="actions__button actions__button--secondary"
+                      type="button"
+                      aria-label="Ver trabajo realizado"
+                      title="Ver detalle"
+                      [routerLink]="['/work-orders', workOrder.id]"
+                    >
+                      <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z" />
+                        <circle cx="12" cy="12" r="2.5" />
+                      </svg>
+                    </button>
+                    <button
+                      class="actions__button"
+                      type="button"
+                      aria-label="Editar trabajo realizado"
+                      title="Editar"
+                      [routerLink]="['/work-orders', workOrder.id, 'editar']"
+                    >
+                      <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M4 20h4.6L19.2 9.4a2.6 2.6 0 0 0-3.7-3.7L4.9 16.3 4 20Z" />
+                        <path d="m14.2 7 2.8 2.8" />
+                      </svg>
+                    </button>
+                    <div class="status-menu">
+                      <button
+                        class="actions__button"
+                        type="button"
+                        aria-label="Cambiar estado"
+                        title="Cambiar estado"
+                        [disabled]="updatingStatusId() === workOrder.id"
+                        (click)="toggleMenu(workOrder.id, $event)"
+                      >
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                          <circle cx="5" cy="12" r="1.6" />
+                          <circle cx="12" cy="12" r="1.6" />
+                          <circle cx="19" cy="12" r="1.6" />
+                        </svg>
+                      </button>
+                      @if (openMenuId() === workOrder.id && menuPosition(); as position) {
+                        <div
+                          class="status-menu__dropdown"
+                          [style.top.px]="position.top ?? null"
+                          [style.bottom.px]="position.bottom ?? null"
+                          [style.right.px]="position.right"
+                        >
+                          <button
+                            type="button"
+                            [disabled]="workOrder.status === 'COMPLETED'"
+                            (click)="changeStatus(workOrder, 'COMPLETED')"
+                          >
+                            Marcar completado
+                          </button>
+                          <button
+                            type="button"
+                            [disabled]="workOrder.status === 'CANCELLED'"
+                            (click)="changeStatus(workOrder, 'CANCELLED')"
+                          >
+                            Marcar cancelado
+                          </button>
+                        </div>
+                      }
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td class="empty-state" colspan="6">
+                  @if (searchControl.value.trim() || selectedStatus()) {
+                    <strong>No encontramos trabajos con esos filtros.</strong>
+                    <span>Probá con otro cliente, patente o estado.</span>
+                  } @else {
+                    <strong>Todavía no registraste ningún trabajo realizado.</strong>
+                    <span>Se crean automáticamente al completar un turno, o podés cargarlos a mano.</span>
+                  }
+                </td>
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+
+    @if (totalPages() > 1) {
+      <nav class="pagination" aria-label="Paginación de trabajos realizados">
+        <button type="button" [disabled]="page() === 0" (click)="previousPage()">
+          Anterior
+        </button>
+        <span>Página {{ page() + 1 }} de {{ totalPages() }}</span>
+        <button type="button" [disabled]="page() + 1 >= totalPages()" (click)="nextPage()">
+          Siguiente
+        </button>
+      </nav>
+    }
+  </section>
+</main>

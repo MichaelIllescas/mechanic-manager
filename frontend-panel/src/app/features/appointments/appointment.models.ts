@@ -13,12 +13,16 @@ export interface Appointment {
   customerId: number;
   customerFirstName: string;
   customerLastName: string;
+  customerPhone: string;
+  quoteId: number | null;
+  quoteNumber: number | null;
   createdAt: string | null;
   updatedAt: string | null;
 }
 
 export interface CreateAppointmentRequest {
   vehicleId: number;
+  quoteId: number | null;
   scheduledAt: string;
   notes: string | null;
 }

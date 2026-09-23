@@ -6,6 +6,14 @@
       @if (quote(); as currentQuote) {
         <a [routerLink]="['/quotes', currentQuote.id, 'editar']">Editar</a>
         <button type="button" (click)="downloadQuote()">Descargar PDF</button>
+        @if (currentQuote.status === 'APPROVED') {
+          <a
+            [routerLink]="['/work-orders/nuevo']"
+            [queryParams]="{ vehicleId: currentQuote.vehicleId, quoteId: currentQuote.id }"
+          >
+            Registrar trabajo realizado
+          </a>
+        }
       }
     </div>
   </section>

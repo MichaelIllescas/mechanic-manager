@@ -307,6 +307,23 @@
   color: #6d7f97;
 }
 
+.quote-picker {
+  width: 100%;
+  min-height: 48px;
+  margin-top: 10px;
+  padding: 0 14px;
+  border: 1px solid #c8d7eb;
+  border-radius: 8px;
+  color: #07182e;
+  background: #fbfdff;
+  outline: none;
+}
+
+.quote-picker:focus {
+  border-color: #159cff;
+  box-shadow: 0 0 0 4px rgba(21, 156, 255, 0.14);
+}
+
 /* ---------- Acciones ---------- */
 
 .appointment-form__actions {

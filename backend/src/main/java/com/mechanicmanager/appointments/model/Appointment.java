@@ -1,5 +1,6 @@
 package com.mechanicmanager.appointments.model;
 
+import com.mechanicmanager.quotes.model.Quote;
 import com.mechanicmanager.users.model.User;
 import com.mechanicmanager.vehicles.model.Vehicle;
 import jakarta.persistence.Column;
@@ -12,6 +13,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -64,6 +66,9 @@ public class Appointment {
 
     @Column(name = "notes", columnDefinition = "TEXT")
     private String notes;
+
+    @OneToOne(mappedBy = "appointment", fetch = FetchType.LAZY)
+    private Quote quote;
 
     @Generated(event = EventType.INSERT)
     @Column(name = "created_at", nullable = false, insertable = false, updatable = false)

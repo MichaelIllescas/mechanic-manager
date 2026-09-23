@@ -369,7 +369,7 @@
   z-index: 30;
   display: flex;
   flex-direction: column;
-  width: 190px;
+  width: 224px;
   padding: 6px;
   border: 1px solid #d9e7f7;
   border-radius: 10px;
@@ -378,6 +378,9 @@
 }
 
 .status-menu__dropdown button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   padding: 10px 12px;
   border: 0;
   border-radius: 7px;
@@ -385,7 +388,19 @@
   background: transparent;
   font-weight: 700;
   text-align: left;
+  white-space: nowrap;
   cursor: pointer;
+}
+
+.status-menu__dropdown button svg {
+  width: 17px;
+  height: 17px;
+  flex: 0 0 auto;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2;
 }
 
 .status-menu__dropdown button:hover:not(:disabled) {
@@ -395,6 +410,24 @@
 .status-menu__dropdown button:disabled {
   color: #a9b8ca;
   cursor: default;
+}
+
+.status-menu__divider {
+  height: 1px;
+  margin: 6px 4px;
+  background: #e5eef9;
+}
+
+.status-menu__delete {
+  color: #b3261e !important;
+}
+
+.status-menu__delete:hover:not(:disabled) {
+  background: #fdecea !important;
+}
+
+.status-menu__delete:disabled {
+  color: #e5a9a4 !important;
 }
 
 .actions__button svg {

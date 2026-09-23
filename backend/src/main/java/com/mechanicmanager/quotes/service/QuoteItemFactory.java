@@ -20,6 +20,7 @@ public class QuoteItemFactory {
 
     public QuoteItem create(Long userId, QuoteItemRequest request) {
         validateSingleSource(request);
+        validateCatalogPrice(request);
 
         ServiceType serviceType = findServiceType(userId, request.serviceTypeId());
         Supply supply = findSupply(userId, request.supplyId());
@@ -41,6 +42,15 @@ public class QuoteItemFactory {
         if (request.serviceTypeId() != null && request.supplyId() != null) {
             throw new InvalidQuoteException(
                     "Un ítem no puede ser servicio e insumo al mismo tiempo"
+            );
+        }
+    }
+
+    private void validateCatalogPrice(QuoteItemRequest request) {
+        boolean catalogItem = request.serviceTypeId() != null || request.supplyId() != null;
+        if (catalogItem && request.unitPrice().signum() < 0) {
+            throw new InvalidQuoteException(
+                    "El precio de un servicio o insumo no puede ser negativo"
             );
         }
     }

@@ -121,4 +121,22 @@ public interface WorkOrderApi {
             UpdateWorkOrderStatusRequest request,
             @Parameter(hidden = true) AuthenticatedUser currentUser
     );
+
+    @Operation(
+            summary = "Eliminar una orden de trabajo",
+            description = "Baja definitiva: no queda registro en el historial del vehículo."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Orden de trabajo eliminada correctamente"),
+            @ApiResponse(responseCode = "401", description = "No autenticado",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "El usuario no tiene rol USER",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Orden de trabajo no encontrada",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    ResponseEntity<Void> delete(
+            @Parameter(description = "Identificador de la orden de trabajo", example = "1") Long id,
+            @Parameter(hidden = true) AuthenticatedUser currentUser
+    );
 }

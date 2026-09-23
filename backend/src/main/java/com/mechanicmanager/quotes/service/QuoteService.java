@@ -18,6 +18,7 @@ public class QuoteService {
     private final SearchQuotesUseCase searchQuotesUseCase;
     private final UpdateQuoteUseCase updateQuoteUseCase;
     private final UpdateQuoteStatusUseCase updateQuoteStatusUseCase;
+    private final DeleteQuoteUseCase deleteQuoteUseCase;
 
     public QuoteResponse create(Long userId, CreateQuoteRequest request) {
         return createQuoteUseCase.execute(userId, request);
@@ -57,5 +58,9 @@ public class QuoteService {
             UpdateQuoteStatusRequest request
     ) {
         return updateQuoteStatusUseCase.execute(userId, quoteId, request);
+    }
+
+    public void delete(Long userId, Long quoteId) {
+        deleteQuoteUseCase.execute(userId, quoteId);
     }
 }

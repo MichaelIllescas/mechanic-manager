@@ -6,6 +6,7 @@ import com.mechanicmanager.appointments.model.Appointment;
 import com.mechanicmanager.appointments.model.AppointmentStatus;
 import com.mechanicmanager.appointments.repository.AppointmentRepository;
 import com.mechanicmanager.shared.exception.ResourceNotFoundException;
+import com.mechanicmanager.workorders.service.CreateWorkOrderFromAppointmentUseCase;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,6 +28,8 @@ class CompleteAppointmentUseCaseTest {
 
     @Mock
     private AppointmentRepository appointmentRepository;
+    @Mock
+    private CreateWorkOrderFromAppointmentUseCase createWorkOrderFromAppointmentUseCase;
 
     private CompleteAppointmentUseCase useCase;
 
@@ -34,7 +37,8 @@ class CompleteAppointmentUseCaseTest {
     void setUp() {
         useCase = new CompleteAppointmentUseCase(
                 appointmentRepository,
-                new AppointmentMapper()
+                new AppointmentMapper(),
+                createWorkOrderFromAppointmentUseCase
         );
     }
 

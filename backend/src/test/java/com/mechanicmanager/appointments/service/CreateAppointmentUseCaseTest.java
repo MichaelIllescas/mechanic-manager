@@ -6,6 +6,7 @@ import com.mechanicmanager.appointments.model.Appointment;
 import com.mechanicmanager.appointments.model.AppointmentStatus;
 import com.mechanicmanager.appointments.repository.AppointmentRepository;
 import com.mechanicmanager.customers.model.Customer;
+import com.mechanicmanager.quotes.repository.QuoteRepository;
 import com.mechanicmanager.shared.exception.ResourceNotFoundException;
 import com.mechanicmanager.users.model.User;
 import com.mechanicmanager.users.repository.UserRepository;
@@ -42,6 +43,8 @@ class CreateAppointmentUseCaseTest {
 
     @Mock
     private UserRepository userRepository;
+    @Mock
+    private QuoteRepository quoteRepository;
 
     private CreateAppointmentUseCase useCase;
 
@@ -50,6 +53,7 @@ class CreateAppointmentUseCaseTest {
         useCase = new CreateAppointmentUseCase(
                 appointmentRepository,
                 vehicleRepository,
+                quoteRepository,
                 userRepository,
                 new AppointmentMapper()
         );
@@ -137,7 +141,7 @@ class CreateAppointmentUseCaseTest {
         when(appointmentRepository.save(any(Appointment.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
-        useCase.execute(7L, new CreateAppointmentRequest(30L, past, null));
+        useCase.execute(7L, new CreateAppointmentRequest(30L, null, past, null));
 
         ArgumentCaptor<Appointment> captor = ArgumentCaptor.forClass(Appointment.class);
         verify(appointmentRepository).save(captor.capture());
@@ -164,6 +168,6 @@ class CreateAppointmentUseCaseTest {
     }
 
     private static CreateAppointmentRequest request(String notes) {
-        return new CreateAppointmentRequest(30L, SCHEDULED_AT, notes);
+        return new CreateAppointmentRequest(30L, null, SCHEDULED_AT, notes);
     }
 }

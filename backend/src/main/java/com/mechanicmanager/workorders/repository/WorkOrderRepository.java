@@ -23,4 +23,6 @@ public interface WorkOrderRepository extends
     Optional<WorkOrder> findByIdAndUserId(Long id, Long userId);
 
     Optional<WorkOrder> findByAppointmentIdAndUserId(Long appointmentId, Long userId);
+
+    Optional<WorkOrder> findByQuoteIdAndUserId(Long quoteId, Long userId);
 }

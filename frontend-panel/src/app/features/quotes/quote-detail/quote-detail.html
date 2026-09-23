@@ -88,6 +88,7 @@
           @if (currentQuote.customerDocumentNumber) {
             <small>DNI {{ currentQuote.customerDocumentNumber }}</small>
           }
+          <small>Tel: {{ currentQuote.customerPhone }}</small>
         </article>
         <article>
           <span>Vehículo</span>
@@ -120,8 +121,8 @@
                   }
                 </td>
                 <td data-label="Cantidad">{{ item.quantity }}</td>
-                <td data-label="Precio unitario">{{ item.unitPrice | currency: 'ARS' : 'code' : '1.2-2' }}</td>
-                <td data-label="Subtotal">{{ item.subtotal | currency: 'ARS' : 'code' : '1.2-2' }}</td>
+                <td data-label="Precio unitario">{{ item.unitPrice | currency: 'ARS' : 'symbol-narrow' : '1.2-2' }}</td>
+                <td data-label="Subtotal">{{ item.subtotal | currency: 'ARS' : 'symbol-narrow' : '1.2-2' }}</td>
               </tr>
             }
           </tbody>
@@ -130,7 +131,7 @@
 
       <div class="document-total">
         <span>Total estimado</span>
-        <strong>{{ currentQuote.total | currency: 'ARS' : 'code' : '1.2-2' }}</strong>
+        <strong>{{ currentQuote.total | currency: 'ARS' : 'symbol-narrow' : '1.2-2' }}</strong>
       </div>
 
       @if (currentQuote.notes) {

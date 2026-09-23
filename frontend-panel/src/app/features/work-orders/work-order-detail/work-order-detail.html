@@ -69,6 +69,10 @@
         <article>
           <span>Cliente</span>
           <strong>{{ current.customerName }}</strong>
+          @if (current.customerDocumentNumber) {
+            <small>DNI {{ current.customerDocumentNumber }}</small>
+          }
+          <small>Tel: {{ current.customerPhone }}</small>
         </article>
         <article>
           <span>Vehículo</span>
@@ -114,8 +118,8 @@
                   }
                 </td>
                 <td data-label="Cantidad">{{ item.quantity }}</td>
-                <td data-label="Precio unitario">{{ item.unitPrice | currency: 'ARS' : 'code' : '1.2-2' }}</td>
-                <td data-label="Subtotal">{{ item.subtotal | currency: 'ARS' : 'code' : '1.2-2' }}</td>
+                <td data-label="Precio unitario">{{ item.unitPrice | currency: 'ARS' : 'symbol-narrow' : '1.2-2' }}</td>
+                <td data-label="Subtotal">{{ item.subtotal | currency: 'ARS' : 'symbol-narrow' : '1.2-2' }}</td>
               </tr>
             } @empty {
               <tr>
@@ -128,7 +132,7 @@
 
       <div class="document-total">
         <span>Total</span>
-        <strong>{{ current.total | currency: 'ARS' : 'code' : '1.2-2' }}</strong>
+        <strong>{{ current.total | currency: 'ARS' : 'symbol-narrow' : '1.2-2' }}</strong>
       </div>
 
       @if (current.notes) {

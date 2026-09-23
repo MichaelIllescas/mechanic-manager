@@ -237,10 +237,26 @@
  * debajo del otro repartiéndose la franja, así ninguno pierde ancho y la
  * patente se sigue leyendo.
  */
-.event {
+.event-wrap {
   position: absolute;
   left: 3px;
   right: 3px;
+}
+
+.event-wrap:hover .event__delete,
+.event__delete:focus-visible {
+  opacity: 1;
+}
+
+/* Bloques apilados y chicos: centrado real, no cabe alineado al encabezado. */
+.event-wrap--compact .event__delete {
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.event {
+  width: 100%;
+  height: 100%;
   display: flex;
   flex-direction: column;
   gap: 1px;
@@ -255,6 +271,47 @@
   text-align: left;
   cursor: pointer;
   overflow: hidden;
+}
+
+.event__delete {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  z-index: 2;
+  width: 16px;
+  height: 16px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 1px solid #fff;
+  border-radius: 50%;
+  color: #fff;
+  background: #d94b4b;
+  font-size: 0.85rem;
+  line-height: 1;
+  opacity: 0;
+  cursor: pointer;
+  transition: opacity 120ms ease;
+}
+
+.event__delete:hover {
+  background: #c33f3f;
+}
+
+.event__delete svg,
+.chip__delete svg {
+  width: 65%;
+  height: 65%;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-width: 3;
+}
+
+@media (hover: none) {
+  .event__delete {
+    opacity: 1;
+  }
 }
 
 /* Apilado con otros turnos no entra el vehículo: queda hora y patente. */
@@ -425,7 +482,17 @@
   min-width: 0;
 }
 
+.chip-wrap {
+  position: relative;
+}
+
+.chip-wrap:hover .chip__delete,
+.chip__delete:focus-visible {
+  opacity: 1;
+}
+
 .chip {
+  width: 100%;
   display: flex;
   align-items: baseline;
   gap: 6px;
@@ -439,6 +506,38 @@
   text-align: left;
   cursor: pointer;
   overflow: hidden;
+}
+
+.chip__delete {
+  position: absolute;
+  top: 50%;
+  right: 2px;
+  z-index: 2;
+  width: 14px;
+  height: 14px;
+  transform: translateY(-50%);
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 1px solid #fff;
+  border-radius: 50%;
+  color: #fff;
+  background: #d94b4b;
+  font-size: 0.7rem;
+  line-height: 1;
+  opacity: 0;
+  cursor: pointer;
+  transition: opacity 120ms ease;
+}
+
+.chip__delete:hover {
+  background: #c33f3f;
+}
+
+@media (hover: none) {
+  .chip__delete {
+    opacity: 1;
+  }
 }
 
 .chip.is-selected {
@@ -496,6 +595,32 @@
 }
 
 @media (max-width: 700px) {
+  .agenda-header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .agenda-header__action {
+    width: 100%;
+  }
+
+  .agenda-status-toolbar {
+    padding: 12px 16px;
+    overflow: hidden;
+  }
+
+  .agenda-status-filters {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .agenda-status-filters button {
+    min-width: 0;
+    padding: 0 6px;
+    white-space: nowrap;
+  }
+
   /*
    * La celda del mes no da para texto en un teléfono: el turno queda como un
    * punto de color por estado y el día entero se vuelve el área táctil, que
@@ -542,6 +667,11 @@
   }
 
   .chip span {
+    display: none;
+  }
+
+  /* Los puntos son de 8px: no hay lugar para la X, se borra desde el detalle. */
+  .chip__delete {
     display: none;
   }
 

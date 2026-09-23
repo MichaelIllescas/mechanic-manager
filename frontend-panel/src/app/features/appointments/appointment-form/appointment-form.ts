@@ -13,15 +13,16 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 import { NotificationService } from '../../../core/notifications/notification-service';
 import { QuoteService } from '../../quotes/quote-service';
-import { QuoteSummary } from '../../quotes/quote.models';
+import { Quote, QuoteSummary } from '../../quotes/quote.models';
 import { VehicleService } from '../../vehicles/vehicle-service';
 import { Vehicle } from '../../vehicles/vehicle.models';
 import { AppointmentService } from '../appointment-service';
 import { parseLocalDateTime, toIsoDate } from '../calendar.utils';
+import { QuoteQuickCreate } from './quote-quick-create/quote-quick-create';
 
 @Component({
   selector: 'app-appointment-form',
-  imports: [ReactiveFormsModule, RouterLink, CurrencyPipe, DatePipe],
+  imports: [ReactiveFormsModule, RouterLink, CurrencyPipe, DatePipe, QuoteQuickCreate],
   templateUrl: './appointment-form.html',
   styleUrl: './appointment-form.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -52,9 +53,11 @@ export class AppointmentForm implements OnInit {
   /** Presupuestos aprobados sin turno asignado todavía, para poder vincular uno al agendar. */
   readonly approvedQuotes = signal<QuoteSummary[]>([]);
   readonly selectedVehicleId = signal<number | null>(null);
+  readonly selectedCustomerId = signal<number | null>(null);
   readonly availableQuotes = computed(() =>
     this.approvedQuotes().filter((quote) => quote.vehicleId === this.selectedVehicleId()),
   );
+  readonly showQuoteQuickCreate = signal(false);
 
   readonly filteredVehicles = computed(() => {
     const search = this.vehicleSearch().trim().toLowerCase();
@@ -158,6 +161,7 @@ export class AppointmentForm implements OnInit {
     this.form.controls.quoteId.setValue(null);
     this.selectedVehicleLabel.set(this.formatVehicle(vehicle));
     this.selectedVehicleId.set(vehicle.id);
+    this.selectedCustomerId.set(vehicle.customerId);
     this.vehicleSearch.set('');
     this.vehicleResultsOpen.set(false);
   }
@@ -168,8 +172,37 @@ export class AppointmentForm implements OnInit {
     this.form.controls.quoteId.setValue(null);
     this.selectedVehicleLabel.set(null);
     this.selectedVehicleId.set(null);
+    this.selectedCustomerId.set(null);
     this.vehicleSearch.set('');
     this.vehicleResultsOpen.set(false);
+  }
+
+  openQuoteQuickCreate(): void {
+    this.showQuoteQuickCreate.set(true);
+  }
+
+  closeQuoteQuickCreate(): void {
+    this.showQuoteQuickCreate.set(false);
+  }
+
+  quoteQuickCreated(quote: Quote): void {
+    this.showQuoteQuickCreate.set(false);
+    this.approvedQuotes.update((quotes) => [
+      {
+        id: quote.id,
+        number: quote.number,
+        customerId: quote.customerId,
+        customerName: quote.customerName,
+        vehicleId: quote.vehicleId,
+        vehicleLicensePlate: quote.vehicleLicensePlate,
+        validUntil: quote.validUntil,
+        status: quote.status,
+        total: quote.total,
+        createdAt: quote.createdAt,
+      },
+      ...quotes,
+    ]);
+    this.form.controls.quoteId.setValue(quote.id);
   }
 
   private loadVehicles(): void {
@@ -179,6 +212,7 @@ export class AppointmentForm implements OnInit {
       next: (vehicles) => {
         this.vehicles.set(vehicles);
         this.loadingVehicles.set(false);
+        this.prefillVehicleIfMissing(vehicles);
       },
       error: (error: HttpErrorResponse) => {
         this.loadingVehicles.set(false);
@@ -227,11 +261,40 @@ export class AppointmentForm implements OnInit {
    */
   private applyPrefillFromQuery(): void {
     const date = this.route.snapshot.queryParamMap.get('date');
+    const vehicleId = Number(this.route.snapshot.queryParamMap.get('vehicleId'));
+    const quoteId = Number(this.route.snapshot.queryParamMap.get('quoteId'));
 
     this.form.patchValue({
       date: date ?? toIsoDate(new Date()),
       time: '09:00',
     });
+
+    if (Number.isInteger(vehicleId) && vehicleId > 0) {
+      this.form.controls.vehicleId.setValue(vehicleId);
+      this.selectedVehicleId.set(vehicleId);
+    }
+
+    if (Number.isInteger(quoteId) && quoteId > 0) {
+      this.form.controls.quoteId.setValue(quoteId);
+    }
+
+    this.prefillVehicleIfMissing(this.vehicles());
+  }
+
+  private prefillVehicleIfMissing(vehicles: Vehicle[]): void {
+    const vehicleId = this.form.controls.vehicleId.value;
+    if (!vehicleId || this.selectedVehicleLabel()) {
+      return;
+    }
+
+    const vehicle = vehicles.find((candidate) => candidate.id === vehicleId);
+    if (!vehicle) {
+      return;
+    }
+
+    this.selectedVehicleLabel.set(this.formatVehicle(vehicle));
+    this.selectedVehicleId.set(vehicle.id);
+    this.selectedCustomerId.set(vehicle.customerId);
   }
 
   formatNumber(number: number): string {

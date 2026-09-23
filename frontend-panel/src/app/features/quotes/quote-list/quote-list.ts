@@ -24,6 +24,7 @@ import {
 } from 'rxjs';
 
 import { NotificationService } from '../../../core/notifications/notification-service';
+import { ConfirmService } from '../../../core/confirm/confirm-service';
 import { QuoteService } from '../quote-service';
 import { QuotePage, QuoteStatus, QuoteSummary } from '../quote.models';
 
@@ -43,6 +44,7 @@ interface QuoteSearchRequest {
 export class QuoteList implements OnInit {
   private readonly quoteService = inject(QuoteService);
   private readonly notifications = inject(NotificationService);
+  private readonly confirmService = inject(ConfirmService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly requests = new Subject<QuoteSearchRequest>();
 
@@ -57,6 +59,7 @@ export class QuoteList implements OnInit {
   readonly openMenuId = signal<number | null>(null);
   readonly menuPosition = signal<{ top?: number; bottom?: number; right: number } | null>(null);
   readonly updatingStatusId = signal<number | null>(null);
+  readonly deletingId = signal<number | null>(null);
 
   ngOnInit(): void {
     this.requests
@@ -122,7 +125,7 @@ export class QuoteList implements OnInit {
 
     const button = event.currentTarget as HTMLElement;
     const rect = button.getBoundingClientRect();
-    const dropdownHeight = 160;
+    const dropdownHeight = 220;
     const right = window.innerWidth - rect.right;
 
     if (rect.bottom + 8 + dropdownHeight > window.innerHeight) {
@@ -173,6 +176,39 @@ export class QuoteList implements OnInit {
       error: (error: HttpErrorResponse) => {
         this.updatingStatusId.set(null);
         this.notifications.error(error.error?.message ?? 'No se pudo actualizar el estado');
+      },
+    });
+  }
+
+  async deleteQuote(quote: QuoteSummary): Promise<void> {
+    this.closeMenu();
+
+    if (this.deletingId()) {
+      return;
+    }
+
+    const confirmed = await this.confirmService.confirm({
+      title: 'Eliminar presupuesto',
+      message: `¿Eliminar el presupuesto N.° ${quote.number} de ${quote.customerName}? Esta acción no se puede deshacer.`,
+      confirmLabel: 'Eliminar',
+      danger: true,
+    });
+    if (!confirmed) {
+      return;
+    }
+
+    this.deletingId.set(quote.id);
+
+    this.quoteService.delete(quote.id).subscribe({
+      next: () => {
+        this.deletingId.set(null);
+        this.quotes.update((list) => list.filter((item) => item.id !== quote.id));
+        this.totalElements.update((total) => Math.max(0, total - 1));
+        this.notifications.success('Presupuesto eliminado correctamente');
+      },
+      error: (error: HttpErrorResponse) => {
+        this.deletingId.set(null);
+        this.notifications.error(error.error?.message ?? 'No se pudo eliminar el presupuesto');
       },
     });
   }

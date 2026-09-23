@@ -152,4 +152,23 @@ public interface AppointmentApi {
             @Parameter(description = "Identificador del turno", example = "1") Long id,
             @Parameter(hidden = true) AuthenticatedUser currentUser
     );
+
+    @Operation(
+            summary = "Eliminar un turno",
+            description = "Baja definitiva, en cualquier estado. El presupuesto vinculado y la "
+                    + "orden de trabajo autogenerada (si existen) no se borran: quedan sin turno."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Turno eliminado correctamente"),
+            @ApiResponse(responseCode = "401", description = "No autenticado",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "El usuario autenticado no tiene rol USER",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "El turno no existe en el taller",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    ResponseEntity<Void> delete(
+            @Parameter(description = "Identificador del turno", example = "1") Long id,
+            @Parameter(hidden = true) AuthenticatedUser currentUser
+    );
 }

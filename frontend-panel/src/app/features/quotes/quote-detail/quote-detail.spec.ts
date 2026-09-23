@@ -17,6 +17,8 @@ describe('QuoteDetail', () => {
     number: 24,
     customerId: 3,
     customerName: 'Ana Gómez',
+    customerDocumentNumber: null,
+    customerPhone: '1100000000',
     vehicleId: 8,
     vehicleLicensePlate: 'AB123CD',
     vehicleDescription: 'Toyota Corolla',
@@ -96,6 +98,10 @@ describe('QuoteDetail', () => {
     expect(component).toBeTruthy();
     expect(quoteService.findById).toHaveBeenCalledWith(15);
     expect(component.quote()).toEqual(quote);
+  });
+
+  it('shows the customer phone', () => {
+    expect((fixture.nativeElement as HTMLElement).textContent).toContain('Tel: 1100000000');
   });
 
   it('rejects an invalid route identifier without requesting data', () => {

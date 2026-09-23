@@ -1,0 +1,51 @@
+<div class="quick-create-backdrop" role="presentation">
+  <section class="quick-create-dialog" role="dialog" aria-modal="true">
+    <header class="quick-create-header">
+      <div>
+        <p>Presupuesto rápido</p>
+        <h2>Crear presupuesto para {{ vehicleLabel() }}</h2>
+      </div>
+      <button class="quick-create-close" type="button" aria-label="Cerrar" (click)="cancel()">
+        &times;
+      </button>
+    </header>
+
+    @if (errorMessage()) {
+      <p class="quick-error" role="alert">{{ errorMessage() }}</p>
+    }
+
+    <form [formGroup]="form">
+      <app-quote-items-editor [items]="$any(items)" />
+
+      <div class="quick-create-form quick-create-form--meta">
+        <label class="quick-field">
+          <span>Válido hasta</span>
+          <input type="date" formControlName="validUntil" />
+        </label>
+        <label class="quick-field quick-field--wide">
+          <span>Observaciones</span>
+          <textarea
+            formControlName="notes"
+            rows="3"
+            maxlength="2000"
+            placeholder="Condiciones o aclaraciones"
+          ></textarea>
+        </label>
+      </div>
+    </form>
+
+    <footer class="quick-create-actions">
+      <button class="quick-create-actions__cancel" type="button" (click)="cancel()">
+        Cancelar
+      </button>
+      <button
+        class="quick-create-actions__save"
+        type="button"
+        [disabled]="saving()"
+        (click)="save()"
+      >
+        {{ saving() ? 'Guardando...' : 'Crear y aprobar presupuesto' }}
+      </button>
+    </footer>
+  </section>
+</div>

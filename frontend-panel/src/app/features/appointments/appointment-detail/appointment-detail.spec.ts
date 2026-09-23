@@ -1,6 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
+import { of } from 'rxjs';
 
+import { QuoteService } from '../../quotes/quote-service';
+import { Quote } from '../../quotes/quote.models';
 import { Appointment } from '../appointment.models';
 import { AppointmentDetail } from './appointment-detail';
 
@@ -20,14 +23,40 @@ describe('AppointmentDetail', () => {
     customerId: 2,
     customerFirstName: 'Jose',
     customerLastName: 'Pereyra',
+    customerPhone: '1100000000',
+    quoteId: 9,
+    quoteNumber: 9,
     createdAt: null,
     updatedAt: null,
+  };
+
+  const quote: Quote = {
+    id: 9,
+    number: 9,
+    customerId: 2,
+    customerName: 'Jose Pereyra',
+    customerDocumentNumber: null,
+    customerPhone: '1100000000',
+    vehicleId: 3,
+    vehicleLicensePlate: 'AD123AA',
+    vehicleDescription: 'Fiat Uno',
+    validUntil: null,
+    status: 'APPROVED',
+    total: 125000,
+    notes: null,
+    items: [],
+    createdAt: '2026-09-01T10:00:00',
+    updatedAt: '2026-09-01T10:00:00',
+  };
+
+  const quoteService = {
+    findById: vi.fn().mockReturnValue(of(quote)),
   };
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [AppointmentDetail],
-      providers: [provideRouter([])],
+      providers: [provideRouter([]), { provide: QuoteService, useValue: quoteService }],
     }).compileComponents();
 
     fixture = TestBed.createComponent(AppointmentDetail);
@@ -42,6 +71,7 @@ describe('AppointmentDetail', () => {
     expect(text).toContain('AD123AA');
     expect(text).toContain('Jose Pereyra');
     expect(text).toContain('Cambio de correa');
+    expect(text).toContain('$125,000.00');
   });
 
   it('avisa cuando el usuario cierra el panel', () => {
@@ -77,7 +107,8 @@ describe('AppointmentDetail', () => {
     fixture.detectChanges();
 
     const element = fixture.nativeElement as HTMLElement;
-    expect(element.querySelector('.detail__actions')).toBeNull();
     expect(element.textContent).toContain('ya está cerrado');
+    expect(element.textContent).toContain('Ver trabajo realizado');
+    expect(element.textContent).not.toContain('Reprogramar');
   });
 });

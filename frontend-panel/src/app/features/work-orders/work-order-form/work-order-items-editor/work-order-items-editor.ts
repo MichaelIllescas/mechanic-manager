@@ -121,6 +121,10 @@ export class WorkOrderItemsEditor implements OnInit {
     this.items().removeAt(index);
   }
 
+  isManualItem(item: FormArray['controls'][number]): boolean {
+    return !item.get('serviceTypeId')?.value && !item.get('supplyId')?.value;
+  }
+
   private loadCatalogs(): void {
     this.loading.set(true);
     let pending = 2;
@@ -168,8 +172,15 @@ export class WorkOrderItemsEditor implements OnInit {
       supplyId: [item?.supplyId ?? (null as number | null)],
       description: [item?.description ?? '', [Validators.required, Validators.maxLength(255)]],
       quantity: [item?.quantity ?? 1, [Validators.required, Validators.min(0.01)]],
-      unitPrice: [item?.unitPrice ?? 0, [Validators.required, Validators.min(0)]],
+      unitPrice: [
+        item?.unitPrice ?? 0,
+        this.isCatalogItem(item) ? [Validators.required, Validators.min(0)] : [Validators.required],
+      ],
     });
+  }
+
+  private isCatalogItem(item?: WorkOrderItemRequest): boolean {
+    return Boolean(item?.serviceTypeId || item?.supplyId);
   }
 
   private calculateTotal(): void {

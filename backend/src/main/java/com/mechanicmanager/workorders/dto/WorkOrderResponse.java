@@ -14,6 +14,8 @@ public record WorkOrderResponse(
         String vehicleDescription,
         Long customerId,
         String customerName,
+        String customerDocumentNumber,
+        String customerPhone,
         Long appointmentId,
         Long quoteId,
         Long quoteNumber,

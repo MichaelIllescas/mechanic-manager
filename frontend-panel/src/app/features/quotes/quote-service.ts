@@ -60,4 +60,8 @@ export class QuoteService {
   ): Observable<Quote> {
     return this.http.patch<Quote>(`${this.apiUrl}/${id}/status`, request);
   }
+
+  delete(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  }
 }

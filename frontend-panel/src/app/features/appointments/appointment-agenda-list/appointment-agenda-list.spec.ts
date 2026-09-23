@@ -19,6 +19,9 @@ describe('AppointmentAgendaList', () => {
     customerId: 1,
     customerFirstName: 'Jose',
     customerLastName: 'Pereyra',
+    customerPhone: '',
+    quoteId: null,
+    quoteNumber: null,
     createdAt: null,
     updatedAt: null,
   });

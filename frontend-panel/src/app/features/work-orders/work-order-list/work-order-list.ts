@@ -23,6 +23,7 @@ import {
   tap,
 } from 'rxjs';
 
+import { ConfirmService } from '../../../core/confirm/confirm-service';
 import { NotificationService } from '../../../core/notifications/notification-service';
 import { WorkOrderService } from '../work-order-service';
 import { WorkOrderPage, WorkOrderStatus, WorkOrderSummary } from '../work-order.models';
@@ -44,6 +45,7 @@ interface WorkOrderSearchRequest {
 export class WorkOrderList implements OnInit {
   private readonly workOrderService = inject(WorkOrderService);
   private readonly notifications = inject(NotificationService);
+  private readonly confirmService = inject(ConfirmService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly route = inject(ActivatedRoute);
   private readonly requests = new Subject<WorkOrderSearchRequest>();
@@ -60,6 +62,7 @@ export class WorkOrderList implements OnInit {
   readonly openMenuId = signal<number | null>(null);
   readonly menuPosition = signal<{ top?: number; bottom?: number; right: number } | null>(null);
   readonly updatingStatusId = signal<number | null>(null);
+  readonly deletingId = signal<number | null>(null);
 
   ngOnInit(): void {
     const vehicleId = Number(this.route.snapshot.queryParamMap.get('vehicleId'));
@@ -135,7 +138,7 @@ export class WorkOrderList implements OnInit {
 
     const button = event.currentTarget as HTMLElement;
     const rect = button.getBoundingClientRect();
-    const dropdownHeight = 110;
+    const dropdownHeight = 160;
     const right = window.innerWidth - rect.right;
 
     if (rect.bottom + 8 + dropdownHeight > window.innerHeight) {
@@ -186,6 +189,41 @@ export class WorkOrderList implements OnInit {
       error: (error: HttpErrorResponse) => {
         this.updatingStatusId.set(null);
         this.notifications.error(error.error?.message ?? 'No se pudo actualizar el estado');
+      },
+    });
+  }
+
+  async deleteWorkOrder(workOrder: WorkOrderSummary): Promise<void> {
+    this.closeMenu();
+
+    if (this.deletingId()) {
+      return;
+    }
+
+    const confirmed = await this.confirmService.confirm({
+      title: 'Eliminar trabajo realizado',
+      message: `¿Eliminar el trabajo realizado de ${workOrder.customerName} (${workOrder.vehicleLicensePlate})? Esta acción no se puede deshacer.`,
+      confirmLabel: 'Eliminar',
+      danger: true,
+    });
+    if (!confirmed) {
+      return;
+    }
+
+    this.deletingId.set(workOrder.id);
+
+    this.workOrderService.delete(workOrder.id).subscribe({
+      next: () => {
+        this.deletingId.set(null);
+        this.workOrders.update((list) => list.filter((item) => item.id !== workOrder.id));
+        this.totalElements.update((total) => Math.max(0, total - 1));
+        this.notifications.success('Trabajo realizado eliminado correctamente');
+      },
+      error: (error: HttpErrorResponse) => {
+        this.deletingId.set(null);
+        this.notifications.error(
+          error.error?.message ?? 'No se pudo eliminar el trabajo realizado',
+        );
       },
     });
   }

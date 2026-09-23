@@ -18,6 +18,8 @@ public class WorkOrderMapper {
                 vehicleDescription(workOrder),
                 workOrder.getVehicle().getCustomer().getId(),
                 customerName(workOrder),
+                workOrder.getVehicle().getCustomer().getDocumentNumber(),
+                workOrder.getVehicle().getCustomer().getPhone(),
                 workOrder.getAppointment() == null
                         ? null
                         : workOrder.getAppointment().getId(),

@@ -20,6 +20,7 @@ public class WorkOrderItemFactory {
 
     public WorkOrderItem create(Long userId, WorkOrderItemRequest request) {
         validateSingleSource(request);
+        validateCatalogPrice(request);
 
         ServiceType serviceType = findServiceType(userId, request.serviceTypeId());
         Supply supply = findSupply(userId, request.supplyId());
@@ -41,6 +42,15 @@ public class WorkOrderItemFactory {
         if (request.serviceTypeId() != null && request.supplyId() != null) {
             throw new InvalidWorkOrderException(
                     "Un ítem no puede ser servicio e insumo al mismo tiempo"
+            );
+        }
+    }
+
+    private void validateCatalogPrice(WorkOrderItemRequest request) {
+        boolean catalogItem = request.serviceTypeId() != null || request.supplyId() != null;
+        if (catalogItem && request.unitPrice().signum() < 0) {
+            throw new InvalidWorkOrderException(
+                    "El precio de un servicio o insumo no puede ser negativo"
             );
         }
     }

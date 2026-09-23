@@ -20,6 +20,7 @@ public class WorkOrderService {
     private final SearchWorkOrdersUseCase searchWorkOrdersUseCase;
     private final UpdateWorkOrderUseCase updateWorkOrderUseCase;
     private final UpdateWorkOrderStatusUseCase updateWorkOrderStatusUseCase;
+    private final DeleteWorkOrderUseCase deleteWorkOrderUseCase;
 
     public WorkOrderResponse create(Long userId, CreateWorkOrderRequest request) {
         return createWorkOrderUseCase.execute(userId, request);
@@ -65,5 +66,9 @@ public class WorkOrderService {
             UpdateWorkOrderStatusRequest request
     ) {
         return updateWorkOrderStatusUseCase.execute(userId, workOrderId, request);
+    }
+
+    public void delete(Long userId, Long workOrderId) {
+        deleteWorkOrderUseCase.execute(userId, workOrderId);
     }
 }

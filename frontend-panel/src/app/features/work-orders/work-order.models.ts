@@ -46,6 +46,8 @@ export interface WorkOrder {
   vehicleDescription: string;
   customerId: number;
   customerName: string;
+  customerDocumentNumber: string | null;
+  customerPhone: string;
   appointmentId: number | null;
   quoteId: number | null;
   quoteNumber: number | null;

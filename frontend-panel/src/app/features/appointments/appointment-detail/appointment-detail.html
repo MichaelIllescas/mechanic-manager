@@ -52,6 +52,13 @@
           <button type="button" class="quote-link" (click)="openQuotePreview(quoteId)">
             N.° {{ formatNumber(appointment().quoteNumber!) }}
           </button>
+          @if (quotePreview(); as quote) {
+            <strong class="quote-total">
+              {{ quote.total | currency: 'ARS' : 'symbol-narrow' : '1.2-2' }}
+            </strong>
+          } @else if (loadingQuotePreview()) {
+            <span class="quote-total quote-total--loading">Cargando total...</span>
+          }
         </dd>
       </div>
     }
@@ -100,9 +107,20 @@
       </div>
     }
   }
+
+  <div class="detail__divider"></div>
+
+  <button class="detail__delete" type="button" (click)="deleted.emit(appointment())">
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path
+        d="M4 7h16M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2m-8 0 1 13a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2l1-13"
+      />
+    </svg>
+    Eliminar turno
+  </button>
 </aside>
 
-@if (loadingQuotePreview() || quotePreview() || quotePreviewError()) {
+@if (quotePreviewOpen()) {
   <div class="quote-preview__scrim" (click)="closeQuotePreview()"></div>
 
   <aside class="quote-preview" role="dialog" aria-label="Vista previa del presupuesto">
@@ -133,7 +151,9 @@
         </div>
         <div>
           <span>Válido hasta</span>
-          <strong>{{ quote.validUntil ? (quote.validUntil | date: 'dd/MM/yyyy') : 'Sin fecha' }}</strong>
+          <strong>{{
+            quote.validUntil ? (quote.validUntil | date: 'dd/MM/yyyy') : 'Sin fecha'
+          }}</strong>
         </div>
       </div>
 
@@ -141,14 +161,14 @@
         @for (item of quote.items; track item.id) {
           <li>
             <span>{{ item.description }} × {{ item.quantity }}</span>
-            <strong>{{ item.subtotal | currency: 'ARS' : 'code' : '1.2-2' }}</strong>
+            <strong>{{ item.subtotal | currency: 'ARS' : 'symbol-narrow' : '1.2-2' }}</strong>
           </li>
         }
       </ul>
 
       <div class="quote-preview__total">
         <span>Total</span>
-        <strong>{{ quote.total | currency: 'ARS' : 'code' : '1.2-2' }}</strong>
+        <strong>{{ quote.total | currency: 'ARS' : 'symbol-narrow' : '1.2-2' }}</strong>
       </div>
 
       @if (quote.notes) {

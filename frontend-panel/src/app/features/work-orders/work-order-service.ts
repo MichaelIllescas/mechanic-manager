@@ -75,4 +75,8 @@ export class WorkOrderService {
   ): Observable<WorkOrder> {
     return this.http.patch<WorkOrder>(`${this.apiUrl}/${id}/status`, request);
   }
+
+  delete(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  }
 }

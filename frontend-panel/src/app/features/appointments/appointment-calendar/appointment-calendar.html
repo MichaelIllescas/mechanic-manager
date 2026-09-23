@@ -32,7 +32,7 @@
           @if (loading()) {
             Cargando agenda...
           } @else {
-            {{ scheduledCount() }} turnos agendados
+            {{ filteredAppointments().length }} turnos visibles
           }
         </p>
       </div>
@@ -62,6 +62,21 @@
         >
           Mes
         </button>
+      </div>
+    </div>
+
+    <div class="agenda-toolbar agenda-status-toolbar">
+      <div class="agenda-views agenda-status-filters" role="group" aria-label="Estado del turno">
+        @for (filter of statusFilters; track filter.value) {
+          <button
+            type="button"
+            [class.is-active]="statusFilter() === filter.value"
+            [attr.aria-pressed]="statusFilter() === filter.value"
+            (click)="setStatusFilter(filter.value)"
+          >
+            {{ filter.label }}
+          </button>
+        }
       </div>
     </div>
 
@@ -95,17 +110,30 @@
 
               <div class="month__items">
                 @for (item of cell.visible; track item.appointment.id) {
-                  <button
-                    class="chip"
-                    type="button"
-                    [class.chip--completed]="item.appointment.status === 'COMPLETED'"
-                    [class.chip--cancelled]="item.appointment.status === 'CANCELLED'"
-                    [class.is-selected]="selected()?.id === item.appointment.id"
-                    (click)="select(item.appointment)"
-                  >
-                    <span class="chip__time">{{ item.time }}</span>
-                    <span class="chip__plate">{{ item.appointment.licensePlate }}</span>
-                  </button>
+                  <div class="chip-wrap">
+                    <button
+                      class="chip"
+                      type="button"
+                      [class.chip--completed]="item.appointment.status === 'COMPLETED'"
+                      [class.chip--cancelled]="item.appointment.status === 'CANCELLED'"
+                      [class.is-selected]="selected()?.id === item.appointment.id"
+                      (click)="select(item.appointment)"
+                    >
+                      <span class="chip__time">{{ item.time }}</span>
+                      <span class="chip__plate">{{ item.appointment.licensePlate }}</span>
+                    </button>
+                    <button
+                      class="chip__delete"
+                      type="button"
+                      aria-label="Eliminar turno"
+                      title="Eliminar turno"
+                      (click)="delete(item.appointment, $event)"
+                    >
+                      <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M6 6 18 18M18 6 6 18" />
+                      </svg>
+                    </button>
+                  </div>
                 }
 
                 @if (cell.hiddenCount > 0) {
@@ -153,25 +181,41 @@
               }
 
               @for (item of column.appointments; track item.appointment.id) {
-                <button
-                  class="event"
-                  type="button"
+                <div
+                  class="event-wrap"
+                  [class.event-wrap--compact]="item.height < 36"
                   [style.top.px]="item.top - gridOffset()"
                   [style.height.px]="item.height"
-                  [class.event--compact]="item.height < 36"
-                  [class.event--completed]="item.appointment.status === 'COMPLETED'"
-                  [class.event--cancelled]="item.appointment.status === 'CANCELLED'"
-                  [class.is-selected]="selected()?.id === item.appointment.id"
-                  (click)="select(item.appointment)"
                 >
-                  <span class="event__head">
-                    <span class="event__time">{{ item.time }}</span>
-                    <span class="event__plate">{{ item.appointment.licensePlate }}</span>
-                  </span>
-                  <span class="event__vehicle">
-                    {{ item.appointment.brand }} {{ item.appointment.model }}
-                  </span>
-                </button>
+                  <button
+                    class="event"
+                    type="button"
+                    [class.event--compact]="item.height < 36"
+                    [class.event--completed]="item.appointment.status === 'COMPLETED'"
+                    [class.event--cancelled]="item.appointment.status === 'CANCELLED'"
+                    [class.is-selected]="selected()?.id === item.appointment.id"
+                    (click)="select(item.appointment)"
+                  >
+                    <span class="event__head">
+                      <span class="event__time">{{ item.time }}</span>
+                      <span class="event__plate">{{ item.appointment.licensePlate }}</span>
+                    </span>
+                    <span class="event__vehicle">
+                      {{ item.appointment.brand }} {{ item.appointment.model }}
+                    </span>
+                  </button>
+                  <button
+                    class="event__delete"
+                    type="button"
+                    aria-label="Eliminar turno"
+                    title="Eliminar turno"
+                    (click)="delete(item.appointment, $event)"
+                  >
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="M6 6 18 18M18 6 6 18" />
+                    </svg>
+                  </button>
+                </div>
               }
             </div>
           }
@@ -186,6 +230,7 @@
       (closed)="closeDetail()"
       (completed)="complete($event)"
       (cancelled)="cancel($event)"
+      (deleted)="delete($event)"
     />
   }
 </main>

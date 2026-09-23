@@ -117,7 +117,12 @@ export class QuoteForm implements OnInit {
       supplyId: [item.supplyId],
       description: [item.description, [Validators.required, Validators.maxLength(255)]],
       quantity: [item.quantity, [Validators.required, Validators.min(0.01)]],
-      unitPrice: [item.unitPrice, [Validators.required, Validators.min(0)]],
+      unitPrice: [
+        item.unitPrice,
+        item.serviceTypeId || item.supplyId
+          ? [Validators.required, Validators.min(0)]
+          : [Validators.required],
+      ],
     });
   }
 

@@ -20,6 +20,8 @@ describe('QuoteService', () => {
     number: 24,
     customerId: 3,
     customerName: 'Ana Gómez',
+    customerDocumentNumber: null,
+    customerPhone: '1100000000',
     vehicleId: 8,
     vehicleLicensePlate: 'AB123CD',
     vehicleDescription: 'Toyota Corolla',
@@ -152,5 +154,13 @@ describe('QuoteService', () => {
     expect(request.request.method).toBe('PATCH');
     expect(request.request.body).toEqual({ status: 'REJECTED' });
     request.flush({ ...quote, status: 'REJECTED' });
+  });
+
+  it('should delete a quote', () => {
+    service.delete(15).subscribe();
+
+    const request = httpMock.expectOne(`${environment.apiUrl}/quotes/15`);
+    expect(request.request.method).toBe('DELETE');
+    request.flush(null);
   });
 });

@@ -85,4 +85,23 @@ describe('QuoteItemsEditor', () => {
     expect(component.items().length).toBe(1);
     expect(component.items().at(0).get('quantity')?.value).toBe(2);
   });
+
+  it('accepts a negative price for a manual discount item', () => {
+    component.addManualItem();
+    const item = component.items().at(0);
+
+    item.patchValue({ description: 'Descuento', quantity: 1, unitPrice: -2500 });
+
+    expect(item.valid).toBe(true);
+    expect(component.total()).toBe(-2500);
+  });
+
+  it('keeps catalog item prices non-negative', () => {
+    component.addService(services[0]);
+    const item = component.items().at(0);
+
+    item.get('unitPrice')?.setValue(-1);
+
+    expect(item.get('unitPrice')?.hasError('min')).toBe(true);
+  });
 });

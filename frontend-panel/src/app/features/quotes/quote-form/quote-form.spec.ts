@@ -26,6 +26,8 @@ describe('QuoteForm', () => {
     number: 24,
     customerId: 1,
     customerName: 'Ana Gómez',
+    customerDocumentNumber: null,
+    customerPhone: '1100000000',
     vehicleId: 8,
     vehicleLicensePlate: 'AB123CD',
     vehicleDescription: 'Toyota Corolla',

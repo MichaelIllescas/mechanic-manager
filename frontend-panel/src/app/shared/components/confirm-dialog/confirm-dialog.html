@@ -1,0 +1,22 @@
+@if (current(); as request) {
+  <div class="confirm-dialog__scrim" (click)="cancel()"></div>
+
+  <aside class="confirm-dialog" role="alertdialog" aria-modal="true" aria-labelledby="confirm-dialog-title">
+    <h3 id="confirm-dialog-title">{{ request.title }}</h3>
+    <p>{{ request.message }}</p>
+
+    <div class="confirm-dialog__actions">
+      <button type="button" class="confirm-dialog__cancel" (click)="cancel()">
+        {{ request.cancelLabel || 'Cancelar' }}
+      </button>
+      <button
+        type="button"
+        class="confirm-dialog__confirm"
+        [class.confirm-dialog__confirm--danger]="request.danger"
+        (click)="confirm()"
+      >
+        {{ request.confirmLabel || 'Confirmar' }}
+      </button>
+    </div>
+  </aside>
+}

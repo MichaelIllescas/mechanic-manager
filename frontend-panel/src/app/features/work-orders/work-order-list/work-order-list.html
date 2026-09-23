@@ -116,7 +116,7 @@
                     {{ statusLabel(workOrder.status) }}
                   </span>
                 </td>
-                <td class="quote-total" data-label="Total">{{ workOrder.total | currency: 'ARS' : 'code' : '1.2-2' }}</td>
+                <td class="quote-total" data-label="Total">{{ workOrder.total | currency: 'ARS' : 'symbol-narrow' : '1.2-2' }}</td>
                 <td class="quote-cell--actions">
                   <div class="actions">
                     <button
@@ -170,6 +170,10 @@
                             [disabled]="workOrder.status === 'COMPLETED'"
                             (click)="changeStatus(workOrder, 'COMPLETED')"
                           >
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                              <path d="M9 12.5 11 14.5 15 9.5" />
+                              <circle cx="12" cy="12" r="9" />
+                            </svg>
                             Marcar completado
                           </button>
                           <button
@@ -177,7 +181,23 @@
                             [disabled]="workOrder.status === 'CANCELLED'"
                             (click)="changeStatus(workOrder, 'CANCELLED')"
                           >
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                              <path d="m9.5 9.5 5 5m0-5-5 5" />
+                              <circle cx="12" cy="12" r="9" />
+                            </svg>
                             Marcar cancelado
+                          </button>
+                          <div class="status-menu__divider"></div>
+                          <button
+                            type="button"
+                            class="status-menu__delete"
+                            [disabled]="deletingId() === workOrder.id"
+                            (click)="deleteWorkOrder(workOrder)"
+                          >
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                              <path d="M4 7h16M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2m-8 0 1 13a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2l1-13" />
+                            </svg>
+                            Eliminar
                           </button>
                         </div>
                       }

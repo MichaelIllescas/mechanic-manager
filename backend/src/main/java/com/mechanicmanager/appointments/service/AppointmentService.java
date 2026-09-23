@@ -19,6 +19,7 @@ public class AppointmentService {
     private final UpdateAppointmentUseCase updateAppointmentUseCase;
     private final CompleteAppointmentUseCase completeAppointmentUseCase;
     private final CancelAppointmentUseCase cancelAppointmentUseCase;
+    private final DeleteAppointmentUseCase deleteAppointmentUseCase;
 
     public AppointmentResponse create(Long userId, CreateAppointmentRequest request) {
         return createAppointmentUseCase.execute(userId, request);
@@ -46,5 +47,9 @@ public class AppointmentService {
 
     public AppointmentResponse cancel(Long userId, Long appointmentId) {
         return cancelAppointmentUseCase.execute(userId, appointmentId);
+    }
+
+    public void delete(Long userId, Long appointmentId) {
+        deleteAppointmentUseCase.execute(userId, appointmentId);
     }
 }

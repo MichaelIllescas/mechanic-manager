@@ -116,4 +116,22 @@ public interface QuoteApi {
             UpdateQuoteStatusRequest request,
             @Parameter(hidden = true) AuthenticatedUser currentUser
     );
+
+    @Operation(
+            summary = "Eliminar un presupuesto",
+            description = "Elimina el presupuesto y conserva el turno y el trabajo realizado vinculados."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Presupuesto eliminado correctamente"),
+            @ApiResponse(responseCode = "401", description = "No autenticado",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "El usuario no tiene rol USER",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Presupuesto no encontrado",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    ResponseEntity<Void> delete(
+            @Parameter(description = "Identificador del presupuesto", example = "1") Long id,
+            @Parameter(hidden = true) AuthenticatedUser currentUser
+    );
 }

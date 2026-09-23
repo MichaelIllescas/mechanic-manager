@@ -12,9 +12,16 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 import { catchError, of } from 'rxjs';
 
+import { ConfirmService } from '../../../core/confirm/confirm-service';
+import { NotificationService } from '../../../core/notifications/notification-service';
 import { AppointmentAgendaList } from '../appointment-agenda-list/appointment-agenda-list';
 import { AppointmentDetail } from '../appointment-detail/appointment-detail';
 import { AppointmentService } from '../appointment-service';
+import {
+  APPOINTMENT_STATUS_FILTERS,
+  AppointmentStatusFilter,
+  filterAppointmentsByStatus,
+} from '../appointment-status-filter';
 import { Appointment, CalendarView } from '../appointment.models';
 import {
   daysFor,
@@ -89,15 +96,15 @@ interface MonthCell {
 })
 export class AppointmentCalendar implements OnInit {
   private readonly appointmentService = inject(AppointmentService);
+  private readonly confirmService = inject(ConfirmService);
+  private readonly notifications = inject(NotificationService);
   private readonly destroyRef = inject(DestroyRef);
 
   readonly hourHeight = HOUR_HEIGHT;
   readonly weekdayNames = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
 
   private readonly wideScreen =
-    typeof window !== 'undefined' && window.matchMedia
-      ? window.matchMedia(WIDE_SCREEN)
-      : null;
+    typeof window !== 'undefined' && window.matchMedia ? window.matchMedia(WIDE_SCREEN) : null;
 
   /** El teléfono no da para la grilla semanal: arranca en la vista del día. */
   readonly isWide = signal(this.wideScreen?.matches ?? true);
@@ -105,9 +112,14 @@ export class AppointmentCalendar implements OnInit {
   readonly view = signal<CalendarView>(this.isWide() ? 'week' : 'day');
   readonly anchor = signal(startOfDay(new Date()));
   readonly appointments = signal<Appointment[]>([]);
+  readonly statusFilter = signal<AppointmentStatusFilter>('ALL');
+  readonly statusFilters = APPOINTMENT_STATUS_FILTERS;
   readonly loading = signal(false);
   readonly errorMessage = signal<string | null>(null);
   readonly selected = signal<Appointment | null>(null);
+  readonly filteredAppointments = computed(() =>
+    filterAppointmentsByStatus(this.appointments(), this.statusFilter()),
+  );
 
   /**
    * Franja de horas que dibuja la grilla.
@@ -121,7 +133,7 @@ export class AppointmentCalendar implements OnInit {
     let from = DEFAULT_FIRST_HOUR;
     let to = DEFAULT_LAST_HOUR;
 
-    for (const appointment of this.appointments()) {
+    for (const appointment of this.filteredAppointments()) {
       const hour = parseLocalDateTime(appointment.scheduledAt).getHours();
       from = Math.min(from, hour);
       to = Math.max(to, hour + 1);
@@ -144,7 +156,7 @@ export class AppointmentCalendar implements OnInit {
   private readonly byDay = computed(() => {
     const groups = new Map<string, PositionedAppointment[]>();
 
-    for (const appointment of this.appointments()) {
+    for (const appointment of this.filteredAppointments()) {
       const date = parseLocalDateTime(appointment.scheduledAt);
       const key = toIsoDate(date);
       const positioned: PositionedAppointment = {
@@ -258,10 +270,6 @@ export class AppointmentCalendar implements OnInit {
     toIsoDate(this.view() === 'month' ? new Date() : this.anchor()),
   );
 
-  readonly scheduledCount = computed(
-    () => this.appointments().filter((item) => item.status === 'SCHEDULED').length,
-  );
-
   ngOnInit(): void {
     const onResize = (event: MediaQueryListEvent) => this.isWide.set(event.matches);
     this.wideScreen?.addEventListener('change', onResize);
@@ -278,6 +286,19 @@ export class AppointmentCalendar implements OnInit {
     this.view.set(view);
     this.selected.set(null);
     this.load();
+  }
+
+  setStatusFilter(filter: AppointmentStatusFilter): void {
+    if (filter === this.statusFilter()) {
+      return;
+    }
+
+    this.statusFilter.set(filter);
+
+    const selected = this.selected();
+    if (selected && filter !== 'ALL' && selected.status !== filter) {
+      this.selected.set(null);
+    }
   }
 
   move(direction: 1 | -1): void {
@@ -316,6 +337,35 @@ export class AppointmentCalendar implements OnInit {
     this.runAction(this.appointmentService.cancel(appointment.id));
   }
 
+  async delete(appointment: Appointment, event?: MouseEvent): Promise<void> {
+    // El ícono va dentro de la misma tarjeta clickeable: sin esto, el click
+    // también dispara select() y abre el detalle del turno que se está borrando.
+    event?.stopPropagation();
+
+    const confirmed = await this.confirmService.confirm({
+      title: 'Eliminar turno',
+      message: `¿Eliminar el turno de ${appointment.licensePlate} (${appointment.brand} ${appointment.model})? Esta acción no se puede deshacer.`,
+      confirmLabel: 'Eliminar',
+      danger: true,
+    });
+    if (!confirmed) {
+      return;
+    }
+
+    this.appointmentService.delete(appointment.id).subscribe({
+      next: () => {
+        this.appointments.update((current) => current.filter((item) => item.id !== appointment.id));
+        if (this.selected()?.id === appointment.id) {
+          this.selected.set(null);
+        }
+        this.notifications.success('Turno eliminado correctamente');
+      },
+      error: (error: HttpErrorResponse) => {
+        this.notifications.error(error.error?.message ?? 'No se pudo eliminar el turno');
+      },
+    });
+  }
+
   private runAction(action: ReturnType<AppointmentService['complete']>): void {
     this.errorMessage.set(null);
 
@@ -335,7 +385,8 @@ export class AppointmentCalendar implements OnInit {
         this.appointments.update((current) =>
           current.map((item) => (item.id === updated.id ? updated : item)),
         );
-        this.selected.set(updated);
+        const filter = this.statusFilter();
+        this.selected.set(filter === 'ALL' || updated.status === filter ? updated : null);
       });
   }
 

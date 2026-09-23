@@ -1,6 +1,14 @@
 import { CurrencyPipe, DatePipe } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
-import { ChangeDetectionStrategy, Component, inject, input, output, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  OnChanges,
+  inject,
+  input,
+  output,
+  signal,
+} from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 import { QuoteService } from '../../quotes/quote-service';
@@ -23,7 +31,7 @@ import { Appointment } from '../appointment.models';
     '(document:keydown.escape)': 'onEscape()',
   },
 })
-export class AppointmentDetail {
+export class AppointmentDetail implements OnChanges {
   private readonly quoteService = inject(QuoteService);
 
   readonly appointment = input.required<Appointment>();
@@ -31,12 +39,35 @@ export class AppointmentDetail {
   readonly closed = output<void>();
   readonly completed = output<Appointment>();
   readonly cancelled = output<Appointment>();
+  readonly deleted = output<Appointment>();
 
   readonly quotePreview = signal<Quote | null>(null);
+  readonly quotePreviewOpen = signal(false);
   readonly loadingQuotePreview = signal(false);
   readonly quotePreviewError = signal<string | null>(null);
 
+  ngOnChanges(): void {
+    this.quotePreviewOpen.set(false);
+    this.quotePreview.set(null);
+    this.quotePreviewError.set(null);
+
+    const quoteId = this.appointment().quoteId;
+    if (quoteId) {
+      this.loadQuote(quoteId);
+    }
+  }
+
   openQuotePreview(quoteId: number): void {
+    this.quotePreviewOpen.set(true);
+
+    if (this.quotePreview()?.id === quoteId || this.loadingQuotePreview()) {
+      return;
+    }
+
+    this.loadQuote(quoteId);
+  }
+
+  private loadQuote(quoteId: number): void {
     this.loadingQuotePreview.set(true);
     this.quotePreviewError.set(null);
     this.quotePreview.set(null);
@@ -58,12 +89,12 @@ export class AppointmentDetail {
   }
 
   closeQuotePreview(): void {
-    this.quotePreview.set(null);
+    this.quotePreviewOpen.set(false);
     this.quotePreviewError.set(null);
   }
 
   onEscape(): void {
-    if (this.quotePreview() || this.quotePreviewError()) {
+    if (this.quotePreviewOpen()) {
       this.closeQuotePreview();
       return;
     }

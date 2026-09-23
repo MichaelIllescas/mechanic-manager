@@ -38,6 +38,7 @@ export interface Quote {
   customerId: number;
   customerName: string;
   customerDocumentNumber: string | null;
+  customerPhone: string;
   vehicleId: number;
   vehicleLicensePlate: string;
   vehicleDescription: string;

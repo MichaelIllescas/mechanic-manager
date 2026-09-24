@@ -34,67 +34,131 @@
         <p>Necesitamos tu contraseña actual para confirmar que sos vos.</p>
       </div>
 
-      <form class="account__form" [formGroup]="form" (ngSubmit)="onSubmit()">
-        <div class="field">
-          <label for="currentPassword">Contraseña actual</label>
-          <input
-            id="currentPassword"
-            [type]="passwordVisible() ? 'text' : 'password'"
-            formControlName="currentPassword"
-            autocomplete="current-password"
-          />
-          @if (form.controls.currentPassword.touched && form.controls.currentPassword.invalid) {
-            <span class="field__error">Ingresá tu contraseña actual.</span>
+      <div class="account__form-content">
+        <form class="account__form" [formGroup]="form" (ngSubmit)="onSubmit()">
+          <div class="field">
+            <label for="currentPassword">Contraseña actual</label>
+            <input
+              id="currentPassword"
+              [type]="passwordVisible() ? 'text' : 'password'"
+              formControlName="currentPassword"
+              autocomplete="current-password"
+              [attr.aria-invalid]="form.controls.currentPassword.touched && form.controls.currentPassword.invalid"
+              [attr.aria-describedby]="form.controls.currentPassword.touched && form.controls.currentPassword.invalid ? 'currentPasswordError' : null"
+            />
+            @if (form.controls.currentPassword.touched && form.controls.currentPassword.invalid) {
+              <span id="currentPasswordError" class="field__error">Ingresá tu contraseña actual.</span>
+            }
+          </div>
+
+          <div class="field">
+            <label for="newPassword">Contraseña nueva</label>
+            <input
+              id="newPassword"
+              [type]="passwordVisible() ? 'text' : 'password'"
+              formControlName="newPassword"
+              placeholder="Al menos 8 caracteres"
+              autocomplete="new-password"
+              [attr.aria-invalid]="form.controls.newPassword.touched && (form.controls.newPassword.invalid || form.hasError('passwordNotChanged'))"
+              aria-describedby="newPasswordHelp"
+            />
+            <span id="newPasswordHelp" class="field__help">Admite entre 8 y 72 caracteres.</span>
+            @if (form.controls.newPassword.touched && form.controls.newPassword.invalid) {
+              <span class="field__error">La contraseña debe tener entre 8 y 72 caracteres.</span>
+            }
+            @if (form.controls.newPassword.touched && form.hasError('passwordNotChanged')) {
+              <span class="field__error">La contraseña nueva debe ser distinta de la actual.</span>
+            }
+          </div>
+
+          <div class="field">
+            <label for="confirmation">Repetir contraseña nueva</label>
+            <input
+              id="confirmation"
+              [type]="passwordVisible() ? 'text' : 'password'"
+              formControlName="confirmation"
+              autocomplete="new-password"
+              [attr.aria-invalid]="form.controls.confirmation.touched && form.hasError('passwordsMismatch')"
+              [attr.aria-describedby]="form.controls.confirmation.touched && form.hasError('passwordsMismatch') ? 'confirmationError' : null"
+            />
+            @if (form.controls.confirmation.touched && form.hasError('passwordsMismatch')) {
+              <span id="confirmationError" class="field__error">Las contraseñas no coinciden.</span>
+            }
+          </div>
+
+          <label class="account__toggle">
+            <input
+              type="checkbox"
+              [checked]="passwordVisible()"
+              (change)="togglePasswordVisibility()"
+            />
+            Mostrar contraseñas
+          </label>
+
+          @if (errorMessage()) {
+            <p class="account__error" role="alert">{{ errorMessage() }}</p>
           }
-        </div>
 
-        <div class="field">
-          <label for="newPassword">Contraseña nueva</label>
-          <input
-            id="newPassword"
-            [type]="passwordVisible() ? 'text' : 'password'"
-            formControlName="newPassword"
-            placeholder="Al menos 8 caracteres"
-            autocomplete="new-password"
-          />
-          @if (form.controls.newPassword.touched && form.controls.newPassword.invalid) {
-            <span class="field__error">La contraseña debe tener entre 8 y 72 caracteres.</span>
-          }
-          @if (form.controls.newPassword.touched && form.hasError('passwordNotChanged')) {
-            <span class="field__error">La contraseña nueva debe ser distinta de la actual.</span>
-          }
-        </div>
+          <button class="account__submit" type="submit" [disabled]="form.invalid || loading()">
+            {{ loading() ? 'Guardando...' : 'Guardar contraseña' }}
+          </button>
+        </form>
 
-        <div class="field">
-          <label for="confirmation">Repetir contraseña nueva</label>
-          <input
-            id="confirmation"
-            [type]="passwordVisible() ? 'text' : 'password'"
-            formControlName="confirmation"
-            autocomplete="new-password"
-          />
-          @if (form.controls.confirmation.touched && form.hasError('passwordsMismatch')) {
-            <span class="field__error">Las contraseñas no coinciden.</span>
-          }
-        </div>
+        <aside class="account__security-guide" aria-labelledby="security-guide-title">
+          <div class="account__security-guide-header">
+            <span class="account__security-icon" aria-hidden="true">
+              <svg lucideShieldCheck></svg>
+            </span>
+            <div>
+              <h3 id="security-guide-title">Antes de guardar</h3>
+              <p>Completá los tres requisitos para habilitar el cambio.</p>
+            </div>
+          </div>
 
-        <label class="account__toggle">
-          <input
-            type="checkbox"
-            [checked]="passwordVisible()"
-            (change)="togglePasswordVisibility()"
-          />
-          Mostrar contraseñas
-        </label>
+          <ul class="account__requirements">
+            <li [class.account__requirement--valid]="hasValidLength()">
+              @if (hasValidLength()) {
+                <svg lucideCheck aria-hidden="true"></svg>
+              } @else {
+                <svg lucideCircle aria-hidden="true"></svg>
+              }
+              <span>
+                <span class="account__sr-only">{{ hasValidLength() ? 'Cumplido: ' : 'Pendiente: ' }}</span>
+                <strong>Longitud válida</strong>
+                <small>Entre 8 y 72 caracteres.</small>
+              </span>
+            </li>
+            <li [class.account__requirement--valid]="hasDifferentPassword()">
+              @if (hasDifferentPassword()) {
+                <svg lucideCheck aria-hidden="true"></svg>
+              } @else {
+                <svg lucideCircle aria-hidden="true"></svg>
+              }
+              <span>
+                <span class="account__sr-only">{{ hasDifferentPassword() ? 'Cumplido: ' : 'Pendiente: ' }}</span>
+                <strong>Una contraseña diferente</strong>
+                <small>No debe coincidir con la actual.</small>
+              </span>
+            </li>
+            <li [class.account__requirement--valid]="hasMatchingConfirmation()">
+              @if (hasMatchingConfirmation()) {
+                <svg lucideCheck aria-hidden="true"></svg>
+              } @else {
+                <svg lucideCircle aria-hidden="true"></svg>
+              }
+              <span>
+                <span class="account__sr-only">{{ hasMatchingConfirmation() ? 'Cumplido: ' : 'Pendiente: ' }}</span>
+                <strong>Confirmación correcta</strong>
+                <small>Ambas contraseñas nuevas deben coincidir.</small>
+              </span>
+            </li>
+          </ul>
 
-        @if (errorMessage()) {
-          <p class="account__error" role="alert">{{ errorMessage() }}</p>
-        }
-
-        <button class="account__submit" type="submit" [disabled]="form.invalid || loading()">
-          {{ loading() ? 'Guardando...' : 'Guardar contraseña' }}
-        </button>
-      </form>
+          <p class="account__security-note">
+            El botón se habilita automáticamente cuando el formulario está completo.
+          </p>
+        </aside>
+      </div>
     </section>
   </div>
 </section>

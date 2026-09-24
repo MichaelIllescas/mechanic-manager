@@ -7,11 +7,22 @@ export interface AppointmentStatusFilterOption {
   label: string;
 }
 
+export interface AppointmentStatusLegendItem {
+  value: AppointmentStatus;
+  label: string;
+}
+
 export const APPOINTMENT_STATUS_FILTERS: readonly AppointmentStatusFilterOption[] = [
   { value: 'ALL', label: 'Todos' },
   { value: 'SCHEDULED', label: 'Agendados' },
   { value: 'COMPLETED', label: 'Completados' },
   { value: 'CANCELLED', label: 'Cancelados' },
+];
+
+export const APPOINTMENT_STATUS_LEGEND: readonly AppointmentStatusLegendItem[] = [
+  { value: 'SCHEDULED', label: 'Pendiente' },
+  { value: 'COMPLETED', label: 'Completado' },
+  { value: 'CANCELLED', label: 'Cancelado' },
 ];
 
 export function filterAppointmentsByStatus(

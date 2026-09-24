@@ -78,6 +78,24 @@
           </button>
         }
       </div>
+
+      <div class="appointment-legend" aria-label="Referencia de colores de los turnos">
+        <span class="appointment-legend__title">Referencia:</span>
+        <ul>
+          @for (item of statusLegend; track item.value) {
+            <li>
+              <span
+                class="appointment-legend__swatch"
+                [class.appointment-legend__swatch--scheduled]="item.value === 'SCHEDULED'"
+                [class.appointment-legend__swatch--completed]="item.value === 'COMPLETED'"
+                [class.appointment-legend__swatch--cancelled]="item.value === 'CANCELLED'"
+                aria-hidden="true"
+              ></span>
+              {{ item.label }}
+            </li>
+          }
+        </ul>
+      </div>
     </div>
 
     @if (errorMessage()) {

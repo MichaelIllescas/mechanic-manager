@@ -1,4 +1,5 @@
-import { Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import {
   AbstractControl,
   FormBuilder,
@@ -7,6 +8,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
+import { LucideCheck, LucideCircle, LucideShieldCheck } from '@lucide/angular';
 
 import { AuthService } from '../../core/auth/auth-service';
 import { NotificationService } from '../../core/notifications/notification-service';
@@ -27,9 +29,10 @@ function passwordIsDifferent(group: AbstractControl): ValidationErrors | null {
 
 @Component({
   selector: 'app-account',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, LucideCheck, LucideCircle, LucideShieldCheck],
   templateUrl: './account.html',
   styleUrl: './account.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Account {
   private readonly fb = inject(FormBuilder);
@@ -52,6 +55,25 @@ export class Account {
     },
     { validators: [passwordsMatch, passwordIsDifferent] },
   );
+
+  private readonly formValue = toSignal(this.form.valueChanges, {
+    initialValue: this.form.getRawValue(),
+  });
+
+  readonly hasValidLength = computed(() => {
+    const length = (this.formValue().newPassword ?? '').length;
+    return length >= 8 && length <= 72;
+  });
+
+  readonly hasDifferentPassword = computed(() => {
+    const { currentPassword, newPassword } = this.formValue();
+    return Boolean(currentPassword && newPassword && currentPassword !== newPassword);
+  });
+
+  readonly hasMatchingConfirmation = computed(() => {
+    const { newPassword, confirmation } = this.formValue();
+    return Boolean(newPassword && confirmation && newPassword === confirmation);
+  });
 
   togglePasswordVisibility(): void {
     this.passwordVisible.update((visible) => !visible);

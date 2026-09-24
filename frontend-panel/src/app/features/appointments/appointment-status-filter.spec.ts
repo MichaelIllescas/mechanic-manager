@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { Appointment } from './appointment.models';
 import {
   APPOINTMENT_STATUS_FILTERS,
+  APPOINTMENT_STATUS_LEGEND,
   filterAppointmentsByStatus,
 } from './appointment-status-filter';
 
@@ -20,6 +21,14 @@ describe('appointment status filter', () => {
       'SCHEDULED',
       'COMPLETED',
       'CANCELLED',
+    ]);
+  });
+
+  it('provides a color legend for every appointment status', () => {
+    expect(APPOINTMENT_STATUS_LEGEND).toEqual([
+      { value: 'SCHEDULED', label: 'Pendiente' },
+      { value: 'COMPLETED', label: 'Completado' },
+      { value: 'CANCELLED', label: 'Cancelado' },
     ]);
   });
 

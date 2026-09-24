@@ -19,6 +19,7 @@ import { AppointmentDetail } from '../appointment-detail/appointment-detail';
 import { AppointmentService } from '../appointment-service';
 import {
   APPOINTMENT_STATUS_FILTERS,
+  APPOINTMENT_STATUS_LEGEND,
   AppointmentStatusFilter,
   filterAppointmentsByStatus,
 } from '../appointment-status-filter';
@@ -114,6 +115,7 @@ export class AppointmentCalendar implements OnInit {
   readonly appointments = signal<Appointment[]>([]);
   readonly statusFilter = signal<AppointmentStatusFilter>('ALL');
   readonly statusFilters = APPOINTMENT_STATUS_FILTERS;
+  readonly statusLegend = APPOINTMENT_STATUS_LEGEND;
   readonly loading = signal(false);
   readonly errorMessage = signal<string | null>(null);
   readonly selected = signal<Appointment | null>(null);

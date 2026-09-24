@@ -92,6 +92,11 @@ uniforme sin importar dónde se haya frenado el request.
 | `code` | Status | Origen |
 |---|---|---|
 | `VALIDATION_ERROR` | 400 | Bean Validation (`@Valid`) |
+| `INVALID_REQUEST_BODY` | 400 | JSON mal formado o valor de tipo incorrecto |
+| `INVALID_PARAMETER` | 400 | Parámetro con valor inválido o ausente |
+| `DATA_CONFLICT` | 409 | Restricción de la base (unicidad, clave foránea) no prevista por el servicio |
+| `REQUEST_ERROR` | 404 / 405 / 415 | Errores 4xx del propio framework (ruta, método, tipo de contenido) |
+| `INTERNAL_ERROR` | 500 | Excepción no prevista; el detalle queda solo en el log |
 | `INVALID_CREDENTIALS` | 401 | `auth` |
 | `UNAUTHENTICATED` | 401 | Filter chain |
 | `ACCOUNT_DISABLED` | 403 | `auth` |

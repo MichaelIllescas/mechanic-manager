@@ -1,5 +1,6 @@
 package com.mechanicmanager.auth.dto;
 
+import com.mechanicmanager.shared.validation.PasswordLength;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
@@ -10,6 +11,7 @@ public record LoginRequest(
         String email,
         
         @NotBlank(message = "La contraseña es obligatoria")
+        @PasswordLength
         String password
 ) {
 }

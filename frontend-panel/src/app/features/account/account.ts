@@ -47,7 +47,7 @@ export class Account {
   readonly form = this.fb.nonNullable.group(
     {
       currentPassword: ['', [Validators.required]],
-      newPassword: ['', [Validators.required, Validators.minLength(8)]],
+      newPassword: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(72)]],
       confirmation: ['', [Validators.required]],
     },
     { validators: [passwordsMatch, passwordIsDifferent] },

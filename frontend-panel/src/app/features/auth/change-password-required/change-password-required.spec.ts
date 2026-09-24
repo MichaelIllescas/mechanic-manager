@@ -50,6 +50,20 @@ describe('ChangePasswordRequired', () => {
     expect(component.form.hasError('passwordNotChanged')).toBe(true);
   });
 
+  it('rejects a new password longer than 72 characters', () => {
+    component.form.setValue({
+      currentPassword: 'temporal-123',
+      newPassword: 'a'.repeat(73),
+      confirmation: 'a'.repeat(73),
+    });
+
+    expect(component.form.controls.newPassword.hasError('maxlength')).toBe(true);
+
+    component.onSubmit();
+
+    expect(auth.changePassword).not.toHaveBeenCalled();
+  });
+
   it('changes the password and goes to the dashboard', () => {
     component.form.setValue({
       currentPassword: 'temporal-123',

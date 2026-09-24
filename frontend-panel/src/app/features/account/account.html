@@ -58,7 +58,7 @@
             autocomplete="new-password"
           />
           @if (form.controls.newPassword.touched && form.controls.newPassword.invalid) {
-            <span class="field__error">La contraseña debe tener al menos 8 caracteres.</span>
+            <span class="field__error">La contraseña debe tener entre 8 y 72 caracteres.</span>
           }
           @if (form.controls.newPassword.touched && form.hasError('passwordNotChanged')) {
             <span class="field__error">La contraseña nueva debe ser distinta de la actual.</span>

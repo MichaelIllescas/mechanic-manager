@@ -1,6 +1,7 @@
 package com.mechanicmanager.users.dto;
 
 import com.mechanicmanager.users.model.Role;
+import com.mechanicmanager.shared.validation.PasswordLength;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -19,6 +20,7 @@ public record CreateUserRequest(
         
         @NotBlank(message = "La contraseña es obligatoria")
         @Size(min = 8, message = "La contraseña debe tener al menos 8 caracteres")
+        @PasswordLength
         String password,
         
         @NotNull(message = "El rol es obligatorio")

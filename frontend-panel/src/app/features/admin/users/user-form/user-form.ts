@@ -29,7 +29,7 @@ export class UserForm implements OnInit {
   readonly form = this.fb.nonNullable.group({
     name: ['', [Validators.required]],
     email: ['', [Validators.required, Validators.email]],
-    password: ['', [Validators.required, Validators.minLength(8)]],
+    password: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(72)]],
     role: ['USER' as 'SYSTEM_ADMIN' | 'USER', [Validators.required]],
   });
 

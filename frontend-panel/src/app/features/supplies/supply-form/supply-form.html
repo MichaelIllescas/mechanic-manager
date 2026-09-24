@@ -33,27 +33,19 @@
           {{ isEdit() ? 'Modo edicion' : 'Modo alta' }}
         </span>
         <h2 id="supply-form-title">Datos del insumo</h2>
-        <p>
-          {{
-            isEdit()
-              ? 'Cambiar el precio no modifica presupuestos ni ordenes ya registrados.'
-              : 'El catalogo no maneja existencias: el stock queda fuera del MVP.'
-          }}
-        </p>
       </div>
     </div>
 
     <form class="supply-form" [formGroup]="form" (ngSubmit)="onSubmit()" autocomplete="off">
       <div class="form-grid">
         <label class="field">
-          <span>Nombre</span>
+          <span>Nombre <span class="field__required" aria-hidden="true">*</span></span>
           <input
             type="text"
             formControlName="name"
             placeholder="Filtro de aceite"
             autocomplete="off"
           />
-          <span class="field__hint">Como lo vas a buscar al armar un presupuesto.</span>
           @if (form.controls.name.touched && form.controls.name.invalid) {
             <small>
               @if (form.controls.name.hasError('required')) {
@@ -66,9 +58,8 @@
         </label>
 
         <label class="field">
-          <span>Precio de referencia</span>
+          <span>Precio de referencia <span class="field__required" aria-hidden="true">*</span></span>
           <input type="number" formControlName="price" placeholder="0.00" step="0.01" min="0" />
-          <span class="field__hint">Se copia como referencia y despues podes ajustarlo.</span>
           @if (form.controls.price.touched && form.controls.price.invalid) {
             <small>
               @if (form.controls.price.hasError('required')) {

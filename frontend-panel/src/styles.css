@@ -7,6 +7,11 @@ body {
   min-height: 100%;
 }
 
+.field__required {
+  color: #c22f47;
+  font-weight: 900;
+}
+
 body {
   margin: 0;
   font-family:

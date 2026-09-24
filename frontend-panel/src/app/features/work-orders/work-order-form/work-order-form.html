@@ -3,7 +3,6 @@
     <div>
       <p>Trabajos realizados</p>
       <h1>{{ isEdit() ? 'Editar trabajo realizado' : 'Registrar trabajo realizado' }}</h1>
-      <span>Registrá el vehículo, la fecha y los trabajos realizados.</span>
     </div>
     <a routerLink="/work-orders">Volver al listado</a>
   </header>
@@ -20,13 +19,12 @@
           <span>1</span>
           <div>
             <h2>Vehículo y fecha</h2>
-            <p>El cliente se deduce del vehículo seleccionado.</p>
           </div>
         </header>
 
         <div class="metadata-grid">
           <label class="wide">
-            <span>Vehículo</span>
+            <span>Vehículo <span class="field__required" aria-hidden="true">*</span></span>
 
             @if (isEdit()) {
               <div class="vehicle-picker__selected vehicle-picker__selected--locked">
@@ -78,7 +76,7 @@
           </label>
 
           <label>
-            <span>Fecha del trabajo</span>
+            <span>Fecha del trabajo <span class="field__required" aria-hidden="true">*</span></span>
             <input type="date" formControlName="performedAt" />
           </label>
 
@@ -96,7 +94,6 @@
           <span>3</span>
           <div>
             <h2>Observaciones</h2>
-            <p>Opcional, podés modificarlo después.</p>
           </div>
         </header>
         <div class="metadata-grid">

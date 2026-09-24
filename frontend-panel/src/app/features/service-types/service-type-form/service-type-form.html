@@ -31,27 +31,19 @@
           {{ isEdit() ? 'Modo edicion' : 'Modo alta' }}
         </span>
         <h2 id="service-form-title">Datos del servicio</h2>
-        <p>
-          {{
-            isEdit()
-              ? 'Cambiar el precio no modifica los presupuestos ni las ordenes ya registrados.'
-              : 'El precio es de referencia: se copia al cargar el servicio en un presupuesto.'
-          }}
-        </p>
       </div>
     </div>
 
     <form class="service-form" [formGroup]="form" (ngSubmit)="onSubmit()" autocomplete="off">
       <div class="form-grid">
         <label class="field">
-          <span>Nombre</span>
+          <span>Nombre <span class="field__required" aria-hidden="true">*</span></span>
           <input
             type="text"
             formControlName="name"
             placeholder="Cambio de aceite"
             autocomplete="off"
           />
-          <span class="field__hint">Como lo vas a buscar al armar un presupuesto.</span>
           @if (form.controls.name.touched && form.controls.name.invalid) {
             <small>
               @if (form.controls.name.hasError('required')) {
@@ -64,9 +56,8 @@
         </label>
 
         <label class="field">
-          <span>Precio de referencia</span>
+          <span>Precio de referencia <span class="field__required" aria-hidden="true">*</span></span>
           <input type="number" formControlName="basePrice" placeholder="0.00" step="0.01" min="0" />
-          <span class="field__hint">Se copia al presupuesto y despues podes ajustarlo ahi.</span>
           @if (form.controls.basePrice.touched && form.controls.basePrice.invalid) {
             <small>
               @if (form.controls.basePrice.hasError('required')) {
@@ -85,7 +76,6 @@
             rows="3"
             placeholder="Que incluye el trabajo, repuestos previstos, aclaraciones"
           ></textarea>
-          <span class="field__hint">Opcional. Maximo 500 caracteres.</span>
           @if (form.controls.description.touched && form.controls.description.invalid) {
             <small>La descripcion no puede superar los 500 caracteres.</small>
           }

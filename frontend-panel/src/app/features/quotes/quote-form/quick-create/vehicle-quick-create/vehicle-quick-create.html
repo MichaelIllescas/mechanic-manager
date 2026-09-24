@@ -2,7 +2,6 @@
   <section class="quick-create-dialog" role="dialog" aria-modal="true">
     <header class="quick-create-header">
       <div>
-        <p>Nuevo registro</p>
         <h2>Registrar vehículo</h2>
       </div>
       <button class="quick-create-close" type="button" aria-label="Cerrar" (click)="cancel()">
@@ -14,19 +13,22 @@
     }
     <div class="quick-create-form" [formGroup]="form">
       <label class="quick-field"
-        ><span>Patente</span><input formControlName="licensePlate" maxlength="20"
+        ><span>Patente <span class="field__required" aria-hidden="true">*</span></span
+        ><input formControlName="licensePlate" maxlength="20"
       /></label>
       <label class="quick-field"
-        ><span>Marca</span><input formControlName="brand" maxlength="80"
+        ><span>Marca <span class="field__required" aria-hidden="true">*</span></span
+        ><input formControlName="brand" maxlength="80"
       /></label>
       <label class="quick-field"
-        ><span>Modelo</span><input formControlName="model" maxlength="120"
+        ><span>Modelo <span class="field__required" aria-hidden="true">*</span></span
+        ><input formControlName="model" maxlength="120"
       /></label>
       <label class="quick-field"
         ><span>Año</span><input type="number" formControlName="year" min="1886" max="9999"
       /></label>
       <label class="quick-field"
-        ><span>Tipo</span
+        ><span>Tipo <span class="field__required" aria-hidden="true">*</span></span
         ><select formControlName="vehicleType">
           @for (type of vehicleTypes; track type.value) {
             <option [value]="type.value">{{ type.label }}</option>

@@ -2,7 +2,6 @@
   <section class="quick-create-dialog" role="dialog" aria-modal="true">
     <header class="quick-create-header">
       <div>
-        <p>Nuevo registro</p>
         <h2>Crear insumo</h2>
       </div>
       <button class="quick-create-close" type="button" aria-label="Cerrar" (click)="cancel()">
@@ -14,10 +13,12 @@
     }
     <div class="quick-create-form" [formGroup]="form">
       <label class="quick-field"
-        ><span>Nombre</span><input formControlName="name" maxlength="150"
+        ><span>Nombre <span class="field__required" aria-hidden="true">*</span></span
+        ><input formControlName="name" maxlength="150"
       /></label>
       <label class="quick-field"
-        ><span>Precio</span><input type="number" formControlName="price" min="0" step="0.01"
+        ><span>Precio <span class="field__required" aria-hidden="true">*</span></span
+        ><input type="number" formControlName="price" min="0" step="0.01"
       /></label>
     </div>
     <footer class="quick-create-actions">

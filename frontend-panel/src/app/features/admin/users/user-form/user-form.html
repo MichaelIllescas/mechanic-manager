@@ -31,41 +31,32 @@
       <div>
         <span class="user-form-card__mode">{{ isEdit() ? 'Modo edicion' : 'Modo registro' }}</span>
         <h2 id="user-form-title">Datos de acceso</h2>
-        <p>
-          {{
-            isEdit()
-              ? 'La contrasena se gestiona por separado para proteger la cuenta.'
-              : 'Completa la informacion inicial de la cuenta.'
-          }}
-        </p>
       </div>
     </div>
 
     <form class="user-form" [formGroup]="form" (ngSubmit)="onSubmit()" autocomplete="off">
       <div class="form-grid">
         <label class="field">
-          <span>Nombre</span>
+          <span>Nombre <span class="field__required" aria-hidden="true">*</span></span>
           <input
             type="text"
             formControlName="name"
             placeholder="Nombre completo"
             autocomplete="off"
           />
-          <span class="field__hint">Nombre visible dentro del panel administrativo.</span>
           @if (form.controls.name.touched && form.controls.name.invalid) {
             <small>El nombre es obligatorio.</small>
           }
         </label>
 
         <label class="field">
-          <span>Email</span>
+          <span>Email <span class="field__required" aria-hidden="true">*</span></span>
           <input
             type="email"
             formControlName="email"
             placeholder="usuario@taller.com"
             autocomplete="off"
           />
-          <span class="field__hint">Se usara para iniciar sesion.</span>
           @if (form.controls.email.touched && form.controls.email.invalid) {
             <small>Ingresa un email valido.</small>
           }
@@ -73,14 +64,13 @@
 
         @if (!isEdit()) {
           <label class="field">
-            <span>Contrasena inicial</span>
+            <span>Contrasena inicial <span class="field__required" aria-hidden="true">*</span></span>
             <input
               type="password"
               formControlName="password"
               placeholder="Minimo 8 caracteres"
               autocomplete="new-password"
             />
-            <span class="field__hint">El usuario podra cambiarla luego del primer acceso.</span>
             @if (form.controls.password.touched && form.controls.password.invalid) {
               <small>La contrasena debe tener al menos 8 caracteres.</small>
             }
@@ -102,12 +92,11 @@
         }
 
         <label class="field">
-          <span>Rol</span>
+          <span>Rol <span class="field__required" aria-hidden="true">*</span></span>
           <select formControlName="role" autocomplete="off">
             <option value="USER">Usuario taller</option>
             <option value="SYSTEM_ADMIN">Admin sistema</option>
           </select>
-          <span class="field__hint">Define el alcance de acceso dentro de la plataforma.</span>
         </label>
       </div>
 

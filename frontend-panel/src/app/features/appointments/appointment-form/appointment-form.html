@@ -36,7 +36,6 @@
           {{ isEdit() ? 'Modo edición' : 'Modo alta' }}
         </span>
         <h2 id="appointment-form-title">Datos del turno</h2>
-        <p>Vehículo, fecha y hora son obligatorios.</p>
       </div>
     </div>
 
@@ -50,7 +49,9 @@
       <form class="appointment-form" [formGroup]="form" (ngSubmit)="onSubmit()" autocomplete="off">
         <div class="form-grid">
           <div class="field field--wide">
-            <label for="appointment-vehicle-search">Vehículo</label>
+            <label for="appointment-vehicle-search">
+              Vehículo <span class="field__required" aria-hidden="true">*</span>
+            </label>
 
             @if (isEdit()) {
               <div class="vehicle-picker__selected vehicle-picker__selected--locked">
@@ -145,7 +146,7 @@
           </div>
 
           <label class="field">
-            <span>Fecha</span>
+            <span>Fecha <span class="field__required" aria-hidden="true">*</span></span>
             <input type="date" formControlName="date" />
             @if (form.controls.date.touched && form.controls.date.invalid) {
               <small class="field__error">La fecha es obligatoria.</small>
@@ -153,7 +154,7 @@
           </label>
 
           <label class="field">
-            <span>Hora</span>
+            <span>Hora <span class="field__required" aria-hidden="true">*</span></span>
             <input type="time" formControlName="time" />
             @if (form.controls.time.touched && form.controls.time.invalid) {
               <small class="field__error">La hora es obligatoria.</small>
@@ -167,10 +168,6 @@
               rows="4"
               placeholder="Motivo del turno, comentarios del cliente, algo a tener en cuenta..."
             ></textarea>
-            <small class="field__hint">
-              Opcional. El detalle de los trabajos se define después, en el presupuesto o al
-              registrar el trabajo realizado.
-            </small>
             @if (form.controls.notes.invalid) {
               <small class="field__error">Las notas no pueden superar los 1000 caracteres.</small>
             }

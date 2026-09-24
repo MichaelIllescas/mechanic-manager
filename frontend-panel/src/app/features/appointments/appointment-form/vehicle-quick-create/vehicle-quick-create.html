@@ -14,7 +14,6 @@
         <span>1</span>
         <div>
           <h3 id="quick-customer-title">Cliente</h3>
-          <p>Buscá uno existente o registralo sin salir de acá.</p>
         </div>
       </div>
 
@@ -23,7 +22,7 @@
       } @else if (creatingCustomer()) {
         <form class="quick-customer-form" [formGroup]="customerForm" (ngSubmit)="saveCustomer()">
           <label>
-            <span>Nombre</span>
+            <span>Nombre <span class="field__required" aria-hidden="true">*</span></span>
             <input type="text" formControlName="firstName" autocomplete="off" />
             @if (
               customerForm.controls.firstName.touched && customerForm.controls.firstName.invalid
@@ -32,14 +31,14 @@
             }
           </label>
           <label>
-            <span>Apellido</span>
+            <span>Apellido <span class="field__required" aria-hidden="true">*</span></span>
             <input type="text" formControlName="lastName" autocomplete="off" />
             @if (customerForm.controls.lastName.touched && customerForm.controls.lastName.invalid) {
               <small>Ingresá el apellido.</small>
             }
           </label>
           <label>
-            <span>Teléfono</span>
+            <span>Teléfono <span class="field__required" aria-hidden="true">*</span></span>
             <input type="tel" formControlName="phone" autocomplete="tel" />
             @if (customerForm.controls.phone.touched && customerForm.controls.phone.invalid) {
               <small>Ingresá un teléfono válido.</small>
@@ -100,13 +99,12 @@
         <span>2</span>
         <div>
           <h3 id="quick-vehicle-title">Vehículo</h3>
-          <p>Después podés completar kilometraje, chasis y observaciones.</p>
         </div>
       </div>
 
       <form class="quick-vehicle-form" [formGroup]="vehicleForm" (ngSubmit)="saveVehicle()">
         <label>
-          <span>Patente</span>
+          <span>Patente <span class="field__required" aria-hidden="true">*</span></span>
           <input type="text" formControlName="licensePlate" maxlength="20" placeholder="AB123CD" />
           @if (
             vehicleForm.controls.licensePlate.touched && vehicleForm.controls.licensePlate.invalid
@@ -115,7 +113,7 @@
           }
         </label>
         <label>
-          <span>Tipo</span>
+          <span>Tipo <span class="field__required" aria-hidden="true">*</span></span>
           <select formControlName="vehicleType">
             @for (type of vehicleTypes; track type.value) {
               <option [value]="type.value">{{ type.label }}</option>
@@ -123,14 +121,14 @@
           </select>
         </label>
         <label>
-          <span>Marca</span>
+          <span>Marca <span class="field__required" aria-hidden="true">*</span></span>
           <input type="text" formControlName="brand" maxlength="80" placeholder="Toyota" />
           @if (vehicleForm.controls.brand.touched && vehicleForm.controls.brand.invalid) {
             <small>La marca es obligatoria.</small>
           }
         </label>
         <label>
-          <span>Modelo</span>
+          <span>Modelo <span class="field__required" aria-hidden="true">*</span></span>
           <input type="text" formControlName="model" maxlength="120" placeholder="Corolla" />
           @if (vehicleForm.controls.model.touched && vehicleForm.controls.model.invalid) {
             <small>El modelo es obligatorio.</small>

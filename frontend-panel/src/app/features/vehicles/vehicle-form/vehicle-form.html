@@ -34,7 +34,6 @@
           {{ isEdit() ? 'Modo edición' : 'Modo alta' }}
         </span>
         <h2 id="vehicle-form-title">Datos del vehículo</h2>
-        <p>Cliente, patente, marca, modelo y tipo son obligatorios.</p>
       </div>
     </div>
 
@@ -44,7 +43,7 @@
       <form class="vehicle-form" [formGroup]="form" (ngSubmit)="onSubmit()" autocomplete="off">
         <div class="form-grid">
           <label class="field field--wide">
-            <span>Cliente</span>
+            <span>Cliente <span class="field__required" aria-hidden="true">*</span></span>
             <div class="customer-picker">
               @if (selectedCustomerLabel(); as customerLabel) {
                 <div class="customer-picker__selected">
@@ -113,7 +112,7 @@
           </label>
 
           <label class="field">
-            <span>Patente</span>
+            <span>Patente <span class="field__required" aria-hidden="true">*</span></span>
             <input
               type="text"
               formControlName="licensePlate"
@@ -133,7 +132,7 @@
           </label>
 
           <label class="field">
-            <span>Tipo</span>
+            <span>Tipo <span class="field__required" aria-hidden="true">*</span></span>
             <select formControlName="vehicleType">
               @for (type of vehicleTypes; track type.value) {
                 <option [value]="type.value">{{ type.label }}</option>
@@ -145,7 +144,7 @@
           </label>
 
           <label class="field">
-            <span>Marca</span>
+            <span>Marca <span class="field__required" aria-hidden="true">*</span></span>
             <input
               type="text"
               formControlName="brand"
@@ -165,7 +164,7 @@
           </label>
 
           <label class="field">
-            <span>Modelo</span>
+            <span>Modelo <span class="field__required" aria-hidden="true">*</span></span>
             <input
               type="text"
               formControlName="model"
@@ -187,7 +186,6 @@
           <label class="field">
             <span>Año</span>
             <input type="number" formControlName="year" placeholder="2020" min="1886" max="9999" />
-            <span class="field__hint">Opcional.</span>
             @if (form.controls.year.touched && form.controls.year.invalid) {
               <small>Ingresá un año entre 1886 y 9999.</small>
             }
@@ -196,7 +194,6 @@
           <label class="field">
             <span>Kilometraje</span>
             <input type="number" formControlName="mileage" placeholder="45000" min="0" />
-            <span class="field__hint">Opcional. No puede ser negativo.</span>
             @if (form.controls.mileage.touched && form.controls.mileage.invalid) {
               <small>El kilometraje no puede ser negativo.</small>
             }
@@ -211,7 +208,6 @@
               maxlength="100"
               autocomplete="off"
             />
-            <span class="field__hint">Opcional.</span>
             @if (form.controls.chassisNumber.touched && form.controls.chassisNumber.invalid) {
               <small>El número de chasis no puede superar los 100 caracteres.</small>
             }
@@ -226,7 +222,6 @@
               maxlength="100"
               autocomplete="off"
             />
-            <span class="field__hint">Opcional.</span>
             @if (form.controls.engineNumber.touched && form.controls.engineNumber.invalid) {
               <small>El número de motor no puede superar los 100 caracteres.</small>
             }
@@ -239,7 +234,6 @@
               rows="4"
               placeholder="Información adicional útil sobre el vehículo"
             ></textarea>
-            <span class="field__hint">Opcional. Máximo 1000 caracteres.</span>
             @if (form.controls.notes.touched && form.controls.notes.invalid) {
               <small>Las observaciones no pueden superar los 1000 caracteres.</small>
             }

@@ -2,7 +2,6 @@
   <section class="quick-create-dialog" role="dialog" aria-modal="true">
     <header class="quick-create-header">
       <div>
-        <p>Nuevo registro</p>
         <h2>Registrar cliente</h2>
       </div>
       <button class="quick-create-close" type="button" aria-label="Cerrar" (click)="cancel()">
@@ -14,16 +13,19 @@
     }
     <div class="quick-create-form" [formGroup]="form">
       <label class="quick-field"
-        ><span>Nombre</span><input formControlName="firstName" maxlength="120"
+        ><span>Nombre <span class="field__required" aria-hidden="true">*</span></span
+        ><input formControlName="firstName" maxlength="120"
       /></label>
       <label class="quick-field"
-        ><span>Apellido</span><input formControlName="lastName" maxlength="120"
+        ><span>Apellido <span class="field__required" aria-hidden="true">*</span></span
+        ><input formControlName="lastName" maxlength="120"
       /></label>
       <label class="quick-field"
         ><span>Documento</span><input formControlName="documentNumber" maxlength="30"
       /></label>
       <label class="quick-field"
-        ><span>Teléfono</span><input type="tel" formControlName="phone" maxlength="30"
+        ><span>Teléfono <span class="field__required" aria-hidden="true">*</span></span
+        ><input type="tel" formControlName="phone" maxlength="30"
       /></label>
       <label class="quick-field"
         ><span>Email</span><input type="email" formControlName="email" maxlength="255"

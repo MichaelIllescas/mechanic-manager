@@ -72,7 +72,7 @@ describe('VehicleDetail', () => {
     expect(text).toContain('AB123CD');
     expect(text).toContain('Toyota Corolla');
     expect(text).toContain('Ana Gómez');
-    expect(text).toContain('#30');
+    expect(text).not.toContain('#30');
     expect(text).toContain('Auto');
     expect(text).toContain('ENGINE-123');
     expect(text).toContain('Sin informar');

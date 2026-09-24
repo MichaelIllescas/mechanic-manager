@@ -32,15 +32,10 @@
         <span class="customer-avatar" aria-hidden="true">{{ initials(currentCustomer) }}</span>
         <div>
           <h2 id="customer-title">{{ currentCustomer.firstName }} {{ currentCustomer.lastName }}</h2>
-          <p>Cliente #{{ currentCustomer.id }}</p>
         </div>
       </div>
 
       <div class="detail-grid" aria-label="Datos del cliente">
-        <div class="detail-field">
-          <span>Número interno</span>
-          <strong>#{{ currentCustomer.id }}</strong>
-        </div>
         <div class="detail-field">
           <span>Nombre</span>
           <strong>{{ currentCustomer.firstName }}</strong>

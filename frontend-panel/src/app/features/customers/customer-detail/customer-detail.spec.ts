@@ -65,7 +65,7 @@ describe('CustomerDetail', () => {
 
     expect(customerService.findFromListById).toHaveBeenCalledWith(1);
     expect(text).toContain('Ana Gómez');
-    expect(text).toContain('#1');
+    expect(text).not.toContain('#1');
     expect(text).toContain('30111222');
     expect(text).toContain('11 4444-5555');
     expect(text).toContain('ana@email.com');

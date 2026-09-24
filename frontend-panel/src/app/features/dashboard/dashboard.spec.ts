@@ -66,6 +66,22 @@ describe('Dashboard', () => {
     expect(text).toContain('AB123CD');
     expect(text).toContain('Ana Gómez');
     expect(text).toContain('Presupuestos pendientes vencidos');
+    expect(fixture.nativeElement.querySelectorAll('.summary-card__icon')).toHaveLength(4);
+  });
+
+  it('refreshes the summary from an accessible icon button', () => {
+    createComponent();
+
+    const refreshButton = fixture.nativeElement.querySelector(
+      'button[aria-label="Actualizar resumen"]',
+    ) as HTMLButtonElement;
+
+    expect(refreshButton).toBeTruthy();
+    expect(refreshButton.querySelector('svg[lucideRefreshCw]')).toBeTruthy();
+
+    refreshButton.click();
+
+    expect(dashboardService.getSummary).toHaveBeenCalledTimes(2);
   });
 
   it('shows a retryable error when loading fails', () => {

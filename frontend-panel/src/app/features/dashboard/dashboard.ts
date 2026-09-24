@@ -10,6 +10,13 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
+import {
+  LucideCalendarDays,
+  LucideCar,
+  LucideFileText,
+  LucideRefreshCw,
+  LucideWrench,
+} from '@lucide/angular';
 
 import { AuthService } from '../../core/auth/auth-service';
 import { DashboardAppointmentStatus, DashboardSummary } from './dashboard.models';
@@ -17,7 +24,15 @@ import { DashboardService } from './dashboard-service';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [RouterLink, DatePipe],
+  imports: [
+    RouterLink,
+    DatePipe,
+    LucideCalendarDays,
+    LucideCar,
+    LucideFileText,
+    LucideRefreshCw,
+    LucideWrench,
+  ],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -7,8 +7,20 @@
     </div>
 
     <div class="dashboard__header-actions">
-      <button type="button" class="button button--secondary" (click)="loadSummary()" [disabled]="loading()">
-        Actualizar
+      <button
+        type="button"
+        class="button button--secondary button--icon"
+        (click)="loadSummary()"
+        [disabled]="loading()"
+        [attr.aria-label]="loading() ? 'Actualizando resumen' : 'Actualizar resumen'"
+        [attr.title]="loading() ? 'Actualizando resumen' : 'Actualizar resumen'"
+      >
+        <svg
+          lucideRefreshCw
+          class="button__refresh-icon"
+          [class.button__refresh-icon--loading]="loading()"
+          aria-hidden="true"
+        ></svg>
       </button>
       <a class="button button--primary" routerLink="/appointments/nuevo">
         <span aria-hidden="true">+</span>
@@ -33,28 +45,48 @@
         </article>
       }
     </section>
-  } @else if (summary(); as data) {
+    } @else if (summary(); as data) {
     <section class="dashboard__summary" aria-label="Resumen del taller">
       <article class="summary-card summary-card--appointments">
-        <span class="summary-card__label">Turnos de hoy</span>
+        <div class="summary-card__header">
+          <span class="summary-card__label">Turnos de hoy</span>
+          <span class="summary-card__icon" aria-hidden="true">
+            <svg lucideCalendarDays></svg>
+          </span>
+        </div>
         <strong class="summary-card__value">{{ data.metrics.todayAppointments }}</strong>
         <a routerLink="/appointments">Ver agenda</a>
       </article>
 
       <article class="summary-card summary-card--quotes">
-        <span class="summary-card__label">Presupuestos pendientes</span>
+        <div class="summary-card__header">
+          <span class="summary-card__label">Presupuestos pendientes</span>
+          <span class="summary-card__icon" aria-hidden="true">
+            <svg lucideFileText></svg>
+          </span>
+        </div>
         <strong class="summary-card__value">{{ data.metrics.pendingQuotes }}</strong>
         <a routerLink="/quotes">Revisar presupuestos</a>
       </article>
 
       <article class="summary-card summary-card--orders">
-        <span class="summary-card__label">Trabajos del mes</span>
+        <div class="summary-card__header">
+          <span class="summary-card__label">Trabajos del mes</span>
+          <span class="summary-card__icon" aria-hidden="true">
+            <svg lucideWrench></svg>
+          </span>
+        </div>
         <strong class="summary-card__value">{{ data.metrics.completedWorkOrdersThisMonth }}</strong>
         <a routerLink="/work-orders">Ver trabajos</a>
       </article>
 
       <article class="summary-card summary-card--vehicles">
-        <span class="summary-card__label">Vehículos registrados</span>
+        <div class="summary-card__header">
+          <span class="summary-card__label">Vehículos registrados</span>
+          <span class="summary-card__icon" aria-hidden="true">
+            <svg lucideCar></svg>
+          </span>
+        </div>
         <strong class="summary-card__value">{{ data.metrics.registeredVehicles }}</strong>
         <a routerLink="/vehicles">Ver vehículos</a>
       </article>

@@ -5,10 +5,13 @@
 
 .admin-layout {
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
   background-color: #f4f7fb;
 }
 
 .admin-layout__content {
+  flex: 1;
   width: min(100% - 2rem, 90rem);
   margin: 0 auto;
   padding: 2rem 0;

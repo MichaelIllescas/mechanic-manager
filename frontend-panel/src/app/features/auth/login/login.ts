@@ -4,6 +4,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Router, RouterLink } from '@angular/router';
 
 import { AuthService } from '../../../core/auth/auth-service';
+import { LoginResponse } from '../../../core/auth/auth.models';
 
 @Component({
   selector: 'app-login',
@@ -29,6 +30,14 @@ export class Login {
     this.passwordVisible.update((visible) => !visible);
   }
 
+  private destinationFor(res: LoginResponse): string {
+    if (res.mustChangePassword) {
+      return '/cambiar-password';
+    }
+
+    return res.role === 'SYSTEM_ADMIN' ? '/admin/usuarios' : '/dashboard';
+  }
+
   onSubmit(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
@@ -41,9 +50,7 @@ export class Login {
     this.auth.login(this.form.getRawValue()).subscribe({
       next: (res) => {
         this.loading.set(false);
-        void this.router.navigate([
-          res.role === 'SYSTEM_ADMIN' ? '/admin/usuarios' : '/dashboard',
-        ]);
+        void this.router.navigate([this.destinationFor(res)]);
       },
       error: (err: HttpErrorResponse) => {
         this.loading.set(false);

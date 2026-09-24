@@ -23,6 +23,13 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
         router.navigate(['/login']);
       }
 
+      // La cuenta sigue con la contraseña temporal: el backend rechaza todo
+      // salvo el cambio de contraseña, así que se lleva al usuario a hacerlo.
+      if (error.status === 403 && error.error?.code === 'PASSWORD_CHANGE_REQUIRED') {
+        auth.setMustChangePassword(true);
+        router.navigate(['/cambiar-password']);
+      }
+
       return throwError(() => error);
     }),
   );

@@ -35,7 +35,8 @@ public class AuthService {
                 jwtService.getExpirationSeconds(),
                 user.id(),
                 user.name(),
-                user.role()
+                user.role(),
+                user.mustChangePassword()
         );
     }
 

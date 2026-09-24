@@ -15,7 +15,8 @@ public record AuthenticatedUser(
         String email,
         String passwordHash,
         Role role,
-        boolean enabled
+        boolean enabled,
+        boolean mustChangePassword
 ) implements UserDetails {
     
     public static AuthenticatedUser fromEntity(User user) {
@@ -25,7 +26,8 @@ public record AuthenticatedUser(
                 user.getEmail(),
                 user.getPasswordHash(),
                 user.getRole(),
-                user.isEnabled()
+                user.isEnabled(),
+                user.isMustChangePassword()
         );
     }
     

@@ -3,6 +3,7 @@ import { Routes } from '@angular/router';
 import { adminGuard } from './core/guards/admin-guard';
 import { authGuard } from './core/guards/auth-guard';
 import { guestGuard } from './core/guards/guest-guard';
+import { passwordChangeGuard } from './core/guards/password-change-guard';
 
 export const routes: Routes = [
   {
@@ -24,6 +25,14 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/auth/reset-password/reset-password').then(
         (component) => component.ResetPassword,
+      ),
+  },
+  {
+    path: 'cambiar-password',
+    canMatch: [passwordChangeGuard],
+    loadComponent: () =>
+      import('./features/auth/change-password-required/change-password-required').then(
+        (component) => component.ChangePasswordRequired,
       ),
   },
   {

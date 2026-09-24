@@ -21,7 +21,7 @@ class DashboardControllerTest {
         GetDashboardSummaryUseCase useCase = mock(GetDashboardSummaryUseCase.class);
         DashboardController controller = new DashboardController(useCase);
         AuthenticatedUser user = new AuthenticatedUser(
-                7L, "Ana", "ana@example.com", "hash", Role.USER, true);
+                7L, "Ana", "ana@example.com", "hash", Role.USER, true, false);
         DashboardSummaryResponse expected = new DashboardSummaryResponse(
                 LocalDateTime.of(2026, 9, 23, 10, 30),
                 new DashboardSummaryResponse.Metrics(0, 0, 0, 0),

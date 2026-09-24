@@ -8,6 +8,7 @@ public record LoginResponse(
         long expiresIn,
         Long userId,
         String name,
-        Role role
+        Role role,
+        boolean mustChangePassword
 ) {
 }

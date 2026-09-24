@@ -11,6 +11,10 @@ export const guestGuard: CanActivateFn = () => {
     return true;
   }
 
+  if (authService.mustChangePassword()) {
+    return router.createUrlTree(['/cambiar-password']);
+  }
+
   return authService.isAdmin()
     ? router.createUrlTree(['/admin/usuarios'])
     : router.createUrlTree(['/dashboard']);

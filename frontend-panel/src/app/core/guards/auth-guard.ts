@@ -11,6 +11,10 @@ export const authGuard: CanMatchFn = () => {
     return router.createUrlTree(['/login']);
   }
 
+  if (auth.mustChangePassword()) {
+    return router.createUrlTree(['/cambiar-password']);
+  }
+
   return auth.isAdmin()
     ? router.createUrlTree(['/admin/usuarios'])
     : true;

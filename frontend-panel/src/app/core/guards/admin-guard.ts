@@ -11,5 +11,9 @@ export const adminGuard: CanMatchFn = () => {
     return router.createUrlTree(['/login']);
   }
 
+  if (auth.mustChangePassword()) {
+    return router.createUrlTree(['/cambiar-password']);
+  }
+
   return auth.isAdmin() ? true : router.createUrlTree(['/dashboard']);
 };

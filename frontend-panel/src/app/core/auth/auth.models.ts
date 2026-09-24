@@ -10,6 +10,7 @@ export interface LoginResponse {
   userId: number;
   name: string;
   role: string;
+  mustChangePassword: boolean;
 }
 export interface ForgotPasswordRequest {
   email: string;

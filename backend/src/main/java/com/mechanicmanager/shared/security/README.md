@@ -83,6 +83,14 @@ reintroducir el estado que la arquitectura eligió evitar. El refresh token
 tampoco está en el alcance del MVP. Ambos se revisarán si la validación con
 clientes lo justifica, y quedarán registrados en un ADR.
 
+**Cambiar la contraseña no invalida los tokens ya emitidos (riesgo aceptado).**
+Un token robado sigue válido hasta que vence (60 minutos por defecto, ver
+`JWT_EXPIRATION_MINUTES`), aunque el dueño cambie su contraseña. La ventana es
+corta y exige que el token ya haya sido robado. Si la validación con clientes lo
+justifica, la salida más barata es incluir en el token una huella de la
+contraseña vigente y compararla en `JwtAuthenticationFilter`: no requiere
+migración ni consultas extra.
+
 **El email es el `username`.**
 En Spring Security "username" es solo el identificador de login. El nuestro es
 el email, y se normaliza a minúsculas **en el service** antes de consultar,

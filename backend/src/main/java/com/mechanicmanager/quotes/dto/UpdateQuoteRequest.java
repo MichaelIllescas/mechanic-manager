@@ -1,7 +1,6 @@
 package com.mechanicmanager.quotes.dto;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -20,7 +19,8 @@ public record UpdateQuoteRequest(
         @Positive(message = "El identificador del vehículo debe ser mayor a cero")
         Long vehicleId,
 
-        @FutureOrPresent(message = "La vigencia no puede ser anterior a hoy")
+        // Sin @FutureOrPresent a propósito: un presupuesto vencido tiene que poder
+        // editarse (una nota, un precio) sin obligar a cambiar la fecha.
         LocalDate validUntil,
 
         @Size(max = 2000, message = "Las notas no pueden superar los 2000 caracteres")

@@ -143,6 +143,15 @@ describe('QuoteDetail', () => {
     expect(root.textContent).toContain('ya tiene un trabajo realizado');
   });
 
+  it('reads server dates without a zone as local time, not as UTC', () => {
+    createComponent();
+
+    const date = component.localDateTime('2026-09-23T22:38:00');
+
+    expect(date.getHours()).toBe(22);
+    expect(date.getDate()).toBe(23);
+  });
+
   it('opens the native print dialog to download the quote as PDF', () => {
     const print = vi.spyOn(window, 'print').mockImplementation(() => undefined);
     createComponent();

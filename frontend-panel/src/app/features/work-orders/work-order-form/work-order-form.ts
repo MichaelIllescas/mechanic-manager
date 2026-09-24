@@ -14,6 +14,7 @@ import { nonNegativeTotal } from '../../../shared/utils/items-total';
 import { scrollToFirstError } from '../../../shared/utils/scroll-to-error';
 
 import { NotificationService } from '../../../core/notifications/notification-service';
+import { toIsoDate } from '../../appointments/calendar.utils';
 import { QuoteService } from '../../quotes/quote-service';
 import { VehicleService } from '../../vehicles/vehicle-service';
 import { Vehicle } from '../../vehicles/vehicle.models';
@@ -262,7 +263,7 @@ export class WorkOrderForm implements OnInit {
     this.quoteId = Number.isInteger(quoteId) && quoteId > 0 ? quoteId : null;
 
     this.form.patchValue({
-      performedAt: new Date().toISOString().slice(0, 10),
+      performedAt: toIsoDate(new Date()),
     });
 
     if (Number.isInteger(vehicleId) && vehicleId > 0) {

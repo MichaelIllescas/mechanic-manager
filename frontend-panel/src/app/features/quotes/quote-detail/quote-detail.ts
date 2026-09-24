@@ -100,9 +100,13 @@ export class QuoteDetail implements OnInit {
     return labels[status];
   }
 
+  /**
+   * El backend manda fechas y horas sin zona, ya en hora local del taller. Un
+   * valor así se interpreta como hora local; agregarle "Z" lo trataría como UTC
+   * y lo mostraría corrido por la diferencia horaria.
+   */
   localDateTime(value: string): Date {
-    const hasTimeZone = /(?:Z|[+-]\d{2}:?\d{2})$/i.test(value);
-    return new Date(hasTimeZone ? value : `${value}Z`);
+    return new Date(value);
   }
 
   private loadQuote(quoteId: number): void {

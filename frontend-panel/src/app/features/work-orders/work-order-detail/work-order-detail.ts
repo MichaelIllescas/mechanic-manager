@@ -36,6 +36,8 @@ export class WorkOrderDetail implements OnInit {
   readonly updatingStatus = signal(false);
   readonly errorMessage = signal<string | null>(null);
   readonly downloadedAt = signal<Date | null>(null);
+  private printRequested = false;
+  private workshopSettled = false;
 
   ngOnInit(): void {
     const workOrderId = Number(this.route.snapshot.paramMap.get('id'));
@@ -45,10 +47,20 @@ export class WorkOrderDetail implements OnInit {
       return;
     }
 
+    this.printRequested = this.route.snapshot.queryParamMap.get('print') === '1';
+
     this.load(workOrderId);
     this.workshopService.findMine().subscribe({
-      next: (workshop) => this.workshop.set(workshop),
-      error: () => this.workshop.set(null),
+      next: (workshop) => {
+        this.workshop.set(workshop);
+        this.workshopSettled = true;
+        this.printIfRequested();
+      },
+      error: () => {
+        this.workshop.set(null);
+        this.workshopSettled = true;
+        this.printIfRequested();
+      },
     });
   }
 
@@ -107,11 +119,24 @@ export class WorkOrderDetail implements OnInit {
       next: (workOrder) => {
         this.workOrder.set(workOrder);
         this.loading.set(false);
+        this.printIfRequested();
       },
       error: (error: HttpErrorResponse) => {
         this.loading.set(false);
+        this.printRequested = false;
         this.errorMessage.set(error.error?.message ?? 'No se pudo cargar el trabajo realizado');
       },
     });
+  }
+
+  /** Abre el diálogo de impresión una sola vez, cuando ya están cargados el trabajo y el taller. */
+  private printIfRequested(): void {
+    if (!this.printRequested || !this.workOrder() || !this.workshopSettled) {
+      return;
+    }
+
+    this.printRequested = false;
+    this.changeDetector.detectChanges();
+    this.downloadWorkOrder();
   }
 }

@@ -13,7 +13,6 @@
           {{ isEdit() ? 'Modo edición' : 'Modo alta' }}
         </span>
         <h2 id="customer-form-title">Datos del cliente</h2>
-        <p>Nombre, apellido y teléfono son obligatorios.</p>
       </div>
     </div>
   }
@@ -24,10 +23,22 @@
     <form class="customer-form" [formGroup]="form" (ngSubmit)="onSubmit()" autocomplete="off">
       <div class="form-grid">
         <label class="field">
-          <span>Nombre</span>
-          <input type="text" formControlName="firstName" placeholder="Juan" autocomplete="off" />
+          <span>Nombre <span class="field__required" aria-hidden="true">*</span></span>
+          <input
+            type="text"
+            formControlName="firstName"
+            placeholder="Juan"
+            autocomplete="off"
+            required
+            [attr.aria-invalid]="form.controls.firstName.touched && form.controls.firstName.invalid"
+            [attr.aria-describedby]="
+              form.controls.firstName.touched && form.controls.firstName.invalid
+                ? 'first-name-error'
+                : null
+            "
+          />
           @if (form.controls.firstName.touched && form.controls.firstName.invalid) {
-            <small>
+            <small id="first-name-error" class="field__error" aria-live="polite">
               @if (form.controls.firstName.hasError('required')) {
                 El nombre es obligatorio.
               } @else {
@@ -38,10 +49,22 @@
         </label>
 
         <label class="field">
-          <span>Apellido</span>
-          <input type="text" formControlName="lastName" placeholder="Pérez" autocomplete="off" />
+          <span>Apellido <span class="field__required" aria-hidden="true">*</span></span>
+          <input
+            type="text"
+            formControlName="lastName"
+            placeholder="Pérez"
+            autocomplete="off"
+            required
+            [attr.aria-invalid]="form.controls.lastName.touched && form.controls.lastName.invalid"
+            [attr.aria-describedby]="
+              form.controls.lastName.touched && form.controls.lastName.invalid
+                ? 'last-name-error'
+                : null
+            "
+          />
           @if (form.controls.lastName.touched && form.controls.lastName.invalid) {
-            <small>
+            <small id="last-name-error" class="field__error" aria-live="polite">
               @if (form.controls.lastName.hasError('required')) {
                 El apellido es obligatorio.
               } @else {
@@ -58,18 +81,37 @@
             formControlName="documentNumber"
             placeholder="30111222"
             autocomplete="off"
+            [attr.aria-invalid]="
+              form.controls.documentNumber.touched && form.controls.documentNumber.invalid
+            "
+            [attr.aria-describedby]="
+              form.controls.documentNumber.touched && form.controls.documentNumber.invalid
+                ? 'document-number-error'
+                : null
+            "
           />
-          <span class="field__hint">Opcional. Máximo 30 caracteres.</span>
           @if (form.controls.documentNumber.touched && form.controls.documentNumber.invalid) {
-            <small>El documento no puede superar los 30 caracteres.</small>
+            <small id="document-number-error" class="field__error" aria-live="polite">
+              El documento no puede superar los 30 caracteres.
+            </small>
           }
         </label>
 
         <label class="field">
-          <span>Teléfono</span>
-          <input type="tel" formControlName="phone" placeholder="11 4444-5555" autocomplete="tel" />
+          <span>Teléfono <span class="field__required" aria-hidden="true">*</span></span>
+          <input
+            type="tel"
+            formControlName="phone"
+            placeholder="11 4444-5555"
+            autocomplete="tel"
+            required
+            [attr.aria-invalid]="form.controls.phone.touched && form.controls.phone.invalid"
+            [attr.aria-describedby]="
+              form.controls.phone.touched && form.controls.phone.invalid ? 'phone-error' : null
+            "
+          />
           @if (form.controls.phone.touched && form.controls.phone.invalid) {
-            <small>
+            <small id="phone-error" class="field__error" aria-live="polite">
               @if (form.controls.phone.hasError('required')) {
                 El teléfono es obligatorio.
               } @else {
@@ -86,12 +128,15 @@
             formControlName="email"
             placeholder="cliente@email.com"
             autocomplete="email"
+            [attr.aria-invalid]="form.controls.email.touched && form.controls.email.invalid"
+            [attr.aria-describedby]="
+              form.controls.email.touched && form.controls.email.invalid ? 'email-error' : null
+            "
           />
-          <span class="field__hint">Opcional.</span>
           @if (form.controls.email.touched && form.controls.email.invalid) {
-            <small>
+            <small id="email-error" class="field__error" aria-live="polite">
               @if (form.controls.email.hasError('email')) {
-                Ingresá un email válido.
+                El email debe tener el formato usuario@dominio.com.
               } @else {
                 El email no puede superar los 255 caracteres.
               }
@@ -106,10 +151,17 @@
             formControlName="address"
             placeholder="Av. Siempre Viva 742"
             autocomplete="street-address"
+            [attr.aria-invalid]="form.controls.address.touched && form.controls.address.invalid"
+            [attr.aria-describedby]="
+              form.controls.address.touched && form.controls.address.invalid
+                ? 'address-error'
+                : null
+            "
           />
-          <span class="field__hint">Opcional. Máximo 255 caracteres.</span>
           @if (form.controls.address.touched && form.controls.address.invalid) {
-            <small>La dirección no puede superar los 255 caracteres.</small>
+            <small id="address-error" class="field__error" aria-live="polite">
+              La dirección no puede superar los 255 caracteres.
+            </small>
           }
         </label>
 
@@ -119,10 +171,15 @@
             formControlName="notes"
             rows="4"
             placeholder="Preferencias, aclaraciones o información útil"
+            [attr.aria-invalid]="form.controls.notes.touched && form.controls.notes.invalid"
+            [attr.aria-describedby]="
+              form.controls.notes.touched && form.controls.notes.invalid ? 'notes-error' : null
+            "
           ></textarea>
-          <span class="field__hint">Opcional. Máximo 1000 caracteres.</span>
           @if (form.controls.notes.touched && form.controls.notes.invalid) {
-            <small>Las observaciones no pueden superar los 1000 caracteres.</small>
+            <small id="notes-error" class="field__error" aria-live="polite">
+              Las observaciones no pueden superar los 1000 caracteres.
+            </small>
           }
         </label>
       </div>

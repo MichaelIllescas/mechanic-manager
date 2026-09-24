@@ -19,6 +19,7 @@ const APP_LINKS: NavbarLink[] = [
   { label: 'Presupuestos', path: '/quotes' },
   { label: 'Turnos', path: '/appointments' },
   { label: 'Trabajos', path: '/work-orders' },
+  { label: 'Historial', path: '/historial' },
 ];
 
 const ADMIN_LINKS: NavbarLink[] = [{ label: 'Usuarios', path: '/admin/usuarios' }];

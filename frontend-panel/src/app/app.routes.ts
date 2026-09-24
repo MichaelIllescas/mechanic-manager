@@ -94,6 +94,11 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'historial',
+        loadChildren: () =>
+          import('./features/history/history.routes').then((module) => module.HISTORY_ROUTES),
+      },
+      {
         path: '',
         pathMatch: 'full',
         redirectTo: 'dashboard',

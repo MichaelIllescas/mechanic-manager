@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -21,6 +22,7 @@ public class WorkOrderService {
     private final UpdateWorkOrderUseCase updateWorkOrderUseCase;
     private final UpdateWorkOrderStatusUseCase updateWorkOrderStatusUseCase;
     private final DeleteWorkOrderUseCase deleteWorkOrderUseCase;
+    private final GetWorkOrderHistoryUseCase getWorkOrderHistoryUseCase;
 
     public WorkOrderResponse create(Long userId, CreateWorkOrderRequest request) {
         return createWorkOrderUseCase.execute(userId, request);
@@ -70,5 +72,9 @@ public class WorkOrderService {
 
     public void delete(Long userId, Long workOrderId) {
         deleteWorkOrderUseCase.execute(userId, workOrderId);
+    }
+
+    public List<WorkOrderResponse> findHistory(Long userId, Long customerId, Long vehicleId) {
+        return getWorkOrderHistoryUseCase.execute(userId, customerId, vehicleId);
     }
 }

@@ -1,0 +1,217 @@
+<main class="history-page">
+  <section class="history-header">
+    <p class="history-header__eyebrow">Taller</p>
+    <h1>Historial</h1>
+    <p class="history-header__copy">
+      Buscá un cliente o un vehículo y consultá todos los trabajos realizados, con su detalle.
+    </p>
+  </section>
+
+  <section class="history-panel" aria-label="Búsqueda de historial">
+    <div class="tabs" role="tablist">
+      <button
+        type="button"
+        role="tab"
+        [attr.aria-selected]="tab() === 'customer'"
+        [class.tabs__button--active]="tab() === 'customer'"
+        (click)="selectTab('customer')"
+      >
+        Cliente
+      </button>
+      <button
+        type="button"
+        role="tab"
+        [attr.aria-selected]="tab() === 'vehicle'"
+        [class.tabs__button--active]="tab() === 'vehicle'"
+        (click)="selectTab('vehicle')"
+      >
+        Vehículo
+      </button>
+    </div>
+
+    <div class="history-search">
+      <div class="search">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="11" cy="11" r="7" />
+          <path d="m20 20-4-4" />
+        </svg>
+        <input
+          type="search"
+          autocomplete="off"
+          [attr.aria-label]="tab() === 'customer' ? 'Buscar cliente' : 'Buscar vehículo'"
+          [placeholder]="
+            tab() === 'customer' ? 'Nombre, apellido o documento' : 'Patente, marca o modelo'
+          "
+          [formControl]="searchControl"
+        />
+      </div>
+
+      @if (searching()) {
+        <p class="history-hint">Buscando...</p>
+      } @else if (searchControl.value.trim()) {
+        @if (tab() === 'customer') {
+          <ul class="results">
+            @for (customer of customerResults(); track customer.id) {
+              <li>
+                <button
+                  type="button"
+                  [class.results__item--active]="selectedCustomer()?.id === customer.id"
+                  (click)="selectCustomer(customer)"
+                >
+                  <strong>{{ customer.firstName }} {{ customer.lastName }}</strong>
+                  <span>{{ customer.documentNumber || 'Sin documento' }} · {{ customer.phone }}</span>
+                </button>
+              </li>
+            } @empty {
+              <li class="results__empty">No encontramos clientes con esa búsqueda.</li>
+            }
+          </ul>
+        } @else {
+          <ul class="results">
+            @for (vehicle of vehicleResults(); track vehicle.id) {
+              <li>
+                <button
+                  type="button"
+                  [class.results__item--active]="selectedVehicle()?.id === vehicle.id"
+                  (click)="selectVehicle(vehicle)"
+                >
+                  <strong>{{ vehicle.licensePlate }} · {{ vehicle.brand }} {{ vehicle.model }}</strong>
+                  <span>{{ vehicle.customerFirstName }} {{ vehicle.customerLastName }}</span>
+                </button>
+              </li>
+            } @empty {
+              <li class="results__empty">No encontramos vehículos con esa búsqueda.</li>
+            }
+          </ul>
+        }
+      } @else if (!selectedCustomer() && !selectedVehicle()) {
+        <p class="history-hint">
+          Escribí para buscar {{ tab() === 'customer' ? 'un cliente' : 'un vehículo' }}.
+        </p>
+      }
+    </div>
+
+    @if (errorMessage()) {
+      <p class="history-error" role="alert">{{ errorMessage() }}</p>
+    }
+  </section>
+
+  @if (selectedCustomer() || selectedVehicle()) {
+    <section class="history-result" aria-label="Historial seleccionado">
+      <div class="subject">
+        <div>
+          @if (selectedCustomer(); as customer) {
+            <h2>{{ customer.firstName }} {{ customer.lastName }}</h2>
+            <p>
+              {{ customer.documentNumber || 'Sin documento' }} · {{ customer.phone }}
+              @if (customer.email) {
+                · {{ customer.email }}
+              }
+            </p>
+            <a [routerLink]="['/customers', customer.id]">Ver ficha del cliente</a>
+          } @else if (selectedVehicle(); as vehicle) {
+            <h2>{{ vehicle.licensePlate }} · {{ vehicle.brand }} {{ vehicle.model }}</h2>
+            <p>
+              {{ vehicle.customerFirstName }} {{ vehicle.customerLastName }}
+              @if (vehicle.year) {
+                · {{ vehicle.year }}
+              }
+              @if (vehicle.mileage !== null) {
+                · {{ vehicle.mileage }} km
+              }
+            </p>
+            <a [routerLink]="['/vehicles', vehicle.id]">Ver ficha del vehículo</a>
+          }
+        </div>
+
+        <dl class="subject__stats">
+          <div>
+            <dt>Trabajos</dt>
+            <dd>{{ workOrders().length }}</dd>
+          </div>
+          <div>
+            <dt>Total facturado</dt>
+            <dd>{{ totalSpent() | currency: 'ARS' : 'symbol-narrow' : '1.2-2' }}</dd>
+          </div>
+        </dl>
+      </div>
+
+      @if (loadingHistory()) {
+        <p class="history-hint history-hint--padded">Cargando historial...</p>
+      } @else {
+        <ol class="timeline">
+          @for (workOrder of workOrders(); track workOrder.id) {
+            <li class="entry">
+              <header class="entry__header">
+                <div>
+                  <a class="entry__date" [routerLink]="['/work-orders', workOrder.id]">
+                    {{ workOrder.performedAt | date: 'dd/MM/yyyy' }}
+                  </a>
+                  @if (selectedCustomer()) {
+                    <span class="entry__vehicle">
+                      {{ workOrder.vehicleLicensePlate }} · {{ workOrder.vehicleDescription }}
+                    </span>
+                  }
+                  @if (workOrder.mileage !== null) {
+                    <span class="entry__meta">{{ workOrder.mileage }} km</span>
+                  }
+                </div>
+                <div class="entry__summary">
+                  <span
+                    class="status"
+                    [class.status--completed]="workOrder.status === 'COMPLETED'"
+                    [class.status--cancelled]="workOrder.status === 'CANCELLED'"
+                  >
+                    {{ statusLabel(workOrder.status) }}
+                  </span>
+                  <strong>{{ workOrder.total | currency: 'ARS' : 'symbol-narrow' : '1.2-2' }}</strong>
+                  <a
+                    class="entry__action"
+                    title="Ver detalle del trabajo"
+                    [attr.aria-label]="'Ver detalle del trabajo del ' + (workOrder.performedAt | date: 'dd/MM/yyyy')"
+                    [routerLink]="['/work-orders', workOrder.id]"
+                  >
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z" />
+                      <circle cx="12" cy="12" r="2.5" />
+                    </svg>
+                    Ver detalle
+                  </a>
+                  <a
+                    class="entry__action"
+                    title="Descargar comprobante"
+                    [attr.aria-label]="'Descargar comprobante del ' + (workOrder.performedAt | date: 'dd/MM/yyyy')"
+                    [routerLink]="['/work-orders', workOrder.id]"
+                    [queryParams]="{ print: 1 }"
+                  >
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="M12 4v11m0 0-4-4m4 4 4-4M5 20h14" />
+                    </svg>
+                    Comprobante
+                  </a>
+                </div>
+              </header>
+
+              @if (workOrder.items.length) {
+                <ul class="entry__items">
+                  @for (item of workOrder.items; track item.id) {
+                    <li>
+                      <span>{{ item.quantity }} × {{ item.description }}</span>
+                      <span>{{ item.subtotal | currency: 'ARS' : 'symbol-narrow' : '1.2-2' }}</span>
+                    </li>
+                  }
+                </ul>
+              }
+
+              @if (workOrder.notes) {
+                <p class="entry__notes">{{ workOrder.notes }}</p>
+              }
+            </li>
+          } @empty {
+            <li class="history-hint">Todavía no hay trabajos registrados.</li>
+          }
+        </ol>
+      }
+    </section>
+  }
+</main>

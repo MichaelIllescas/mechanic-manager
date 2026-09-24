@@ -19,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Tag(
         name = "Órdenes de trabajo",
@@ -47,6 +48,26 @@ public interface WorkOrderApi {
             @Parameter(description = "Fecha hasta (inclusive)") LocalDate to,
             @Parameter(description = "Página basada en cero", example = "0") int page,
             @Parameter(description = "Resultados por página, máximo 50", example = "20") int size,
+            @Parameter(hidden = true) AuthenticatedUser currentUser
+    );
+
+    @Operation(
+            summary = "Historial detallado",
+            description = "Órdenes de trabajo con sus ítems, de la más reciente a la más antigua, "
+                    + "de un cliente o de un vehículo. Se debe indicar exactamente uno de los dos."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Historial obtenido correctamente"),
+            @ApiResponse(responseCode = "400", description = "Debe indicarse customerId o vehicleId, no ambos",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "401", description = "No autenticado",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "El usuario no tiene rol USER",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    ResponseEntity<List<WorkOrderResponse>> findHistory(
+            @Parameter(description = "Identificador de cliente") Long customerId,
+            @Parameter(description = "Identificador de vehículo") Long vehicleId,
             @Parameter(hidden = true) AuthenticatedUser currentUser
     );
 

@@ -74,6 +74,41 @@ describe('CustomerFormFields', () => {
     expect(customerService.create).not.toHaveBeenCalled();
   });
 
+  it('marks only required fields with an asterisk', () => {
+    const labels = Array.from(
+      fixture.nativeElement.querySelectorAll(
+        '.field > span:first-child',
+      ) as NodeListOf<HTMLElement>,
+    );
+    const requiredLabels = labels
+      .filter((label) => label.querySelector('.field__required'))
+      .map((label) => label.textContent?.trim());
+
+    expect(requiredLabels).toEqual(['Nombre *', 'Apellido *', 'Teléfono *']);
+    expect(fixture.nativeElement.textContent).not.toContain('Opcional.');
+  });
+
+  it('shows contextual validation messages for touched invalid fields', () => {
+    component.form.controls.firstName.markAsTouched();
+    component.form.controls.email.setValue('email-invalido');
+    component.form.controls.email.markAsTouched();
+    fixture.detectChanges();
+
+    const nameInput = fixture.nativeElement.querySelector(
+      'input[formControlName="firstName"]',
+    ) as HTMLInputElement;
+    const emailInput = fixture.nativeElement.querySelector(
+      'input[formControlName="email"]',
+    ) as HTMLInputElement;
+
+    expect(fixture.nativeElement.textContent).toContain('El nombre es obligatorio.');
+    expect(fixture.nativeElement.textContent).toContain(
+      'El email debe tener el formato usuario@dominio.com.',
+    );
+    expect(nameInput.getAttribute('aria-describedby')).toBe('first-name-error');
+    expect(emailInput.getAttribute('aria-describedby')).toBe('email-error');
+  });
+
   it('creates a customer with normalized optional values and emits it', () => {
     const saved = vi.fn();
     component.saved.subscribe(saved);

@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @RestController
 @RequestMapping(WorkOrderRoutes.BASE)
@@ -57,6 +58,20 @@ public class WorkOrderController implements WorkOrderApi {
                 to,
                 page,
                 size
+        ));
+    }
+
+    @Override
+    @GetMapping(WorkOrderRoutes.HISTORY)
+    public ResponseEntity<List<WorkOrderResponse>> findHistory(
+            @RequestParam(required = false) Long customerId,
+            @RequestParam(required = false) Long vehicleId,
+            @AuthenticationPrincipal AuthenticatedUser currentUser
+    ) {
+        return ResponseEntity.ok(workOrderService.findHistory(
+                currentUser.id(),
+                customerId,
+                vehicleId
         ));
     }
 

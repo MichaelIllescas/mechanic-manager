@@ -26,6 +26,7 @@ describe('QuoteDetail', () => {
     status: 'PENDING',
     total: 126500,
     notes: 'Valores sujetos a revisión',
+    hasWorkOrder: false,
     items: [
       {
         id: 31,
@@ -128,6 +129,18 @@ describe('QuoteDetail', () => {
     component.updateStatus('PENDING');
 
     expect(quoteService.updateStatus).not.toHaveBeenCalled();
+  });
+
+  it('locks the status buttons when the quote already has a work order', () => {
+    quoteService.findById.mockReturnValue(of({ ...quote, hasWorkOrder: true }));
+    createComponent();
+
+    const root = fixture.nativeElement as HTMLElement;
+    const buttons = Array.from(root.querySelectorAll<HTMLButtonElement>('.status-actions button'));
+
+    expect(buttons).toHaveLength(3);
+    expect(buttons.every((button) => button.disabled)).toBe(true);
+    expect(root.textContent).toContain('ya tiene un trabajo realizado');
   });
 
   it('opens the native print dialog to download the quote as PDF', () => {

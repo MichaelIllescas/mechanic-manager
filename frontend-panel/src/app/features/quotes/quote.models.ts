@@ -46,6 +46,8 @@ export interface Quote {
   status: QuoteStatus;
   total: number;
   notes: string | null;
+  /** Con un trabajo realizado asociado, el estado del presupuesto ya no se puede cambiar. */
+  hasWorkOrder: boolean;
   items: QuoteItem[];
   createdAt: string;
   updatedAt: string;

@@ -69,7 +69,7 @@ public class CreateQuoteUseCase {
 
         quote.replaceItems(items);
 
-        return quoteMapper.toResponse(quoteRepository.save(quote));
+        return quoteMapper.toResponse(quoteRepository.save(quote), false);
     }
 
     private Long nextNumber(Long userId) {

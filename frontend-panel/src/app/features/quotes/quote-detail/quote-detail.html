@@ -180,14 +180,20 @@
     <section class="status-panel no-print" aria-label="Cambiar estado del presupuesto">
       <div>
         <h2>Estado del presupuesto</h2>
-        <p>Podés corregir o editar el presupuesto independientemente de su estado.</p>
+        @if (currentQuote.hasWorkOrder) {
+          <p>
+            Este presupuesto ya tiene un trabajo realizado, por eso su estado no se puede cambiar.
+          </p>
+        } @else {
+          <p>Podés corregir o editar el presupuesto independientemente de su estado.</p>
+        }
       </div>
 
       <div class="status-actions">
         <button
           type="button"
           [class.status-actions__button--active]="currentQuote.status === 'PENDING'"
-          [disabled]="updatingStatus() || currentQuote.status === 'PENDING'"
+          [disabled]="updatingStatus() || currentQuote.hasWorkOrder || currentQuote.status === 'PENDING'"
           (click)="updateStatus('PENDING')"
         >
           Pendiente
@@ -195,7 +201,7 @@
         <button
           type="button"
           [class.status-actions__button--approved]="currentQuote.status === 'APPROVED'"
-          [disabled]="updatingStatus() || currentQuote.status === 'APPROVED'"
+          [disabled]="updatingStatus() || currentQuote.hasWorkOrder || currentQuote.status === 'APPROVED'"
           (click)="updateStatus('APPROVED')"
         >
           Aprobado
@@ -203,7 +209,7 @@
         <button
           type="button"
           [class.status-actions__button--rejected]="currentQuote.status === 'REJECTED'"
-          [disabled]="updatingStatus() || currentQuote.status === 'REJECTED'"
+          [disabled]="updatingStatus() || currentQuote.hasWorkOrder || currentQuote.status === 'REJECTED'"
           (click)="updateStatus('REJECTED')"
         >
           Rechazado

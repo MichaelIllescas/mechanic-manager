@@ -44,6 +44,7 @@ describe('AppointmentDetail', () => {
     status: 'APPROVED',
     total: 125000,
     notes: null,
+    hasWorkOrder: false,
     items: [],
     createdAt: '2026-09-01T10:00:00',
     updatedAt: '2026-09-01T10:00:00',

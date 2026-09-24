@@ -21,6 +21,7 @@ public record QuoteResponse(
         QuoteStatus status,
         BigDecimal total,
         String notes,
+        boolean hasWorkOrder,
         List<QuoteItemResponse> items,
         LocalDateTime createdAt,
         LocalDateTime updatedAt

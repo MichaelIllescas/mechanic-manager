@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class QuoteMapper {
 
-    public QuoteResponse toResponse(Quote quote) {
+    public QuoteResponse toResponse(Quote quote, boolean hasWorkOrder) {
         return new QuoteResponse(
                 quote.getId(),
                 quote.getNumber(),
@@ -25,6 +25,7 @@ public class QuoteMapper {
                 quote.getStatus(),
                 quote.getTotal(),
                 quote.getNotes(),
+                hasWorkOrder,
                 quote.getItems().stream()
                         .map(this::toItemResponse)
                         .toList(),

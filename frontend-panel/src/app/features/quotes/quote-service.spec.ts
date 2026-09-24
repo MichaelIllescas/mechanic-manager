@@ -29,6 +29,7 @@ describe('QuoteService', () => {
     status: 'PENDING',
     total: 125000,
     notes: 'Valores sujetos a revisión',
+    hasWorkOrder: false,
     items: [
       {
         id: 31,

@@ -12,6 +12,7 @@ import com.mechanicmanager.quotes.repository.QuoteRepository;
 import com.mechanicmanager.shared.exception.ResourceNotFoundException;
 import com.mechanicmanager.vehicles.model.Vehicle;
 import com.mechanicmanager.vehicles.repository.VehicleRepository;
+import com.mechanicmanager.workorders.repository.WorkOrderRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +28,7 @@ public class UpdateQuoteUseCase {
     private final VehicleRepository vehicleRepository;
     private final QuoteItemFactory quoteItemFactory;
     private final QuoteMapper quoteMapper;
+    private final WorkOrderRepository workOrderRepository;
 
     @Transactional
     public QuoteResponse execute(
@@ -61,7 +63,10 @@ public class UpdateQuoteUseCase {
         quote.setNotes(trimToNull(request.notes()));
         quote.replaceItems(items);
 
-        return quoteMapper.toResponse(quoteRepository.save(quote));
+        return quoteMapper.toResponse(
+                quoteRepository.save(quote),
+                workOrderRepository.existsByQuoteIdAndUserId(quoteId, userId)
+        );
     }
 
     private void validateVehicleCustomer(Vehicle vehicle, Customer customer) {

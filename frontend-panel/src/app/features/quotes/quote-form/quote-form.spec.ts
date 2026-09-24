@@ -35,6 +35,7 @@ describe('QuoteForm', () => {
     status: 'APPROVED',
     total: 10000,
     notes: null,
+    hasWorkOrder: false,
     items: [
       {
         id: 31,

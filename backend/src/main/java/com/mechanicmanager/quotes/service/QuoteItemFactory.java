@@ -11,12 +11,35 @@ import com.mechanicmanager.supplies.repository.SupplyRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
+import java.util.List;
+
 @Component
 @RequiredArgsConstructor
 public class QuoteItemFactory {
 
     private final ServiceTypeRepository serviceTypeRepository;
     private final SupplyRepository supplyRepository;
+
+    /**
+     * Crea todos los ítems y verifica que el total no quede negativo: un
+     * descuento manual mayor a lo que descuenta no es un importe válido.
+     */
+    public List<QuoteItem> createAll(Long userId, List<QuoteItemRequest> requests) {
+        List<QuoteItem> items = requests.stream()
+                .map(request -> create(userId, request))
+                .toList();
+
+        BigDecimal total = items.stream()
+                .map(QuoteItem::getSubtotal)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        if (total.signum() < 0) {
+            throw new InvalidQuoteException("El descuento no puede superar el total del presupuesto");
+        }
+
+        return items;
+    }
 
     public QuoteItem create(Long userId, QuoteItemRequest request) {
         validateSingleSource(request);

@@ -53,9 +53,7 @@ public class CreateWorkOrderUseCase {
         Appointment appointment = findAppointment(userId, request.appointmentId(), vehicle);
         Quote quote = findQuote(userId, request.quoteId(), vehicle);
 
-        List<WorkOrderItem> items = request.items().stream()
-                .map(item -> workOrderItemFactory.create(userId, item))
-                .toList();
+        List<WorkOrderItem> items = workOrderItemFactory.createAll(userId, request.items());
 
         WorkOrder workOrder = WorkOrder.builder()
                 .user(user)

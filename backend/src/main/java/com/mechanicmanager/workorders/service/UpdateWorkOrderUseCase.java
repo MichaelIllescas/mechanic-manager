@@ -32,9 +32,7 @@ public class UpdateWorkOrderUseCase {
                         "No se encontró la orden de trabajo indicada"
                 ));
 
-        List<WorkOrderItem> items = request.items().stream()
-                .map(item -> workOrderItemFactory.create(userId, item))
-                .toList();
+        List<WorkOrderItem> items = workOrderItemFactory.createAll(userId, request.items());
 
         workOrder.setPerformedAt(request.performedAt());
         workOrder.setMileage(request.mileage());

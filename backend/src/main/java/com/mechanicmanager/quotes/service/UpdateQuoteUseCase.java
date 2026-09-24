@@ -53,9 +53,7 @@ public class UpdateQuoteUseCase {
 
         validateVehicleCustomer(vehicle, customer);
 
-        List<QuoteItem> items = request.items().stream()
-                .map(item -> quoteItemFactory.create(userId, item))
-                .toList();
+        List<QuoteItem> items = quoteItemFactory.createAll(userId, request.items());
 
         quote.setCustomer(customer);
         quote.setVehicle(vehicle);

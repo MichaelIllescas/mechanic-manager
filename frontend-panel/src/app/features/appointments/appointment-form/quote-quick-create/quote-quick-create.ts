@@ -4,6 +4,7 @@ import { FormArray, FormBuilder, ReactiveFormsModule, Validators } from '@angula
 import { switchMap } from 'rxjs';
 
 import { NotificationService } from '../../../../core/notifications/notification-service';
+import { nonNegativeTotal } from '../../../../shared/utils/items-total';
 import { QuoteItemsEditor } from '../../../quotes/quote-form/quote-items-editor/quote-items-editor';
 import { QuoteService } from '../../../quotes/quote-service';
 import { CreateQuoteRequest, Quote } from '../../../quotes/quote.models';
@@ -38,7 +39,7 @@ export class QuoteQuickCreate {
   readonly form = this.fb.group({
     validUntil: [''],
     notes: ['', Validators.maxLength(2000)],
-    items: this.fb.array([], Validators.required),
+    items: this.fb.array([], [Validators.required, nonNegativeTotal]),
   });
 
   get items(): FormArray {
@@ -50,6 +51,8 @@ export class QuoteQuickCreate {
       this.form.markAllAsTouched();
       if (this.items.length === 0) {
         this.errorMessage.set('Agregá al menos un servicio o insumo');
+      } else if (this.items.hasError('negativeTotal')) {
+        this.errorMessage.set('El descuento no puede superar el total del presupuesto');
       }
       return;
     }

@@ -51,4 +51,24 @@ class WorkOrderItemFactoryTest {
                 .isInstanceOf(InvalidWorkOrderException.class)
                 .hasMessage("El precio de un servicio o insumo no puede ser negativo");
     }
+
+    private WorkOrderItemRequest manual(String description, String unitPrice) {
+        return new WorkOrderItemRequest(null, null, description, BigDecimal.ONE, new BigDecimal(unitPrice));
+    }
+
+    @Test
+    void acceptsADiscountThatKeepsTheTotalPositive() {
+        var items = factory.createAll(7L, java.util.List.of(manual("Mano de obra", "1500"), manual("Descuento", "-500")));
+
+        assertThat(items).hasSize(2);
+    }
+
+    @Test
+    void rejectsADiscountLargerThanTheTotal() {
+        var requests = java.util.List.of(manual("Mano de obra", "1500"), manual("Descuento", "-4500"));
+
+        assertThatThrownBy(() -> factory.createAll(7L, requests))
+                .isInstanceOf(InvalidWorkOrderException.class)
+                .hasMessage("El descuento no puede superar el total del trabajo realizado");
+    }
 }

@@ -11,12 +11,36 @@ import com.mechanicmanager.workorders.model.WorkOrderItem;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
+import java.util.List;
+
 @Component
 @RequiredArgsConstructor
 public class WorkOrderItemFactory {
 
     private final ServiceTypeRepository serviceTypeRepository;
     private final SupplyRepository supplyRepository;
+
+    /**
+     * Crea todos los ítems y verifica que el total no quede negativo: un
+     * descuento manual mayor a lo que descuenta no es un importe válido.
+     */
+    public List<WorkOrderItem> createAll(Long userId, List<WorkOrderItemRequest> requests) {
+        List<WorkOrderItem> items = requests.stream()
+                .map(request -> create(userId, request))
+                .toList();
+
+        BigDecimal total = items.stream()
+                .map(WorkOrderItem::getSubtotal)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        if (total.signum() < 0) {
+            throw new InvalidWorkOrderException(
+                    "El descuento no puede superar el total del trabajo realizado");
+        }
+
+        return items;
+    }
 
     public WorkOrderItem create(Long userId, WorkOrderItemRequest request) {
         validateSingleSource(request);

@@ -146,6 +146,11 @@
   <div class="total">
     <span>Total estimado</span><strong>$ {{ total() }}</strong>
   </div>
+  @if (total() < 0) {
+    <p class="items-error" role="alert">
+      El descuento supera el total del presupuesto. Reducí el descuento para poder guardar.
+    </p>
+  }
 </section>
 @if (creationMode() === 'service') {
   <app-service-quick-create (saved)="serviceCreated($event)" (cancelled)="creationMode.set(null)" />

@@ -54,9 +54,7 @@ public class CreateQuoteUseCase {
 
         validateVehicleCustomer(vehicle, customer);
 
-        List<QuoteItem> items = request.items().stream()
-                .map(item -> quoteItemFactory.create(userId, item))
-                .toList();
+        List<QuoteItem> items = quoteItemFactory.createAll(userId, request.items());
 
         Quote quote = Quote.builder()
                 .user(user)

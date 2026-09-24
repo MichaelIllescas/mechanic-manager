@@ -4,6 +4,8 @@ import { FormArray, FormBuilder, ReactiveFormsModule, Validators } from '@angula
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 import { NotificationService } from '../../../core/notifications/notification-service';
+import { nonNegativeTotal } from '../../../shared/utils/items-total';
+import { scrollToFirstError } from '../../../shared/utils/scroll-to-error';
 import { QuoteService } from '../quote-service';
 import { CreateQuoteRequest, QuoteItemRequest } from '../quote.models';
 import { QuoteItemsEditor } from './quote-items-editor/quote-items-editor';
@@ -35,7 +37,7 @@ export class QuoteForm implements OnInit {
     vehicleId: [null as number | null, [Validators.required, Validators.min(1)]],
     validUntil: [''],
     notes: ['', Validators.maxLength(2000)],
-    items: this.fb.array([], Validators.required),
+    items: this.fb.array([], [Validators.required, nonNegativeTotal]),
   });
 
   get items(): FormArray {
@@ -60,6 +62,10 @@ export class QuoteForm implements OnInit {
     if (this.form.invalid || this.items.length === 0 || this.loading()) {
       this.form.markAllAsTouched();
       if (this.items.length === 0) this.errorMessage.set('Agregá al menos un servicio o insumo');
+      else if (this.items.hasError('negativeTotal')) {
+        this.errorMessage.set('El descuento no puede superar el total del presupuesto');
+      }
+      scrollToFirstError();
       return;
     }
 
@@ -84,6 +90,7 @@ export class QuoteForm implements OnInit {
           error.error?.message ??
             `No se pudo ${this.isEdit() ? 'actualizar' : 'crear'} el presupuesto`,
         );
+        scrollToFirstError();
       },
     });
   }

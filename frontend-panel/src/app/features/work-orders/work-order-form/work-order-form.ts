@@ -10,6 +10,9 @@ import {
 import { FormArray, FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
+import { nonNegativeTotal } from '../../../shared/utils/items-total';
+import { scrollToFirstError } from '../../../shared/utils/scroll-to-error';
+
 import { NotificationService } from '../../../core/notifications/notification-service';
 import { QuoteService } from '../../quotes/quote-service';
 import { VehicleService } from '../../vehicles/vehicle-service';
@@ -70,7 +73,7 @@ export class WorkOrderForm implements OnInit {
     performedAt: ['', [Validators.required]],
     mileage: [null as number | null, [Validators.min(0)]],
     notes: ['', Validators.maxLength(2000)],
-    items: this.fb.array([], Validators.required),
+    items: this.fb.array([], [Validators.required, nonNegativeTotal]),
   });
 
   get items(): FormArray {
@@ -101,6 +104,10 @@ export class WorkOrderForm implements OnInit {
     if (this.form.invalid || this.items.length === 0 || this.loading()) {
       this.form.markAllAsTouched();
       if (this.items.length === 0) this.errorMessage.set('Agregá al menos un servicio o insumo');
+      else if (this.items.hasError('negativeTotal')) {
+        this.errorMessage.set('El descuento no puede superar el total del trabajo realizado');
+      }
+      scrollToFirstError();
       return;
     }
 
@@ -140,6 +147,7 @@ export class WorkOrderForm implements OnInit {
           error.error?.message ??
             `No se pudo ${this.isEdit() ? 'actualizar' : 'registrar'} el trabajo`,
         );
+        scrollToFirstError();
       },
     });
   }

@@ -123,11 +123,25 @@
 }
 
 .login-form__link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
   color: inherit;
   font-size: 0.9rem;
   text-align: center;
   text-decoration: underline;
   opacity: 0.75;
+}
+
+.login-form__link svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2.2;
 }
 
 .login-form__link:hover {

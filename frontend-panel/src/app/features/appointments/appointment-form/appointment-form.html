@@ -1,16 +1,5 @@
 <main class="appointment-form-page">
   <section class="appointment-form-header">
-    <a
-      class="appointment-form-header__back"
-      routerLink="/appointments"
-      aria-label="Volver a turnos"
-    >
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path d="m15 18-6-6 6-6" />
-      </svg>
-      Volver
-    </a>
-
     <p class="appointment-form-header__eyebrow">Taller</p>
     <h1>{{ isEdit() ? 'Reprogramar turno' : 'Nuevo turno' }}</h1>
     <p>
@@ -82,6 +71,7 @@
                       (focus)="openVehicleResults()"
                     />
                     <button type="button" (click)="openVehicleQuickCreate()">
+                      <span aria-hidden="true">+</span>
                       Registrar vehículo
                     </button>
                   </div>
@@ -102,6 +92,7 @@
                         <li class="vehicle-picker__empty">
                           <span>No encontramos vehículos.</span>
                           <button type="button" (click)="openVehicleQuickCreate()">
+                            <span aria-hidden="true">+</span>
                             Registrar vehículo
                           </button>
                         </li>
@@ -139,7 +130,10 @@
               } @else if (selectedVehicleId()) {
                 <div class="quote-missing">
                   <span>Este vehículo no tiene un presupuesto aprobado.</span>
-                  <button type="button" (click)="openQuoteQuickCreate()">Crear presupuesto</button>
+                  <button type="button" (click)="openQuoteQuickCreate()">
+                    <span aria-hidden="true">+</span>
+                    Crear presupuesto
+                  </button>
                 </div>
               }
             }

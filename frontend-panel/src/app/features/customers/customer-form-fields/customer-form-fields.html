@@ -193,7 +193,14 @@
           {{ cancelLabel() }}
         </button>
         <button class="button button--primary" type="submit" [disabled]="form.invalid || saving()">
-          {{ saving() ? 'Guardando...' : isEdit() ? 'Guardar cambios' : 'Registrar cliente' }}
+          @if (saving()) {
+            Guardando...
+          } @else if (isEdit()) {
+            Guardar cambios
+          } @else {
+            <span aria-hidden="true">+</span>
+            Registrar cliente
+          }
         </button>
       </div>
     </form>

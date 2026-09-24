@@ -14,26 +14,6 @@
   padding: 10px 2px 0;
 }
 
-.supply-form-header__back {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  margin-bottom: 22px;
-  color: #078cf0;
-  font-weight: 800;
-  text-decoration: none;
-}
-
-.supply-form-header__back svg {
-  width: 18px;
-  height: 18px;
-  fill: none;
-  stroke: currentColor;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  stroke-width: 2.4;
-}
-
 .supply-form-header__eyebrow {
   margin: 0 0 10px;
   color: #078cf0;

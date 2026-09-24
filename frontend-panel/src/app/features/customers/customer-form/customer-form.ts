@@ -1,6 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 import { CustomerFormFields } from '../customer-form-fields/customer-form-fields';
 import { CustomerService } from '../customer-service';
@@ -8,7 +8,7 @@ import { Customer } from '../customer.models';
 
 @Component({
   selector: 'app-customer-form',
-  imports: [CustomerFormFields, RouterLink],
+  imports: [CustomerFormFields],
   templateUrl: './customer-form.html',
   styleUrl: './customer-form.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

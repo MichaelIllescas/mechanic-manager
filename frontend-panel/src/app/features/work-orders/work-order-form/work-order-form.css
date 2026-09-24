@@ -25,19 +25,19 @@
   margin-top: 12px;
   color: #5f708a;
 }
-.page-header a,
 .form-actions a,
 .form-actions button {
   min-height: 42px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 8px;
   padding: 0 16px;
   border-radius: 8px;
   font-weight: 800;
   text-decoration: none;
 }
-.page-header a,
+
 .form-actions a {
   border: 1px solid #c8d7eb;
   color: #0759a8;
@@ -240,9 +240,6 @@ form {
   .page-header {
     align-items: stretch;
     flex-direction: column;
-  }
-  .page-header a {
-    width: 100%;
   }
   .metadata-card {
     padding: 18px;

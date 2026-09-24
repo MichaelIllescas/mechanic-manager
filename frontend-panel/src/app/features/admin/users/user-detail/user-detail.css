@@ -18,14 +18,6 @@
   margin-bottom: 26px;
 }
 
-.user-detail__back {
-  display: inline-flex;
-  margin-bottom: 22px;
-  color: #078cf0;
-  font-weight: 800;
-  text-decoration: none;
-}
-
 .user-detail-header__eyebrow {
   margin: 0 0 10px;
   color: #078cf0;
@@ -186,29 +178,6 @@
   overflow-wrap: anywhere;
 }
 
-.profile-card__footer {
-  display: flex;
-  justify-content: flex-end;
-  padding: 0 28px 28px;
-}
-
-.button {
-  min-height: 44px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 18px;
-  border-radius: 8px;
-  font-weight: 800;
-  text-decoration: none;
-}
-
-.button--secondary {
-  border: 1px solid #c8d7eb;
-  color: #172a45;
-  background: #ffffff;
-}
-
 @media (max-width: 720px) {
   .user-detail-page {
     padding: 24px 16px;
@@ -233,11 +202,4 @@
     grid-column: auto;
   }
 
-  .profile-card__footer {
-    padding: 0 22px 22px;
-  }
-
-  .button {
-    width: 100%;
-  }
 }

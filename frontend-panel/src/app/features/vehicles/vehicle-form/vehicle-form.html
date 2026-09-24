@@ -1,12 +1,5 @@
 <main class="vehicle-form-page">
   <section class="vehicle-form-header">
-    <a class="vehicle-form-header__back" routerLink="/vehicles" aria-label="Volver a vehículos">
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path d="m15 18-6-6 6-6" />
-      </svg>
-      Volver
-    </a>
-
     <p class="vehicle-form-header__eyebrow">Taller</p>
     <h1>{{ isEdit() ? 'Editar vehículo' : 'Nuevo vehículo' }}</h1>
     <p>
@@ -92,6 +85,7 @@
                       <div class="customer-picker__no-results">
                         <p>No encontramos clientes con esa búsqueda.</p>
                         <button type="button" (click)="openCustomerModal()">
+                          <span aria-hidden="true">+</span>
                           Registrar nuevo cliente
                         </button>
                       </div>
@@ -251,7 +245,14 @@
             type="submit"
             [disabled]="form.invalid || saving() || customers().length === 0"
           >
-            {{ saving() ? 'Guardando...' : isEdit() ? 'Guardar cambios' : 'Registrar vehículo' }}
+            @if (saving()) {
+              Guardando...
+            } @else if (isEdit()) {
+              Guardar cambios
+            } @else {
+              <span aria-hidden="true">+</span>
+              Registrar vehículo
+            }
           </button>
         </div>
       </form>

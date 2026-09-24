@@ -10,18 +10,18 @@
 .work-order-detail-toolbar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   gap: 20px;
   margin-bottom: 20px;
 }
 
-.toolbar-back,
 .toolbar-actions a,
 .toolbar-actions button {
   min-height: 42px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 8px;
   padding: 0 16px;
   border-radius: 8px;
   font-weight: 800;
@@ -29,7 +29,6 @@
   cursor: pointer;
 }
 
-.toolbar-back,
 .toolbar-actions a {
   border: 1px solid #c8d7eb;
   color: #0759a8;

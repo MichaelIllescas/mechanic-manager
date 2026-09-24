@@ -1,11 +1,5 @@
 <main class="service-form-page">
   <section class="service-form-header">
-    <a class="service-form-header__back" routerLink="/servicios" aria-label="Volver al catalogo">
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path d="m15 18-6-6 6-6" />
-      </svg>
-      Volver
-    </a>
     <p class="service-form-header__eyebrow">Taller</p>
     <h1>{{ isEdit() ? 'Editar servicio' : 'Nuevo servicio' }}</h1>
     <p>
@@ -89,7 +83,14 @@
       <div class="service-form__actions">
         <a class="button button--secondary" routerLink="/servicios">Cancelar</a>
         <button class="button button--primary" type="submit" [disabled]="form.invalid || loading()">
-          {{ loading() ? 'Guardando...' : isEdit() ? 'Guardar cambios' : 'Crear servicio' }}
+          @if (loading()) {
+            Guardando...
+          } @else if (isEdit()) {
+            Guardar cambios
+          } @else {
+            <span aria-hidden="true">+</span>
+            Crear servicio
+          }
         </button>
       </div>
     </form>

@@ -47,7 +47,12 @@
         [disabled]="saving()"
         (click)="save()"
       >
-        {{ saving() ? 'Guardando...' : 'Registrar y seleccionar' }}
+        @if (saving()) {
+          Guardando...
+        } @else {
+          <span aria-hidden="true">+</span>
+          Registrar y seleccionar
+        }
       </button>
     </footer>
   </section>

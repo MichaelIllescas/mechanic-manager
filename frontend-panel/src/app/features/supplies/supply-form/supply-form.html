@@ -1,11 +1,5 @@
 <main class="supply-form-page">
   <section class="supply-form-header">
-    <a class="supply-form-header__back" routerLink="/insumos" aria-label="Volver al catalogo">
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path d="m15 18-6-6 6-6" />
-      </svg>
-      Volver
-    </a>
     <p class="supply-form-header__eyebrow">Taller</p>
     <h1>{{ isEdit() ? 'Editar insumo' : 'Nuevo insumo' }}</h1>
     <p>
@@ -79,7 +73,14 @@
       <div class="supply-form__actions">
         <a class="button button--secondary" routerLink="/insumos">Cancelar</a>
         <button class="button button--primary" type="submit" [disabled]="form.invalid || loading()">
-          {{ loading() ? 'Guardando...' : isEdit() ? 'Guardar cambios' : 'Crear insumo' }}
+          @if (loading()) {
+            Guardando...
+          } @else if (isEdit()) {
+            Guardar cambios
+          } @else {
+            <span aria-hidden="true">+</span>
+            Crear insumo
+          }
         </button>
       </div>
     </form>

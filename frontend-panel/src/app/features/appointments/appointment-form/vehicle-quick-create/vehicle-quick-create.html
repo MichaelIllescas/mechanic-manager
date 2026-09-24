@@ -73,7 +73,10 @@
             (focus)="customerResultsOpen.set(true)"
             (input)="onCustomerSearch($any($event.target).value)"
           />
-          <button type="button" (click)="startCustomerCreation()">Nuevo cliente</button>
+          <button type="button" (click)="startCustomerCreation()">
+            <span aria-hidden="true">+</span>
+            Nuevo cliente
+          </button>
         </div>
 
         @if (customerResultsOpen() && customerSearch().trim()) {
@@ -86,7 +89,10 @@
             } @empty {
               <div class="customer-results__empty">
                 <span>No encontramos clientes.</span>
-                <button type="button" (click)="startCustomerCreation()">Registrar cliente</button>
+                <button type="button" (click)="startCustomerCreation()">
+                  <span aria-hidden="true">+</span>
+                  Registrar cliente
+                </button>
               </div>
             }
           </div>
@@ -145,7 +151,12 @@
         [disabled]="savingVehicle() || creatingCustomer()"
         (click)="saveVehicle()"
       >
-        {{ savingVehicle() ? 'Guardando...' : 'Registrar y seleccionar' }}
+        @if (savingVehicle()) {
+          Guardando...
+        } @else {
+          <span aria-hidden="true">+</span>
+          Registrar y seleccionar
+        }
       </button>
     </footer>
   </div>

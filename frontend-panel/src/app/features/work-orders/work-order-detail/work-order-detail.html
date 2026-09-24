@@ -1,7 +1,5 @@
 <main class="work-order-detail-page">
   <section class="work-order-detail-toolbar no-print">
-    <a class="toolbar-back" routerLink="/work-orders">Volver a trabajos realizados</a>
-
     @if (workOrder(); as current) {
       <div class="toolbar-actions">
         <a [routerLink]="['/work-orders', current.id, 'editar']">Editar</a>

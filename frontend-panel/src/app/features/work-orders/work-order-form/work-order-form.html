@@ -4,7 +4,6 @@
       <p>Trabajos realizados</p>
       <h1>{{ isEdit() ? 'Editar trabajo realizado' : 'Registrar trabajo realizado' }}</h1>
     </div>
-    <a routerLink="/work-orders">Volver al listado</a>
   </header>
 
   @if (errorMessage()) {
@@ -112,7 +111,14 @@
       <footer class="form-actions">
         <a routerLink="/work-orders">Cancelar</a>
         <button type="submit" [disabled]="saving()">
-          {{ saving() ? 'Guardando...' : isEdit() ? 'Guardar cambios' : 'Registrar trabajo' }}
+          @if (saving()) {
+            Guardando...
+          } @else if (isEdit()) {
+            Guardar cambios
+          } @else {
+            <span aria-hidden="true">+</span>
+            Registrar trabajo
+          }
         </button>
       </footer>
     </form>

@@ -1,14 +1,14 @@
 import { DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 
 import { UserService } from '../user-service';
 import { User } from '../user.models';
 
 @Component({
   selector: 'app-user-detail',
-  imports: [DatePipe, RouterLink],
+  imports: [DatePipe],
   templateUrl: './user-detail.html',
   styleUrl: './user-detail.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

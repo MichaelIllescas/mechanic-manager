@@ -1,7 +1,5 @@
 <main class="quote-detail-page">
   <section class="quote-detail-toolbar no-print">
-    <a class="toolbar-back" routerLink="/quotes">Volver a presupuestos</a>
-
     <div class="toolbar-actions">
       @if (quote(); as currentQuote) {
         <a [routerLink]="['/quotes', currentQuote.id, 'editar']">Editar</a>
@@ -11,6 +9,7 @@
             [routerLink]="['/work-orders/nuevo']"
             [queryParams]="{ vehicleId: currentQuote.vehicleId, quoteId: currentQuote.id }"
           >
+            <span aria-hidden="true">+</span>
             Registrar trabajo realizado
           </a>
         }

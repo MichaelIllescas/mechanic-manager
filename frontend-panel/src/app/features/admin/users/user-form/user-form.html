@@ -1,11 +1,5 @@
 <main class="user-form-page">
   <section class="user-form-header">
-    <a class="user-form-header__back" routerLink="/admin/usuarios" aria-label="Volver al listado">
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path d="m15 18-6-6 6-6" />
-      </svg>
-      Volver
-    </a>
     <p class="user-form-header__eyebrow">Administracion</p>
     <h1>{{ isEdit() ? 'Editar usuario' : 'Nuevo usuario' }}</h1>
     <p>
@@ -107,7 +101,14 @@
       <div class="user-form__actions">
         <a class="button button--secondary" routerLink="/admin/usuarios">Cancelar</a>
         <button class="button button--primary" type="submit" [disabled]="form.invalid || loading()">
-          {{ loading() ? 'Guardando...' : isEdit() ? 'Guardar cambios' : 'Crear usuario' }}
+          @if (loading()) {
+            Guardando...
+          } @else if (isEdit()) {
+            Guardar cambios
+          } @else {
+            <span aria-hidden="true">+</span>
+            Crear usuario
+          }
         </button>
       </div>
     </form>

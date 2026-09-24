@@ -4,7 +4,6 @@
       <p>Presupuestos</p>
       <h1>{{ isEdit() ? 'Editar presupuesto' : 'Nuevo presupuesto' }}</h1>
     </div>
-    <a routerLink="/quotes">Volver al listado</a>
   </header>
 
   @if (errorMessage()) {
@@ -45,7 +44,14 @@
       <footer class="form-actions">
         <a routerLink="/quotes">Cancelar</a>
         <button type="submit" [disabled]="saving()">
-          {{ saving() ? 'Guardando...' : isEdit() ? 'Guardar cambios' : 'Crear presupuesto' }}
+          @if (saving()) {
+            Guardando...
+          } @else if (isEdit()) {
+            Guardar cambios
+          } @else {
+            <span aria-hidden="true">+</span>
+            Crear presupuesto
+          }
         </button>
       </footer>
     </form>

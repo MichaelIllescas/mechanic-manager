@@ -10,7 +10,10 @@
       <button type="button" class="button button--secondary" (click)="loadSummary()" [disabled]="loading()">
         Actualizar
       </button>
-      <a class="button button--primary" routerLink="/appointments/nuevo">Nuevo turno</a>
+      <a class="button button--primary" routerLink="/appointments/nuevo">
+        <span aria-hidden="true">+</span>
+        Nuevo turno
+      </a>
     </div>
   </header>
 
@@ -114,10 +117,10 @@
         </div>
 
         <nav class="quick-actions" aria-label="Acciones rápidas">
-          <a routerLink="/customers/nuevo"><strong>Nuevo cliente</strong><span>Registrar datos de contacto</span></a>
-          <a routerLink="/vehicles/nuevo"><strong>Nuevo vehículo</strong><span>Asociarlo con un cliente</span></a>
-          <a routerLink="/quotes/nuevo"><strong>Nuevo presupuesto</strong><span>Cotizar servicios e insumos</span></a>
-          <a routerLink="/work-orders/nuevo"><strong>Registrar trabajo</strong><span>Agregarlo al historial</span></a>
+          <a routerLink="/customers/nuevo"><strong><span aria-hidden="true">+</span> Nuevo cliente</strong><span>Registrar datos de contacto</span></a>
+          <a routerLink="/vehicles/nuevo"><strong><span aria-hidden="true">+</span> Nuevo vehículo</strong><span>Asociarlo con un cliente</span></a>
+          <a routerLink="/quotes/nuevo"><strong><span aria-hidden="true">+</span> Nuevo presupuesto</strong><span>Cotizar servicios e insumos</span></a>
+          <a routerLink="/work-orders/nuevo"><strong><span aria-hidden="true">+</span> Registrar trabajo</strong><span>Agregarlo al historial</span></a>
         </nav>
       </aside>
     </div>

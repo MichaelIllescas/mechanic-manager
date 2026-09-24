@@ -45,13 +45,15 @@ El control de stock permanece Post-MVP (`PB-36`).
 - se agrega un segundo catálogo en lugar de unificar ambos en una entidad genérica. La unificación se descartó: el stock, cuando llegue, colgará únicamente de `Supply`;
 - un catálogo sin existencias puede leerse como funcionalidad incompleta por parte del usuario del taller. Es el recorte consciente que separa esta decisión de `PB-36`.
 
-## Pendiente
+## Pendiente (resuelto en ADR-011)
 
 Cómo un `QuoteItem` o un `WorkOrderItem` referencia a un `Supply` **no forma parte de esta decisión** y no está resuelto.
 
 En particular queda abierto si el ítem debe distinguir explícitamente mano de obra de materiales, lo que condiciona la posibilidad de discriminar ambos importes en un presupuesto. Se registrará en un ADR posterior.
 
 Hasta entonces, `ServiceType` sigue siendo el único origen de catálogo que un ítem puede referenciar.
+
+**Resuelto:** ADR-011 define que un ítem referencia como máximo un origen de catálogo, un servicio o un insumo, y que un ítem sin origen es manual.
 
 ## Relación con ADR-002 y ADR-009
 

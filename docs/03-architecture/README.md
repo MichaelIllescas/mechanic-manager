@@ -19,7 +19,7 @@ Documentación técnica y arquitectónica del sistema.
 - OpenAPI + Swagger UI.
 - JUnit 5 + Mockito + Testcontainers.
 - Frontend Angular 21 + TypeScript + RxJS.
-- Docker + Docker Compose.
+- Docker Compose para la base de datos local (empaquetado de la aplicación pendiente).
 
 ## Contenido
 

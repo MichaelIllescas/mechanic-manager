@@ -1,6 +1,6 @@
 # Product Scope / MVP Scope
 
-**Versión:** 1.3  
+**Versión:** 1.4  
 **Estado:** MVP simplificado para validación
 
 ---
@@ -23,7 +23,7 @@ SYSTEM_ADMIN -> administra usuarios de la plataforma
 USER -> administra 1 Taller
 
 USER -> posee clientes, vehículos, turnos, presupuestos,
-        catálogo de servicios y órdenes de trabajo
+        catálogos de servicios e insumos y trabajos realizados
 ```
 
 Reglas iniciales:
@@ -43,6 +43,9 @@ Reglas iniciales:
 
 - Administración de cuentas de usuario por `SYSTEM_ADMIN`.
 - Inicio de sesión.
+- Recuperación de contraseña por email y cambio de la propia contraseña.
+- Contraseña temporal en las cuentas nuevas: hay que cambiarla en el primer ingreso.
+- Límite de intentos en el inicio de sesión y en la recuperación de contraseña.
 - Autorización básica por rol.
 - Roles iniciales:
   - `SYSTEM_ADMIN`
@@ -120,8 +123,10 @@ Funciones:
 - crear turno sobre un vehículo;
 - consultar agenda por fecha;
 - reprogramar;
-- completar;
-- cancelar.
+- vincular un presupuesto aprobado del mismo vehículo al crear el turno;
+- completar, lo que registra automáticamente el trabajo realizado (sección 3.9);
+- cancelar;
+- eliminar: el presupuesto y el trabajo vinculados se conservan, sin turno.
 
 Estados iniciales:
 
@@ -133,7 +138,7 @@ No incluye:
 
 - validación de solapamiento de horarios;
 - confirmación previa del cliente ni recordatorios;
-- detalle de los trabajos a realizar: el motivo va como nota libre y el detalle surge del presupuesto o de la orden de trabajo.
+- detalle de los trabajos a realizar: el motivo va como nota libre y el detalle surge del presupuesto o del trabajo realizado.
 
 ### 3.6 Presupuestos
 
@@ -141,21 +146,31 @@ Funciones:
 
 - crear presupuesto;
 - asociar cliente y vehículo;
-- agregar ítems;
-- registrar cantidades;
-- registrar precios;
+- agregar ítems tomándolos del catálogo de servicios o del de insumos, o describiéndolos libremente;
+- registrar cantidades y precios;
+- registrar descuentos como ítems manuales con precio negativo;
 - calcular subtotales y total;
-- consultar presupuestos;
+- consultar y buscar presupuestos, con filtro por estado y paginación;
+- editar y eliminar;
 - gestionar estado;
-- tomar ítems del catálogo de servicios o describirlos libremente;
-- vincular presupuesto aprobado a una orden de trabajo.
+- vincular un presupuesto aprobado a un turno;
+- descargar un comprobante del presupuesto.
 
-Estados iniciales:
+Estados:
 
-- `DRAFT`
-- `SENT`
+- `PENDING` (inicial)
 - `APPROVED`
 - `REJECTED`
+
+Reglas:
+
+- cada presupuesto recibe un número correlativo propio de su usuario, que empieza en 1;
+- un ítem tiene como origen un servicio, un insumo o es manual; nunca dos a la vez (ADR-011);
+- el precio de un ítem de catálogo no puede ser negativo; sólo un ítem manual puede serlo, para representar un descuento;
+- el total no puede ser negativo ni superar el importe máximo que admite la base;
+- un presupuesto puede pasar de cualquier estado a cualquier otro y editarse en cualquier estado;
+- excepción: un presupuesto que ya tiene un trabajo realizado no puede cambiar de estado;
+- al crearlo se puede fijar una vigencia que no puede ser anterior a hoy; al editarlo no se vuelve a exigir, para poder corregir un presupuesto vencido.
 
 ### 3.7 Catálogo de servicios
 
@@ -193,48 +208,59 @@ Reglas iniciales:
 
 El MVP incluye el catálogo con sus precios, no el control de existencias. Cuántas unidades hay en el taller queda fuera del alcance.
 
-### 3.9 Órdenes de trabajo
+### 3.9 Trabajos realizados
 
-Una orden de trabajo es el ingreso concreto de un vehículo al taller.
+Un trabajo realizado registra lo que efectivamente se hizo sobre un vehículo. En el código es `WorkOrder` (ver ADR-011). No tiene ciclo de vida: nace completado.
 
 Funciones:
 
-- registrar ingreso;
-- registrar kilometraje;
-- registrar motivo;
-- registrar diagnóstico;
-- registrar los servicios y repuestos realizados como ítems;
+- registrar un trabajo realizado sobre un vehículo, con fecha y kilometraje opcional;
+- registrar los servicios y repuestos realizados como ítems, con la misma forma que los de un presupuesto;
 - registrar observaciones;
-- calcular total;
-- actualizar estado;
-- consultar órdenes abiertas;
-- vincular presupuesto aprobado cuando corresponda.
+- calcular el total a partir de los ítems;
+- vincularlo a un turno y/o a un presupuesto aprobado del mismo vehículo;
+- consultar y buscar, con filtros por estado, vehículo y rango de fechas, y paginación;
+- editar y eliminar;
+- marcarlo como cancelado o volver a marcarlo como completado;
+- descargar un comprobante del trabajo.
 
-Estados iniciales:
+Estados:
 
-- `PENDING`
-- `IN_PROGRESS`
-- `FINISHED`
-- `DELIVERED`
+- `COMPLETED` (inicial)
+- `CANCELLED`
+
+Reglas:
+
+- puede crearse a mano o de forma automática al completar un turno (sección 3.5);
+- al completar un turno, si tiene un presupuesto aprobado que todavía no originó otro trabajo, sus ítems se copian al trabajo; si no, el trabajo nace sin ítems para completarlo a mano;
+- un turno y un presupuesto originan como máximo un trabajo realizado;
+- los ítems se copian y no se referencian: el presupuesto queda intacto como referencia histórica aunque lo realizado difiera.
 
 ### 3.10 Historial
 
 Funciones:
 
-- consultar órdenes de trabajo anteriores de un vehículo;
-- ordenarlas cronológicamente;
-- visualizar información técnica relevante.
+- consultar los trabajos realizados de un vehículo o de un cliente;
+- ordenarlos cronológicamente, del más reciente al más antiguo;
+- descargar el comprobante de cada trabajo.
 
 Información mínima:
 
 - fecha;
 - kilometraje;
-- motivo;
-- diagnóstico;
 - servicios y repuestos realizados;
 - total;
 - estado;
 - presupuesto asociado cuando exista.
+
+### 3.11 Panel de inicio
+
+Resumen operativo del usuario al ingresar:
+
+- turnos del día y su agenda;
+- presupuestos pendientes y cuántos de ellos están vencidos;
+- trabajos completados en el mes;
+- cantidad de vehículos registrados.
 
 ---
 
@@ -270,6 +296,8 @@ Quedan explícitamente fuera de la primera versión:
 - reportes analíticos avanzados;
 - aplicación móvil nativa;
 - billing automatizado del SaaS;
-- planes comerciales automatizados.
+- planes comerciales automatizados;
+- ciclo de vida de la orden de trabajo (en curso, finalizada, entregada);
+- motivo de ingreso y diagnóstico estructurados.
 
 Estas capacidades podrán evaluarse después de validar el núcleo funcional con clientes reales.

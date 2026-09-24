@@ -32,6 +32,9 @@ JwtAuthenticationFilter
         └── SecurityContextHolder.setAuthentication()
         │
         ▼
+PasswordChangeRequiredFilter   corta con 403 si la contraseña es temporal
+        │
+        ▼
 SecurityFilterChain  ──►  Controller
 ```
 
@@ -42,6 +45,8 @@ SecurityFilterChain  ──►  Controller
 | `SecurityConfig` | Filter chain, reglas de acceso por ruta, `PasswordEncoder`, `AuthenticationManager` |
 | `JwtService` | Firma y verificación de tokens HS256 |
 | `JwtAuthenticationFilter` | Lee el token de cada request y puebla el `SecurityContext` |
+| `PasswordChangeRequiredFilter` | Mientras la cuenta tenga contraseña temporal, rechaza con 403 todo salvo `POST /auth/change-password` |
+| `AttemptLimiter` | Cuenta eventos por clave en una ventana deslizante, en memoria. Lo usa `auth` para limitar intentos |
 | `AuthenticatedUser` | El `UserDetails` de la aplicación. Es el principal autenticado |
 | `AppUserDetailsService` | Carga el usuario por email para Spring Security |
 | `RestAuthenticationEntryPoint` | Responde 401 en JSON cuando falta autenticación |
@@ -91,6 +96,24 @@ justifica, la salida más barata es incluir en el token una huella de la
 contraseña vigente y compararla en `JwtAuthenticationFilter`: no requiere
 migración ni consultas extra.
 
+**Una contraseña temporal solo permite cambiarla.**
+Cuando un administrador crea una cuenta, esta queda con `mustChangePassword`.
+`PasswordChangeRequiredFilter` responde 403 `PASSWORD_CHANGE_REQUIRED` a todo
+salvo `POST /auth/change-password`. Se hace cumplir en el servidor y no solo en
+la interfaz, porque quien llama a la API directamente no pasa por sus pantallas.
+
+**Los intentos de login y de recuperación están limitados.**
+`AuthService` y los casos de uso de recuperación consultan `AttemptLimiter`:
+5 fallos por email y 20 por IP en el login, con ventana de 15 minutos; después
+responden 429 `TOO_MANY_ATTEMPTS`. Es en memoria: se pierde al reiniciar y no
+se comparte entre instancias. La IP sale de `request.getRemoteAddr()`; detrás
+de un proxy, en `prod` se activa `server.forward-headers-strategy=native`.
+
+**El login no revela qué cuentas están deshabilitadas.**
+Spring rechaza a una cuenta deshabilitada antes de mirar la contraseña.
+`AuthService` verifica la contraseña en ese caso, y solo con la correcta
+responde `ACCOUNT_DISABLED`; si no, responde credenciales inválidas.
+
 **El email es el `username`.**
 En Spring Security "username" es solo el identificador de login. El nuestro es
 el email, y se normaliza a minúsculas **en el service** antes de consultar,
@@ -107,35 +130,47 @@ no matchean nunca y fallan en silencio.
 |---|---|---|
 | `security.jwt.secret` | `JWT_SECRET` | Clave HMAC en base64. Mínimo 32 bytes |
 | `security.jwt.expiration-minutes` | `JWT_EXPIRATION_MINUTES` | Validez del token. Default 60 |
+| `security.rate-limit.window-minutes` | (sin variable) | Ventana del límite de intentos. Default 15 |
 
 Las variables se cargan desde `backend/.env`, que **no se commitea**. Ver
 `.env.example` para la plantilla y el comando de generación del secreto.
 
 El secreto no tiene valor por defecto a propósito: si falta, la aplicación no
-arranca. Es preferible a que un entorno quede firmando con una clave conocida.
+arranca, con un mensaje que explica qué variable definir. Es preferible a que un
+entorno quede firmando con una clave conocida. El perfil `dev` es el que se
+activa si nadie define `SPRING_PROFILES_ACTIVE`, y una clave por defecto
+permitiría fabricar tokens en un despliegue mal configurado.
 
 ## Reglas de acceso vigentes
 
 | Ruta | Acceso |
 |---|---|
-| `POST /api/v1/auth/login` | Público |
-| `/v3/api-docs/**`, `/swagger-ui/**` | Público |
-| `/api/v1/admin/**` | `SYSTEM_ADMIN` |
+| `POST /api/v1/auth/login`, `/auth/forgot-password`, `/auth/reset-password` | Público |
+| `/v3/api-docs/**`, `/swagger-ui/**` | Público en `dev`; deshabilitados en `prod` |
+| `POST /api/v1/auth/change-password` | Autenticado. Única ruta permitida con contraseña temporal |
+| `/api/v1/admin/**` | `SYSTEM_ADMIN`, con `@PreAuthorize` en el controller |
+| Endpoints operativos (clientes, vehículos, turnos, presupuestos, servicios, insumos, trabajos, taller, dashboard) | `USER`, con `@PreAuthorize("hasRole('USER')")` en cada controller |
 | Todo lo demás | Autenticado |
 
-## Pendiente: ownership de taller
+La autorización por rol vive en cada controller y no en `SecurityConfig`: un
+controller nuevo sin `@PreAuthorize` queda accesible para cualquier usuario
+autenticado, así que la anotación es parte de crearlo.
 
-La autorización por rol no alcanza. La sección 6 del Technical Design exige
-además que cada usuario opere **solamente** dentro de su propio taller:
+## Aislamiento de datos (ownership)
 
-1. el usuario autenticado determina su único `workshopId`;
-2. las consultas se restringen a ese taller;
-3. un `workshopId` enviado por el frontend **nunca** autoriza por sí solo.
+La autorización por rol no alcanza: cada usuario debe operar **solamente** sobre
+sus propios datos (ADR-003).
 
-Esa validación se aplica en los **services** de cada módulo de negocio, no en
-este paquete, y usa `AccessDeniedAppException` cuando se viola. Está pendiente
-de implementación junto con el módulo `workshops`.
+1. el controller recibe el `userId` del principal autenticado
+   (`@AuthenticationPrincipal AuthenticatedUser`), nunca del cliente;
+2. cada caso de uso filtra por `user_id` (`findByIdAndUserId` y similares);
+3. un identificador que pertenece a otro usuario responde **404**
+   (`ResourceNotFoundException`), no 403, para no revelar que existe;
+4. en `vehicles` y `appointments` la base lo refuerza con claves foráneas
+   compuestas `(id, user_id)`.
 
-Regla crítica de la sección 8: `SYSTEM_ADMIN` y `USER` son contextos distintos.
-Ser administrador de la plataforma **no** habilita el acceso a los datos
-operativos de ningún taller.
+`AccessDeniedAppException` no se usa para esto.
+
+Regla crítica: `SYSTEM_ADMIN` y `USER` son contextos distintos. Ser
+administrador de la plataforma **no** habilita el acceso a los datos operativos
+de ningún taller: los endpoints operativos exigen el rol `USER`.

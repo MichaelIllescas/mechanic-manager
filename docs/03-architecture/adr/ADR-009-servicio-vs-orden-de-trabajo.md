@@ -1,6 +1,6 @@
 # ADR-009 — Separación entre Catálogo de Servicios y Orden de Trabajo
 
-**Estado:** Accepted
+**Estado:** Accepted. El modelo de `WorkOrder` fue reemplazado por ADR-011; la separación entre catálogo y hecho ocurrido sigue vigente.
 **Fecha:** Agosto 2026
 
 ## Contexto

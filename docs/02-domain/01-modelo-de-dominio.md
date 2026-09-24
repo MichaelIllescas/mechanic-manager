@@ -1,6 +1,6 @@
 # Modelo de Dominio
 
-**Versión:** 1.3  
+**Versión:** 1.4  
 **Enfoque:** Modelo simple orientado al MVP
 
 ---
@@ -27,9 +27,9 @@ El modelo debe ser fácil de entender y modificar a medida que aparezca retroali
 | Ítem de presupuesto | Concepto individual de trabajo o repuesto |
 | Servicio | Prestación que el taller ofrece, con precio de referencia. Es catálogo, no un hecho ocurrido |
 | Insumo | Material o repuesto que el taller utiliza en sus trabajos, con precio de referencia. Es catálogo, no un hecho ocurrido |
-| Orden de trabajo | Ingreso concreto de un vehículo al taller, con su diagnóstico, estado y trabajos ejecutados |
-| Ítem de orden de trabajo | Servicio o repuesto efectivamente realizado dentro de una orden |
-| Historial | Vista cronológica de las órdenes de trabajo de un vehículo |
+| Trabajo realizado (`WorkOrder`) | Registro de lo que se hizo sobre un vehículo, con sus ítems, total y estado. No tiene ciclo de vida (ADR-011) |
+| Ítem de trabajo realizado | Servicio o repuesto efectivamente realizado dentro de un trabajo |
+| Historial | Vista cronológica de los trabajos realizados de un vehículo o de un cliente |
 
 ---
 
@@ -47,7 +47,7 @@ Supplies
 WorkOrders
 ```
 
-`History` será inicialmente una consulta derivada de las órdenes de trabajo registradas.
+`History` es una consulta derivada de los trabajos realizados registrados. `Dashboard` es un resumen de lectura sobre turnos, presupuestos, trabajos y vehículos; no tiene entidades propias.
 
 Estas áreas son límites organizativos del código, no bounded contexts formales del MVP.
 
@@ -65,6 +65,7 @@ Atributos iniciales:
 - `passwordHash`
 - `role`
 - `status`
+- `mustChangePassword`
 - `createdAt`
 - `updatedAt`
 
@@ -76,6 +77,7 @@ Roles:
 Reglas:
 
 - un usuario deshabilitado no puede autenticarse;
+- una cuenta con `mustChangePassword` (contraseña temporal puesta por el administrador) sólo puede cambiar su contraseña hasta hacerlo;
 - `SYSTEM_ADMIN` no necesita taller;
 - un `USER` puede asociarse como máximo a un taller;
 - `SYSTEM_ADMIN` administra cuentas de usuario, no talleres.
@@ -179,9 +181,12 @@ Reglas:
 - vehículo y turno deben pertenecer al mismo usuario;
 - `SCHEDULED` es el estado inicial; `COMPLETED` y `CANCELLED` son terminales;
 - reprogramar es modificar `scheduledAt` de un turno en `SCHEDULED`, no un estado propio;
-- el turno se completa cuando el vehículo ingresa al taller; a partir de ahí el estado del trabajo lo lleva la orden de trabajo;
+- el turno se completa cuando el vehículo ingresa al taller; a partir de ahí el trabajo queda registrado en el trabajo realizado;
 - la agenda no valida solapamiento de horarios: un taller puede atender varios vehículos en simultáneo;
-- el motivo del turno se registra como texto libre en `notes`; el detalle estructurado del trabajo surge del presupuesto o de la orden de trabajo.
+- el motivo del turno se registra como texto libre en `notes`; el detalle estructurado del trabajo surge del presupuesto o del trabajo realizado;
+- al crearlo puede vincularse un presupuesto aprobado del mismo vehículo que todavía no tenga turno; la referencia vive en el presupuesto (`Quote.appointmentId`);
+- al completarse se crea automáticamente su trabajo realizado (ver `WorkOrder`);
+- al eliminarlo, el presupuesto y el trabajo vinculados se conservan sin turno.
 
 ---
 
@@ -196,7 +201,8 @@ Atributos de `Quote`:
 - `appointmentId` opcional
 - `number`
 - `createdAt`
-- `validUntil`
+- `updatedAt`
+- `validUntil` opcional
 - `status`
 - `total`
 - `notes`
@@ -206,6 +212,7 @@ Atributos de `QuoteItem`:
 - `id`
 - `quoteId`
 - `serviceTypeId` opcional
+- `supplyId` opcional
 - `description`
 - `quantity`
 - `unitPrice`
@@ -213,20 +220,22 @@ Atributos de `QuoteItem`:
 
 Estados:
 
-- `DRAFT`
-- `SENT`
+- `PENDING` (inicial)
 - `APPROVED`
 - `REJECTED`
 
 Reglas:
 
-- el total surge de sus ítems;
+- el total surge de sus ítems y no puede ser negativo ni superar el importe máximo de la base;
+- `number` es correlativo dentro del usuario y empieza en 1;
 - puede originarse en un turno o crearse sin turno previo;
-- cliente y vehículo deben pertenecer al usuario autenticado;
-- un ítem puede originarse en un `ServiceType` del catálogo o describirse libremente;
+- cliente y vehículo deben pertenecer al usuario autenticado, y el vehículo debe ser del cliente indicado;
+- un ítem puede originarse en un `ServiceType`, en un `Supply` o describirse libremente, pero nunca en los dos catálogos a la vez;
 - `description` y `unitPrice` se copian al crear el ítem y no siguen cambiando con el catálogo;
-- un presupuesto aprobado puede vincularse a una orden de trabajo;
-- un presupuesto aprobado no debe modificarse silenciosamente.
+- el precio de un ítem de catálogo no puede ser negativo; un ítem manual sí, para representar un descuento;
+- cambia entre los tres estados sin restricción y se edita en cualquier estado, salvo que ya tenga un trabajo realizado: entonces su estado no puede cambiar;
+- la vigencia (`validUntil`) no puede ser anterior a hoy al crearlo, pero no se vuelve a exigir al editarlo;
+- un presupuesto aprobado puede originar un trabajo realizado.
 
 ---
 
@@ -281,63 +290,64 @@ No forma parte del MVP el control de stock, existencias ni movimientos de invent
 
 ---
 
-### 4.9 WorkOrder
+### 4.9 WorkOrder (trabajo realizado)
 
-Representa el ingreso concreto de un vehículo al taller. Es el hecho ocurrido.
+Representa lo que efectivamente se hizo sobre un vehículo. Es el hecho ocurrido y no tiene ciclo de vida: nace completado (ADR-011).
 
 Atributos:
 
 - `id`
 - `userId`
 - `vehicleId`
+- `appointmentId` opcional
 - `quoteId` opcional
-- `entryDate`
-- `entryMileage`
-- `reason`
-- `diagnosis`
-- `notes`
+- `performedAt`
+- `mileage` opcional
 - `status`
 - `total`
-- `finishedAt`
-- `deliveredAt`
+- `notes`
+- `createdAt`
+- `updatedAt`
 
 Estados:
 
-- `PENDING`
-- `IN_PROGRESS`
-- `FINISHED`
-- `DELIVERED`
+- `COMPLETED` (inicial)
+- `CANCELLED`
 
 Reglas:
 
 - pertenece a un vehículo del mismo usuario;
-- puede vincular un presupuesto aprobado del mismo usuario;
+- puede vincular un turno y/o un presupuesto del mismo usuario y del mismo vehículo;
+- un turno y un presupuesto originan como máximo un trabajo realizado;
+- puede crearse a mano o automáticamente al completar un turno; en ese caso copia los ítems del presupuesto aprobado del turno, si existe y no fue usado por otro trabajo, y si no nace sin ítems;
 - el trabajo ejecutado se registra en sus ítems, no en un campo de texto;
-- `total` surge de sus ítems;
-- las órdenes finalizadas o entregadas permanecen disponibles como historial.
+- `total` surge de sus ítems y no puede ser negativo ni superar el importe máximo de la base;
+- puede pasar entre `COMPLETED` y `CANCELLED` y editarse en cualquiera de los dos estados;
+- los trabajos permanecen disponibles como historial.
 
 ---
 
 ### 4.10 WorkOrderItem
 
-Representa un servicio o repuesto efectivamente realizado dentro de una orden.
+Representa un servicio o repuesto efectivamente realizado dentro de un trabajo.
 
 Atributos:
 
 - `id`
 - `workOrderId`
 - `serviceTypeId` opcional
+- `supplyId` opcional
 - `description`
 - `quantity`
 - `unitPrice`
 - `subtotal`
-- `notes` opcional
 
 Reglas:
 
-- pertenece a una única orden de trabajo;
-- puede originarse en un `ServiceType` del mismo usuario o describirse libremente para trabajos no catalogados y repuestos;
+- pertenece a un único trabajo realizado;
+- puede originarse en un `ServiceType` o en un `Supply` del mismo usuario, o describirse libremente para trabajos no catalogados; nunca en los dos catálogos a la vez;
 - `description` y `unitPrice` se copian del catálogo al crear el ítem y quedan congelados;
+- el precio de un ítem de catálogo no puede ser negativo; un ítem manual sí, para representar un descuento;
 - `subtotal` surge de `quantity` por `unitPrice`.
 
 ---
@@ -356,12 +366,15 @@ User 1 ──────────── N ServiceType
 User 1 ──────────── N Supply
 Vehicle 1 ───────── N WorkOrder
 Quote 1 ─────────── 0..1 WorkOrder
+Appointment 1 ───── 0..1 WorkOrder
 WorkOrder 1 ─────── N WorkOrderItem
 ServiceType 1 ───── N QuoteItem
 ServiceType 1 ───── N WorkOrderItem
+Supply 1 ────────── N QuoteItem
+Supply 1 ────────── N WorkOrderItem
 ```
 
-`ServiceType` participa como origen opcional de los ítems: un ítem puede existir sin referencia al catálogo.
+`ServiceType` y `Supply` participan como origen opcional de los ítems: un ítem referencia como máximo uno de los dos, o ninguno si es manual.
 
 No existe en el MVP:
 
@@ -377,11 +390,11 @@ Workshop 1 -> N User
 1. Todo dato operativo pertenece a un `USER`.
 2. Un `USER` sólo opera sobre sus propios datos.
 3. El `USER` se obtiene desde la identidad autenticada, no desde un identificador confiado al frontend.
-4. Las referencias entre cliente, vehículo, turno, presupuesto, servicio y orden de trabajo deben corresponder al mismo `USER`.
+4. Las referencias entre cliente, vehículo, turno, presupuesto, servicio, insumo y trabajo realizado deben corresponder al mismo `USER`.
 5. La patente debe ser única por `USER`.
-6. El historial se deriva de las órdenes de trabajo registradas.
+6. El historial se deriva de los trabajos realizados registrados.
 7. Los importes de un presupuesto o de una orden se congelan al registrarse y no siguen al catálogo.
-8. Los cambios de estado deben respetar transiciones válidas.
+8. Los cambios de estado respetan las reglas de cada entidad. En el MVP el turno restringe sus transiciones (`SCHEDULED` pasa a `COMPLETED` o `CANCELLED` y no vuelve); presupuestos y trabajos cambian libremente, con la excepción de un presupuesto que ya tiene trabajo realizado.
 9. `SYSTEM_ADMIN` administra usuarios de plataforma y no la operación de los talleres.
 
 El dueño de los datos es el `USER`, no el `Workshop`. En el MVP un usuario tiene un único taller, así que el `userId` alcanza para aislar la información y evita tener que resolver el taller en cada consulta.

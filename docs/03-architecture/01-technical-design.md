@@ -68,7 +68,7 @@ El stack del MVP queda definido de la siguiente manera:
 | Documentación API | OpenAPI + Swagger UI |
 | Testing | JUnit 5 + Mockito + Testcontainers |
 | Frontend | Angular 21 + TypeScript + RxJS |
-| Contenedores | Docker + Docker Compose |
+| Contenedores | Docker Compose para la base de datos local; el empaquetado de la aplicación está pendiente (ver `05-deployment`) |
 
 ---
 
@@ -274,7 +274,7 @@ Requerimientos mínimos:
 
 `SYSTEM_ADMIN` y `USER` son contextos distintos.
 
-Ser administrador de la plataforma no implica ser usuario operativo de un taller ni habilita automáticamente el acceso a datos de clientes, vehículos, presupuestos u órdenes de trabajo.
+Ser administrador de la plataforma no implica ser usuario operativo de un taller ni habilita automáticamente el acceso a datos de clientes, vehículos, presupuestos o trabajos realizados.
 
 ---
 

@@ -15,7 +15,7 @@ Crear un almacenamiento independiente para historial duplicaría información.
 
 No crear inicialmente una entidad o agregado `VehicleHistory`.
 
-El historial será una consulta cronológica de las órdenes de trabajo asociadas al vehículo, con sus ítems.
+El historial será una consulta cronológica de los trabajos realizados (`WorkOrder`, ver ADR-011) asociados al vehículo o a un cliente, con sus ítems.
 
 Los ítems conservan la descripción y el precio con los que fueron registrados, de modo que el historial no cambia cuando cambia el catálogo de servicios.
 

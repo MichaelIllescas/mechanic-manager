@@ -1,6 +1,6 @@
 # Product Backlog
 
-**Versión:** 1.2  
+**Versión:** 1.3  
 **Método de priorización:** MoSCoW
 
 ---
@@ -19,9 +19,10 @@
 | PB-01 | Seguridad | Crear/administrar usuarios de plataforma como `SYSTEM_ADMIN` | Must | MVP |
 | PB-02 | Seguridad | Inicio de sesión | Must | MVP |
 | PB-03 | Seguridad | Autorizar por rol `SYSTEM_ADMIN` / `USER` | Must | MVP |
+| PB-53 | Seguridad | Recuperar contraseña por email, cambiar la propia y forzar el cambio de la contraseña temporal | Must | MVP |
 | PB-04 | Taller | Crear taller propio | Must | MVP |
 | PB-05 | Taller | Consultar y editar taller propio | Must | MVP |
-| PB-06 | Seguridad | Restringir datos al taller del usuario autenticado | Must | MVP |
+| PB-06 | Seguridad | Restringir datos al usuario autenticado | Must | MVP |
 | PB-07 | Clientes | Registrar cliente | Must | MVP |
 | PB-08 | Clientes | Listar clientes | Must | MVP |
 | PB-09 | Clientes | Buscar cliente | Must | MVP |
@@ -49,15 +50,19 @@
 | PB-49 | Catálogo de insumos | Activar / desactivar insumo | Should | MVP |
 | PB-50 | Catálogo de insumos | Consultar insumos activos | Must | MVP |
 | PB-45 | Presupuestos | Agregar ítem tomándolo del catálogo | Should | MVP |
-| PB-25 | Órdenes de trabajo | Crear orden / registrar ingreso | Must | MVP |
-| PB-26 | Órdenes de trabajo | Vincular presupuesto aprobado | Should | MVP |
-| PB-27 | Órdenes de trabajo | Registrar diagnóstico | Must | MVP |
-| PB-28 | Órdenes de trabajo | Registrar ítems realizados (servicios y repuestos) | Must | MVP |
-| PB-29 | Órdenes de trabajo | Agregar observaciones | Should | MVP |
-| PB-30 | Órdenes de trabajo | Actualizar estado | Must | MVP |
-| PB-31 | Órdenes de trabajo | Consultar órdenes abiertas | Must | MVP |
-| PB-46 | Órdenes de trabajo | Calcular total desde los ítems | Must | MVP |
-| PB-32 | Historial | Consultar historial del vehículo | Must | MVP |
+| PB-25 | Trabajos realizados | Registrar un trabajo realizado sobre un vehículo | Must | MVP |
+| PB-26 | Trabajos realizados | Vincular presupuesto aprobado | Should | MVP |
+| PB-27 | Trabajos realizados | Registrar diagnóstico (descartado, ver ADR-011) | Won't | Descartado |
+| PB-28 | Trabajos realizados | Registrar ítems realizados (servicios y repuestos) | Must | MVP |
+| PB-29 | Trabajos realizados | Agregar observaciones | Should | MVP |
+| PB-30 | Trabajos realizados | Cancelar un trabajo realizado o volver a marcarlo como completado | Must | MVP |
+| PB-31 | Trabajos realizados | Consultar órdenes abiertas (descartado: no existe un estado abierto, ver ADR-011) | Won't | Descartado |
+| PB-46 | Trabajos realizados | Calcular total desde los ítems | Must | MVP |
+| PB-54 | Trabajos realizados | Consultar y filtrar trabajos realizados por estado, vehículo y fechas | Must | MVP |
+| PB-55 | Trabajos realizados | Generar el trabajo realizado al completar un turno, copiando los ítems del presupuesto aprobado | Must | MVP |
+| PB-32 | Historial | Consultar historial de un vehículo o de un cliente | Must | MVP |
+| PB-52 | Historial | Descargar un comprobante del presupuesto o del trabajo realizado | Should | MVP |
+| PB-51 | Panel | Resumen operativo al ingresar: turnos del día, presupuestos pendientes y vencidos, trabajos del mes y vehículos | Should | MVP |
 | PB-33 | Organización | Varios usuarios por taller | Won't | Post-MVP |
 | PB-34 | Organización | Varios talleres por usuario | Won't | Post-MVP |
 | PB-35 | Seguridad | Roles y permisos internos del taller | Won't | Post-MVP |

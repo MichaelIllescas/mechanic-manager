@@ -65,8 +65,8 @@ Responsabilidades:
 - administrar vehículos;
 - administrar agenda y turnos;
 - generar presupuestos;
-- definir el catálogo de servicios del taller;
-- registrar órdenes de trabajo;
+- definir los catálogos de servicios e insumos del taller;
+- registrar los trabajos realizados;
 - consultar historial de vehículos.
 
 En el MVP cada `USER` puede gestionar un único taller y tiene acceso completo a la operación de ese taller.
@@ -124,12 +124,9 @@ El MVP será considerado funcional cuando un usuario pueda completar el siguient
 6. Registra o selecciona un vehículo.
 7. Agenda un turno.
 8. Genera un presupuesto.
-9. Registra el ingreso del vehículo.
-10. Crea la orden de trabajo.
-11. Registra el diagnóstico y los servicios realizados como ítems.
-12. Actualiza el estado de la orden.
-13. Finaliza y entrega el vehículo.
-14. Consulta posteriormente el historial técnico.
+9. Completa el turno cuando el vehículo ingresa, y se genera el trabajo realizado con los ítems del presupuesto aprobado.
+10. Ajusta el trabajo realizado: ítems, kilometraje y observaciones.
+11. Consulta posteriormente el historial técnico del vehículo o del cliente y descarga el comprobante.
 
 Además, un usuario nunca debe poder consultar o modificar información perteneciente al taller de otro usuario.
 

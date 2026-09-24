@@ -51,3 +51,7 @@ Un endpoint nuevo o modificado no se considerará completamente documentado si e
 ## Integración con el stack
 
 El contrato OpenAPI forma parte del stack definido del backend Spring Boot. El archivo `docs/04-api/openapi.yaml` permanece versionado como referencia del contrato y Swagger UI se utilizará para inspeccionar la API durante desarrollo.
+
+## Cómo se mantiene
+
+El archivo `docs/04-api/openapi.yaml` se **genera desde el código** (springdoc) y no se edita a mano. Un test de integración (`OpenApiContractTest`) falla si el archivo versionado difiere de lo que la aplicación expone, lo que vuelve obligatoria la regla de evolución: un endpoint nuevo o modificado no pasa la suite sin el contrato regenerado. El procedimiento para regenerarlo está en `docs/04-api/README.md`.

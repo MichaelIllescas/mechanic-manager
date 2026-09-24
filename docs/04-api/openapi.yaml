@@ -1,468 +1,2244 @@
 openapi: 3.1.0
-
 info:
   title: Mechanic Manager API
+  description: API REST del micro SaaS de gestión para talleres mecánicos.
   version: 1.0.0
-  description: >
-    API REST del micro SaaS de gestión para talleres mecánicos.
-    El contrato se completará progresivamente a medida que se implementen
-    los endpoints del MVP.
-
 servers:
-  - url: /api/v1
-    description: Base path de la API
-
+- url: /
+  description: Mismo servidor que sirve esta documentación
+security:
+- bearerAuth: []
 tags:
-  - name: Auth
-    description: Autenticación y acceso.
-  - name: Workshops
-    description: Creación y configuración del taller propio del usuario autenticado.
-  - name: Users
-    description: Administración de cuentas de usuario de la plataforma por SYSTEM_ADMIN.
-  - name: Customers
-    description: Gestión de clientes.
-  - name: Vehicles
-    description: Gestión de vehículos.
-  - name: Appointments
-    description: Agenda y turnos.
-  - name: Quotes
-    description: Gestión de presupuestos.
-  - name: ServiceTypes
-    description: Catálogo de servicios que ofrece el taller.
-  - name: WorkOrders
-    description: Órdenes de trabajo sobre vehículos.
-  - name: History
-    description: Consulta del historial técnico de vehículos.
+- name: Vehículos
+  description: Gestión de los vehículos pertenecientes al taller del usuario autenticado.
+- name: Taller
+  description: |
+    Datos del taller del usuario autenticado.
 
+    El taller se crea vacío junto con la cuenta, por lo que todos sus
+    campos pueden venir en null hasta que el usuario los complete.
+- name: Dashboard
+  description: Resumen operativo del taller autenticado
+- name: Turnos
+  description: Agenda de turnos del taller del usuario autenticado. Un turno se agenda
+    sobre un vehículo y el cliente se deduce de él.
+- name: Clientes
+  description: Gestión de los clientes pertenecientes al taller del usuario autenticado.
+- name: Órdenes de trabajo
+  description: Historial de trabajos realizados sobre los vehículos del usuario autenticado
+- name: Autenticación
+  description: Obtención del token de acceso a la API.
+- name: Usuarios
+  description: |
+    Administración de las cuentas de usuario de la plataforma.
+
+    Todos los endpoints requieren un usuario autenticado con rol SYSTEM_ADMIN.
+- name: Catálogo de insumos
+  description: |
+    Insumos y repuestos que utiliza el taller: aceite, filtros, pastillas, bujías.
+
+    Es catálogo, no existencias. Cuántas unidades hay en el taller queda fuera
+    del MVP: acá sólo vive el material y su precio de referencia.
+
+    Los insumos no se eliminan: se desactivan, para no romper el historial
+    de presupuestos y órdenes que los referencian.
+- name: Presupuestos
+  description: Gestión de presupuestos del usuario autenticado
+- name: Catálogo de servicios
+  description: |
+    Servicios que ofrece el taller: cambio de aceite, alineación, cambio de pastillas.
+
+    Es catálogo, no trabajo realizado. El trabajo efectivamente ejecutado sobre
+    un vehículo se registra en las órdenes de trabajo.
+
+    Los servicios no se eliminan: se desactivan, para no romper el historial
+    de presupuestos y órdenes que los referencian.
 paths:
-  /customers:
+  /api/v1/workshops/me:
     get:
       tags:
-        - Customers
-      summary: Listar o buscar clientes
-      description: >
-        Sin el parámetro search lista los clientes del taller autenticado.
-        Con search busca por nombre, apellido, documento, teléfono o email.
-      operationId: listCustomers
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: search
-          in: query
-          required: false
-          description: Texto de búsqueda.
-          schema:
-            type: string
+      - Taller
+      summary: Obtener el taller propio
+      description: Devuelve los datos del taller asociado al usuario autenticado.
+      operationId: findMine
       responses:
-        '200':
-          description: Listado obtenido correctamente.
+        "200":
+          description: Taller obtenido correctamente
           content:
-            application/json:
+            '*/*':
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/CustomerResponse'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-    post:
-      tags:
-        - Customers
-      summary: Registrar un cliente
-      operationId: createCustomer
-      security:
-        - bearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CustomerRequest'
-      responses:
-        '201':
-          description: Cliente registrado correctamente.
-          headers:
-            Location:
-              description: URL del cliente registrado.
-              schema:
-                type: string
-                format: uri
+                $ref: "#/components/schemas/WorkshopResponse"
+        "401":
+          description: No autenticado
           content:
-            application/json:
+            '*/*':
               schema:
-                $ref: '#/components/schemas/CustomerResponse'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-  /customers/{id}:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: El usuario no tiene un taller asociado
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
     put:
       tags:
-        - Customers
-      summary: Editar un cliente
-      description: >
-        Solo permite editar un cliente perteneciente al taller del usuario autenticado.
-      operationId: updateCustomer
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: id
-          in: path
-          required: true
-          description: Identificador del cliente.
-          schema:
-            type: integer
-            format: int64
+      - Taller
+      summary: Actualizar el taller propio
+      description: |
+        Actualiza los datos del taller del usuario autenticado.
+
+        Todos los campos son opcionales: se puede guardar el taller
+        parcialmente cargado. Los campos enviados vacíos se guardan como null.
+      operationId: update
       requestBody:
-        required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CustomerRequest'
+              $ref: "#/components/schemas/UpdateWorkshopRequest"
+        required: true
       responses:
-        '200':
-          description: Cliente actualizado correctamente.
+        "200":
+          description: Taller actualizado correctamente
           content:
-            application/json:
+            '*/*':
               schema:
-                $ref: '#/components/schemas/CustomerResponse'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-  /vehicles:
+                $ref: "#/components/schemas/WorkshopResponse"
+        "400":
+          description: Alguno de los campos enviados tiene un formato inválido
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: No autenticado
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: El usuario no tiene un taller asociado
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/v1/work-orders/{id}:
     get:
       tags:
-        - Vehicles
-      summary: Listar o buscar vehículos
-      description: >
-        Sin el parámetro search lista los vehículos del taller autenticado.
-        Con search busca por coincidencia parcial de patente.
-      operationId: listVehicles
-      security:
-        - bearerAuth: []
+      - Órdenes de trabajo
+      summary: Obtener una orden de trabajo
+      operationId: findById
       parameters:
-        - name: search
-          in: query
-          required: false
-          description: Patente o parte de ella.
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Listado obtenido correctamente.
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/VehicleResponse'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-    post:
-      tags:
-        - Vehicles
-      summary: Registrar un vehículo
-      description: >
-        Registra un vehículo y lo asocia a un cliente del taller autenticado.
-      operationId: createVehicle
-      security:
-        - bearerAuth: []
-      requestBody:
+      - name: id
+        in: path
+        description: Identificador de la orden de trabajo
         required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/VehicleRequest'
-      responses:
-        '201':
-          description: Vehículo registrado correctamente.
-          headers:
-            Location:
-              description: URL del vehículo registrado.
-              schema:
-                type: string
-                format: uri
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/VehicleResponse'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '409':
-          $ref: '#/components/responses/Conflict'
-  /vehicles/{id}:
-    put:
-      tags:
-        - Vehicles
-      summary: Editar un vehículo
-      description: >
-        Solo permite editar un vehículo y asociarlo a un cliente perteneciente
-        al taller del usuario autenticado.
-      operationId: updateVehicle
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: id
-          in: path
-          required: true
-          description: Identificador del vehículo.
-          schema:
-            type: integer
-            format: int64
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/VehicleRequest'
-      responses:
-        '200':
-          description: Vehículo actualizado correctamente.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/VehicleResponse'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '409':
-          $ref: '#/components/responses/Conflict'
-
-components:
-  responses:
-    BadRequest:
-      description: Datos inválidos.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-    Unauthorized:
-      description: No autenticado.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-    Forbidden:
-      description: El usuario no tiene permisos para la operación.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-    NotFound:
-      description: El recurso solicitado no existe dentro del alcance autenticado.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-    Conflict:
-      description: La operación viola una restricción de unicidad.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-  securitySchemes:
-    bearerAuth:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
-
-  schemas:
-    CustomerRequest:
-      type: object
-      required:
-        - firstName
-        - lastName
-        - phone
-      properties:
-        firstName:
-          type: string
-          maxLength: 120
-          example: Juan
-        lastName:
-          type: string
-          maxLength: 120
-          example: Pérez
-        documentNumber:
-          type:
-            - string
-            - 'null'
-          maxLength: 30
-          example: '30111222'
-        phone:
-          type: string
-          minLength: 6
-          maxLength: 30
-          example: 11 4444-5555
-        email:
-          type:
-            - string
-            - 'null'
-          format: email
-          maxLength: 255
-          example: juan@email.com
-        address:
-          type:
-            - string
-            - 'null'
-          maxLength: 255
-          example: Av. Siempre Viva 742
-        notes:
-          type:
-            - string
-            - 'null'
-          maxLength: 1000
-          example: Cliente habitual
-    CustomerResponse:
-      allOf:
-        - $ref: '#/components/schemas/CustomerRequest'
-        - type: object
-          required:
-            - id
-          properties:
-            id:
-              type: integer
-              format: int64
-              example: 1
-            createdAt:
-              type:
-                - string
-                - 'null'
-              format: date-time
-            updatedAt:
-              type:
-                - string
-                - 'null'
-              format: date-time
-    VehicleRequest:
-      type: object
-      required:
-        - customerId
-        - licensePlate
-        - brand
-        - model
-        - vehicleType
-      properties:
-        customerId:
+        schema:
           type: integer
           format: int64
-          minimum: 1
-          example: 1
-        licensePlate:
+        example: 1
+      responses:
+        "200":
+          description: Orden de trabajo obtenida correctamente
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/WorkOrderResponse"
+        "401":
+          description: No autenticado
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: El usuario no tiene rol USER
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Orden de trabajo no encontrada
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    put:
+      tags:
+      - Órdenes de trabajo
+      summary: Actualizar una orden de trabajo
+      operationId: update_1
+      parameters:
+      - name: id
+        in: path
+        description: Identificador de la orden de trabajo
+        required: true
+        schema:
+          type: integer
+          format: int64
+        example: 1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateWorkOrderRequest"
+        required: true
+      responses:
+        "200":
+          description: Orden de trabajo actualizada correctamente
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/WorkOrderResponse"
+        "400":
+          description: Datos o relaciones inválidas
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: No autenticado
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: El usuario no tiene rol USER
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Orden de trabajo o referencia no encontrada
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      tags:
+      - Órdenes de trabajo
+      summary: Eliminar una orden de trabajo
+      description: "Baja definitiva: no queda registro en el historial del vehículo."
+      operationId: delete
+      parameters:
+      - name: id
+        in: path
+        description: Identificador de la orden de trabajo
+        required: true
+        schema:
+          type: integer
+          format: int64
+        example: 1
+      responses:
+        "204":
+          description: Orden de trabajo eliminada correctamente
+        "401":
+          description: No autenticado
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: El usuario no tiene rol USER
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Orden de trabajo no encontrada
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/v1/vehicles/{id}:
+    put:
+      tags:
+      - Vehículos
+      summary: Editar un vehículo
+      description: Solo permite editar vehículos y asociar clientes del taller autenticado.
+      operationId: update_2
+      parameters:
+      - name: id
+        in: path
+        description: Identificador del vehículo
+        required: true
+        schema:
+          type: integer
+          format: int64
+        example: 1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateVehicleRequest"
+        required: true
+      responses:
+        "200":
+          description: Vehículo actualizado correctamente
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/VehicleResponse"
+        "400":
+          description: Datos inválidos
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: No autenticado
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: El usuario autenticado no tiene rol USER
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: El vehículo o el cliente no existe en el taller
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: La patente ya existe en el taller
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/v1/supplies/{id}:
+    get:
+      tags:
+      - Catálogo de insumos
+      summary: Obtener un insumo
+      description: Devuelve un insumo del catálogo del usuario autenticado.
+      operationId: findById_1
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: Insumo obtenido correctamente
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/SupplyResponse"
+        "401":
+          description: No autenticado
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: No se encontró el insumo
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    put:
+      tags:
+      - Catálogo de insumos
+      summary: Actualizar un insumo
+      description: |
+        Actualiza el nombre y el precio.
+
+        Modificar el precio no altera los presupuestos ni las órdenes ya
+        registrados: esos conservan el valor que tenían al crearse.
+      operationId: update_3
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateSupplyRequest"
+        required: true
+      responses:
+        "200":
+          description: Insumo actualizado correctamente
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/SupplyResponse"
+        "400":
+          description: Alguno de los campos enviados tiene un formato inválido
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: No autenticado
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: No se encontró el insumo
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: Ya existe otro insumo con ese nombre
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/v1/service-types/{id}:
+    get:
+      tags:
+      - Catálogo de servicios
+      summary: Obtener un servicio
+      description: Devuelve un servicio del catálogo del usuario autenticado.
+      operationId: findById_2
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: Servicio obtenido correctamente
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ServiceTypeResponse"
+        "401":
+          description: No autenticado
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: No se encontró el servicio
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    put:
+      tags:
+      - Catálogo de servicios
+      summary: Actualizar un servicio
+      description: |
+        Actualiza el nombre, la descripción, el precio y la duración estimada.
+
+        Modificar el precio no altera los presupuestos ni las órdenes ya
+        registrados: esos conservan el valor que tenían al crearse.
+      operationId: update_4
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateServiceTypeRequest"
+        required: true
+      responses:
+        "200":
+          description: Servicio actualizado correctamente
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ServiceTypeResponse"
+        "400":
+          description: Alguno de los campos enviados tiene un formato inválido
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: No autenticado
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: No se encontró el servicio
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: Ya existe otro servicio con ese nombre
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/v1/quotes/{id}:
+    get:
+      tags:
+      - Presupuestos
+      summary: Obtener un presupuesto
+      operationId: findById_3
+      parameters:
+      - name: id
+        in: path
+        description: Identificador del presupuesto
+        required: true
+        schema:
+          type: integer
+          format: int64
+        example: 1
+      responses:
+        "200":
+          description: Presupuesto obtenido correctamente
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/QuoteResponse"
+        "401":
+          description: No autenticado
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: El usuario no tiene rol USER
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Presupuesto no encontrado
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    put:
+      tags:
+      - Presupuestos
+      summary: Actualizar un presupuesto
+      description: Permite corregir el presupuesto independientemente de su estado.
+      operationId: update_5
+      parameters:
+      - name: id
+        in: path
+        description: Identificador del presupuesto
+        required: true
+        schema:
+          type: integer
+          format: int64
+        example: 1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateQuoteRequest"
+        required: true
+      responses:
+        "200":
+          description: Presupuesto actualizado correctamente
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/QuoteResponse"
+        "400":
+          description: Datos o relaciones inválidas
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: No autenticado
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: El usuario no tiene rol USER
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Presupuesto o referencia no encontrada
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      tags:
+      - Presupuestos
+      summary: Eliminar un presupuesto
+      description: Elimina el presupuesto y conserva el turno y el trabajo realizado
+        vinculados.
+      operationId: delete_1
+      parameters:
+      - name: id
+        in: path
+        description: Identificador del presupuesto
+        required: true
+        schema:
+          type: integer
+          format: int64
+        example: 1
+      responses:
+        "204":
+          description: Presupuesto eliminado correctamente
+        "401":
+          description: No autenticado
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: El usuario no tiene rol USER
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Presupuesto no encontrado
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/v1/customers/{id}:
+    put:
+      tags:
+      - Clientes
+      summary: Editar un cliente
+      description: Solo permite editar clientes que pertenezcan al taller del usuario
+        autenticado.
+      operationId: update_6
+      parameters:
+      - name: id
+        in: path
+        description: Identificador del cliente
+        required: true
+        schema:
+          type: integer
+          format: int64
+        example: 1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateCustomerRequest"
+        required: true
+      responses:
+        "200":
+          description: Cliente actualizado correctamente
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/CustomerResponse"
+        "400":
+          description: Datos inválidos
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: No autenticado
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: El usuario autenticado no tiene rol USER
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: El cliente no existe en el taller autenticado
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/v1/appointments/{id}:
+    get:
+      tags:
+      - Turnos
+      summary: Consultar un turno por identificador
+      description: "La agenda se consulta por rango, pero reprogramar parte de un\
+        \ id."
+      operationId: findById_4
+      parameters:
+      - name: id
+        in: path
+        description: Identificador del turno
+        required: true
+        schema:
+          type: integer
+          format: int64
+        example: 1
+      responses:
+        "200":
+          description: Turno obtenido correctamente
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AppointmentResponse"
+        "401":
+          description: No autenticado
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: El usuario autenticado no tiene rol USER
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: El turno no existe en el taller
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    put:
+      tags:
+      - Turnos
+      summary: Reprogramar un turno
+      description: "Modifica fecha y notas de un turno agendado. El vehículo no se\
+        \ cambia: si el turno se cargó sobre el auto equivocado se cancela y se crea\
+        \ otro."
+      operationId: update_7
+      parameters:
+      - name: id
+        in: path
+        description: Identificador del turno
+        required: true
+        schema:
+          type: integer
+          format: int64
+        example: 1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateAppointmentRequest"
+        required: true
+      responses:
+        "200":
+          description: Turno actualizado correctamente
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AppointmentResponse"
+        "400":
+          description: Datos inválidos
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: No autenticado
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: El usuario autenticado no tiene rol USER
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: El turno no existe en el taller
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: El turno ya está completado o cancelado
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      tags:
+      - Turnos
+      summary: Eliminar un turno
+      description: "Baja definitiva, en cualquier estado. El presupuesto vinculado\
+        \ y la orden de trabajo autogenerada (si existen) no se borran: quedan sin\
+        \ turno."
+      operationId: delete_2
+      parameters:
+      - name: id
+        in: path
+        description: Identificador del turno
+        required: true
+        schema:
+          type: integer
+          format: int64
+        example: 1
+      responses:
+        "204":
+          description: Turno eliminado correctamente
+        "401":
+          description: No autenticado
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: El usuario autenticado no tiene rol USER
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: El turno no existe en el taller
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/v1/admin/users/{id}:
+    get:
+      tags:
+      - Usuarios
+      summary: Obtener un usuario
+      description: Devuelve los datos de una cuenta a partir de su identificador.
+      operationId: findById_5
+      parameters:
+      - name: id
+        in: path
+        description: Identificador del usuario
+        required: true
+        schema:
+          type: integer
+          format: int64
+        example: 1
+      responses:
+        "200":
+          description: Usuario encontrado
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/UserResponse"
+        "401":
+          description: No autenticado
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: El usuario autenticado no es SYSTEM_ADMIN
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: No existe un usuario con ese id
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    put:
+      tags:
+      - Usuarios
+      summary: Actualizar un usuario
+      description: |
+        Modifica el nombre, el email y el rol de una cuenta.
+
+        No modifica la contraseña ni el estado. Cambiar el email invalida la sesión
+        activa del usuario, porque el token se emite contra su email.
+      operationId: update_8
+      parameters:
+      - name: id
+        in: path
+        description: Identificador del usuario
+        required: true
+        schema:
+          type: integer
+          format: int64
+        example: 1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateUserRequest"
+        required: true
+      responses:
+        "200":
+          description: Usuario actualizado
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/UserResponse"
+        "400":
+          description: Datos inválidos
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: No autenticado
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: El usuario autenticado no es SYSTEM_ADMIN
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: No existe un usuario con ese id
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: El email ya pertenece a otro usuario
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/v1/work-orders:
+    get:
+      tags:
+      - Órdenes de trabajo
+      summary: Buscar órdenes de trabajo
+      description: "Busca por cliente o patente y permite filtrar por estado, vehí\
+        culo y rango de fechas."
+      operationId: findAll
+      parameters:
+      - name: search
+        in: query
+        description: Nombre del cliente o patente
+        required: false
+        schema:
           type: string
-          maxLength: 20
-          example: AB123CD
-        brand:
+      - name: status
+        in: query
+        description: Estado opcional
+        required: false
+        schema:
           type: string
-          maxLength: 80
-          example: Toyota
-        model:
+          enum:
+          - COMPLETED
+          - CANCELLED
+      - name: vehicleId
+        in: query
+        description: Identificador de vehículo opcional
+        required: false
+        schema:
+          type: integer
+          format: int64
+      - name: from
+        in: query
+        description: Fecha desde (inclusive)
+        required: false
+        schema:
+          type: string
+          format: date
+      - name: to
+        in: query
+        description: Fecha hasta (inclusive)
+        required: false
+        schema:
+          type: string
+          format: date
+      - name: page
+        in: query
+        description: Página basada en cero
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 0
+        example: 0
+      - name: size
+        in: query
+        description: "Resultados por página, máximo 50"
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 20
+        example: 20
+      responses:
+        "200":
+          description: Página obtenida correctamente
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/WorkOrderPageResponse"
+        "400":
+          description: Paginación inválida
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: No autenticado
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: El usuario no tiene rol USER
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    post:
+      tags:
+      - Órdenes de trabajo
+      summary: Crear una orden de trabajo
+      description: "Creación manual, opcionalmente vinculada a un turno y/o un presupuesto."
+      operationId: create
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateWorkOrderRequest"
+        required: true
+      responses:
+        "201":
+          description: Orden de trabajo creada correctamente
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/WorkOrderResponse"
+        "400":
+          description: Datos o relaciones inválidas
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: No autenticado
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: El usuario no tiene rol USER
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: "Vehículo, turno, presupuesto o concepto no encontrado"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/v1/vehicles:
+    get:
+      tags:
+      - Vehículos
+      summary: Listar o buscar vehículos
+      description: Sin search lista los vehículos del taller. Con search busca por
+        patente.
+      operationId: findAll_1
+      parameters:
+      - name: search
+        in: query
+        description: Patente opcional de búsqueda
+        required: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Listado obtenido correctamente
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/VehicleResponse"
+        "401":
+          description: No autenticado
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: El usuario autenticado no tiene rol USER
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: El usuario no tiene un taller asociado
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    post:
+      tags:
+      - Vehículos
+      summary: Registrar un vehículo
+      operationId: create_1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateVehicleRequest"
+        required: true
+      responses:
+        "201":
+          description: Vehículo registrado correctamente
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/VehicleResponse"
+        "400":
+          description: Datos inválidos
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: No autenticado
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: El usuario autenticado no tiene rol USER
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: El taller o el cliente no existe
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: La patente ya existe en el taller
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/v1/supplies:
+    get:
+      tags:
+      - Catálogo de insumos
+      summary: Listar el catálogo
+      description: |
+        Devuelve los insumos del usuario autenticado, ordenados por nombre.
+
+        Sin el parámetro `active` devuelve el catálogo completo. Con `active=true`
+        devuelve solo los disponibles para cargar en presupuestos y órdenes.
+      operationId: findAll_2
+      parameters:
+      - name: active
+        in: query
+        required: false
+        schema:
+          type: boolean
+      responses:
+        "200":
+          description: Catálogo obtenido correctamente
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SupplyResponse"
+        "401":
+          description: No autenticado
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    post:
+      tags:
+      - Catálogo de insumos
+      summary: Crear un insumo
+      description: Agrega un insumo al catálogo del usuario autenticado.
+      operationId: create_2
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateSupplyRequest"
+        required: true
+      responses:
+        "201":
+          description: Insumo creado correctamente
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/SupplyResponse"
+        "400":
+          description: Alguno de los campos enviados tiene un formato inválido
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: No autenticado
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: Ya existe un insumo con ese nombre
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/v1/service-types:
+    get:
+      tags:
+      - Catálogo de servicios
+      summary: Listar el catálogo
+      description: |
+        Devuelve los servicios del usuario autenticado, ordenados por nombre.
+
+        Sin el parámetro `active` devuelve el catálogo completo. Con `active=true`
+        devuelve solo los disponibles para cargar en presupuestos y órdenes.
+      operationId: findAll_3
+      parameters:
+      - name: active
+        in: query
+        required: false
+        schema:
+          type: boolean
+      responses:
+        "200":
+          description: Catálogo obtenido correctamente
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ServiceTypeResponse"
+        "401":
+          description: No autenticado
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    post:
+      tags:
+      - Catálogo de servicios
+      summary: Crear un servicio
+      description: Agrega un servicio al catálogo del usuario autenticado.
+      operationId: create_3
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateServiceTypeRequest"
+        required: true
+      responses:
+        "201":
+          description: Servicio creado correctamente
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ServiceTypeResponse"
+        "400":
+          description: Alguno de los campos enviados tiene un formato inválido
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: No autenticado
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: Ya existe un servicio con ese nombre
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/v1/quotes:
+    get:
+      tags:
+      - Presupuestos
+      summary: Buscar presupuestos
+      description: "Busca por número, cliente o patente y permite filtrar por estado."
+      operationId: findAll_4
+      parameters:
+      - name: search
+        in: query
+        description: "Número, nombre del cliente o patente"
+        required: false
+        schema:
+          type: string
+      - name: status
+        in: query
+        description: Estado opcional
+        required: false
+        schema:
+          type: string
+          enum:
+          - PENDING
+          - APPROVED
+          - REJECTED
+      - name: page
+        in: query
+        description: Página basada en cero
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 0
+        example: 0
+      - name: size
+        in: query
+        description: "Resultados por página, máximo 50"
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 20
+        example: 20
+      responses:
+        "200":
+          description: Página obtenida correctamente
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/QuotePageResponse"
+        "400":
+          description: Paginación inválida
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: No autenticado
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: El usuario no tiene rol USER
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    post:
+      tags:
+      - Presupuestos
+      summary: Crear un presupuesto
+      operationId: create_4
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateQuoteRequest"
+        required: true
+      responses:
+        "201":
+          description: Presupuesto creado correctamente
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/QuoteResponse"
+        "400":
+          description: Datos o relaciones inválidas
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: No autenticado
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: El usuario no tiene rol USER
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: "Cliente, vehículo o concepto no encontrado"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/v1/customers:
+    get:
+      tags:
+      - Clientes
+      summary: Listar o buscar clientes
+      description: "Sin search lista todos los clientes del taller. Con search busca\
+        \ por nombre, apellido, documento, teléfono o email."
+      operationId: findAll_5
+      parameters:
+      - name: search
+        in: query
+        description: Texto opcional de búsqueda
+        required: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Listado obtenido correctamente
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CustomerResponse"
+        "401":
+          description: No autenticado
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: El usuario autenticado no tiene rol USER
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: El usuario no tiene un taller asociado
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    post:
+      tags:
+      - Clientes
+      summary: Registrar un cliente
+      operationId: create_5
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCustomerRequest"
+        required: true
+      responses:
+        "201":
+          description: Cliente registrado correctamente
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/CustomerResponse"
+        "400":
+          description: Datos inválidos
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: No autenticado
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: El usuario autenticado no tiene rol USER
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: El usuario no tiene un taller asociado
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/v1/auth/reset-password:
+    post:
+      tags:
+      - Autenticación
+      summary: Restablecer contraseña
+      description: |
+        Cambia la contraseña usando el token recibido por email.
+
+        El token es de un solo uso y vence a los pocos minutos.
+      operationId: resetPassword
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ResetPasswordRequest"
+        required: true
+      responses:
+        "204":
+          description: Contraseña actualizada
+        "400":
+          description: Datos inválidos o enlace vencido
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "429":
+          description: Demasiados intentos con enlaces inválidos
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+      security: []
+  /api/v1/auth/login:
+    post:
+      tags:
+      - Autenticación
+      summary: Iniciar sesión
+      description: |
+        Valida las credenciales y devuelve un token JWT.
+
+        El token se envía en las siguientes peticiones mediante la cabecera
+        Authorization con el prefijo Bearer. El email no distingue mayúsculas.
+      operationId: login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+        required: true
+      responses:
+        "200":
+          description: Autenticación correcta
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/LoginResponse"
+        "400":
+          description: Datos inválidos
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Email o contraseña incorrectos
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: La cuenta está deshabilitada (solo se informa si la contraseña
+            es correcta)
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "429":
+          description: Demasiados intentos fallidos
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+      security: []
+  /api/v1/auth/forgot-password:
+    post:
+      tags:
+      - Autenticación
+      summary: Solicitar recuperación de contraseña
+      description: |
+        Envía por email un enlace para elegir una contraseña nueva.
+
+        El envío se encola y la respuesta no espera al servidor de correo.
+
+        La respuesta es siempre 204, exista o no una cuenta con ese email:
+        el endpoint es público y no debe revelar qué direcciones están
+        registradas. Cada pedido invalida los enlaces anteriores.
+      operationId: forgotPassword
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ForgotPasswordRequest"
+        required: true
+      responses:
+        "204":
+          description: Pedido registrado
+        "400":
+          description: Datos inválidos
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "429":
+          description: Demasiados pedidos
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+      security: []
+  /api/v1/auth/change-password:
+    post:
+      tags:
+      - Autenticación
+      summary: Cambiar la propia contraseña
+      description: |
+        Cambia la contraseña del usuario autenticado.
+
+        Exige la contraseña actual: evita que alguien con la sesión abierta
+        en un equipo ajeno se apropie de la cuenta. La sesión en curso sigue
+        siendo válida después del cambio.
+      operationId: changePassword
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChangePasswordRequest"
+        required: true
+      responses:
+        "204":
+          description: Contraseña actualizada
+        "400":
+          description: Datos inválidos
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: La contraseña actual es incorrecta
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/v1/appointments:
+    get:
+      tags:
+      - Turnos
+      summary: Consultar la agenda entre dos fechas
+      description: "Devuelve los turnos del rango indicado, ordenados por horario.\
+        \ Ambas fechas son inclusivas y obligatorias: la vista diaria pide un rango\
+        \ de un día, la semanal de siete y la mensual la grilla completa. El rango\
+        \ no puede superar los 92 días."
+      operationId: findByRange
+      parameters:
+      - name: from
+        in: query
+        description: "Primer día del rango, inclusive"
+        required: true
+        schema:
+          type: string
+          format: date
+        example: 2026-09-01
+      - name: to
+        in: query
+        description: "Último día del rango, inclusive"
+        required: true
+        schema:
+          type: string
+          format: date
+        example: 2026-09-30
+      responses:
+        "200":
+          description: Agenda obtenida correctamente
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AppointmentResponse"
+        "400":
+          description: "Fechas ausentes, con formato inválido, invertidas o rango\
+            \ mayor a 92 días"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: No autenticado
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: El usuario autenticado no tiene rol USER
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    post:
+      tags:
+      - Turnos
+      summary: Agendar un turno
+      description: "El turno nace en estado SCHEDULED. La agenda no valida solapamiento:\
+        \ el taller puede atender varios vehículos en el mismo horario."
+      operationId: create_6
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateAppointmentRequest"
+        required: true
+      responses:
+        "201":
+          description: Turno agendado correctamente
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AppointmentResponse"
+        "400":
+          description: Datos inválidos
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: No autenticado
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: El usuario autenticado no tiene rol USER
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: El vehículo no existe en el taller
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/v1/appointments/{id}/complete:
+    post:
+      tags:
+      - Turnos
+      summary: Completar un turno
+      description: "Marca que el vehículo ingresó al taller. A partir de ahí el estado\
+        \ del trabajo lo lleva la orden de trabajo, no el turno."
+      operationId: complete
+      parameters:
+      - name: id
+        in: path
+        description: Identificador del turno
+        required: true
+        schema:
+          type: integer
+          format: int64
+        example: 1
+      responses:
+        "200":
+          description: Turno completado correctamente
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AppointmentResponse"
+        "401":
+          description: No autenticado
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: El usuario autenticado no tiene rol USER
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: El turno no existe en el taller
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: El turno no está agendado
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/v1/appointments/{id}/cancel:
+    post:
+      tags:
+      - Turnos
+      summary: Cancelar un turno
+      description: "El turno no se elimina: queda en el historial del vehículo como\
+        \ cancelado."
+      operationId: cancel
+      parameters:
+      - name: id
+        in: path
+        description: Identificador del turno
+        required: true
+        schema:
+          type: integer
+          format: int64
+        example: 1
+      responses:
+        "200":
+          description: Turno cancelado correctamente
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AppointmentResponse"
+        "401":
+          description: No autenticado
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: El usuario autenticado no tiene rol USER
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: El turno no existe en el taller
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: El turno no está agendado
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/v1/admin/users:
+    get:
+      tags:
+      - Usuarios
+      summary: Listar usuarios
+      description: "Devuelve todas las cuentas de la plataforma, habilitadas y deshabilitadas."
+      operationId: findAll_6
+      responses:
+        "200":
+          description: Listado obtenido correctamente
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UserResponse"
+        "401":
+          description: No autenticado
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: El usuario autenticado no es SYSTEM_ADMIN
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    post:
+      tags:
+      - Usuarios
+      summary: Crear un usuario
+      description: |
+        Crea una cuenta con la contraseña inicial definida por el administrador.
+
+        La cuenta se crea habilitada y marcada para cambio de contraseña obligatorio
+        en el primer inicio de sesión. El email se normaliza a minúsculas.
+      operationId: create_7
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateUserRequest"
+        required: true
+      responses:
+        "201":
+          description: Usuario creado. La cabecera Location apunta al recurso.
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/UserResponse"
+        "400":
+          description: Datos inválidos
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: No autenticado
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: El usuario autenticado no es SYSTEM_ADMIN
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: Ya existe un usuario con ese email
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/v1/work-orders/{id}/status:
+    patch:
+      tags:
+      - Órdenes de trabajo
+      summary: Cambiar el estado de una orden de trabajo
+      operationId: updateStatus
+      parameters:
+      - name: id
+        in: path
+        description: Identificador de la orden de trabajo
+        required: true
+        schema:
+          type: integer
+          format: int64
+        example: 1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateWorkOrderStatusRequest"
+        required: true
+      responses:
+        "200":
+          description: Estado actualizado correctamente
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/WorkOrderResponse"
+        "400":
+          description: Estado inválido
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: No autenticado
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: El usuario no tiene rol USER
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Orden de trabajo no encontrada
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/v1/supplies/{id}/status:
+    patch:
+      tags:
+      - Catálogo de insumos
+      summary: Activar o desactivar un insumo
+      description: |
+        Reemplaza al borrado. Un insumo desactivado deja de ofrecerse al cargar
+        presupuestos y órdenes, pero sigue disponible para el historial que lo usa.
+      operationId: updateStatus_1
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateSupplyStatusRequest"
+        required: true
+      responses:
+        "200":
+          description: Estado actualizado correctamente
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/SupplyResponse"
+        "400":
+          description: El estado enviado es inválido
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: No autenticado
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: No se encontró el insumo
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/v1/service-types/{id}/status:
+    patch:
+      tags:
+      - Catálogo de servicios
+      summary: Activar o desactivar un servicio
+      description: |
+        Reemplaza al borrado. Un servicio desactivado deja de ofrecerse al cargar
+        presupuestos y órdenes, pero sigue disponible para el historial que lo usa.
+      operationId: updateStatus_2
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateServiceTypeStatusRequest"
+        required: true
+      responses:
+        "200":
+          description: Estado actualizado correctamente
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ServiceTypeResponse"
+        "400":
+          description: El estado enviado es inválido
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: No autenticado
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: No se encontró el servicio
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/v1/quotes/{id}/status:
+    patch:
+      tags:
+      - Presupuestos
+      summary: Cambiar el estado de un presupuesto
+      operationId: updateStatus_3
+      parameters:
+      - name: id
+        in: path
+        description: Identificador del presupuesto
+        required: true
+        schema:
+          type: integer
+          format: int64
+        example: 1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateQuoteStatusRequest"
+        required: true
+      responses:
+        "200":
+          description: Estado actualizado correctamente
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/QuoteResponse"
+        "400":
+          description: Estado inválido
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: No autenticado
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: El usuario no tiene rol USER
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Presupuesto no encontrado
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/v1/admin/users/{id}/status:
+    patch:
+      tags:
+      - Usuarios
+      summary: Habilitar o deshabilitar un usuario
+      description: |
+        Cambia el estado de la cuenta.
+
+        Deshabilitar tiene efecto inmediato: el usuario pierde el acceso en su
+        siguiente petición aunque su token siga vigente. Un administrador no puede
+        deshabilitar su propia cuenta.
+      operationId: updateStatus_4
+      parameters:
+      - name: id
+        in: path
+        description: Identificador del usuario
+        required: true
+        schema:
+          type: integer
+          format: int64
+        example: 1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateUserStatusRequest"
+        required: true
+      responses:
+        "200":
+          description: Estado actualizado
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/UserResponse"
+        "400":
+          description: Datos inválidos
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: No autenticado
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: "No es SYSTEM_ADMIN, o intenta deshabilitarse a sí mismo"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: No existe un usuario con ese id
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/v1/work-orders/history:
+    get:
+      tags:
+      - Órdenes de trabajo
+      summary: Historial detallado
+      description: "Órdenes de trabajo con sus ítems, de la más reciente a la más\
+        \ antigua, de un cliente o de un vehículo. Se debe indicar exactamente uno\
+        \ de los dos."
+      operationId: findHistory
+      parameters:
+      - name: customerId
+        in: query
+        description: Identificador de cliente
+        required: false
+        schema:
+          type: integer
+          format: int64
+      - name: vehicleId
+        in: query
+        description: Identificador de vehículo
+        required: false
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: Historial obtenido correctamente
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/WorkOrderResponse"
+        "400":
+          description: "Debe indicarse customerId o vehicleId, no ambos"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: No autenticado
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: El usuario no tiene rol USER
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/v1/dashboard/summary:
+    get:
+      tags:
+      - Dashboard
+      summary: Obtener el resumen operativo del dashboard
+      operationId: summary
+      responses:
+        "200":
+          description: Resumen obtenido correctamente
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/DashboardSummaryResponse"
+        "401":
+          description: No autenticado
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: El usuario no tiene rol USER
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+components:
+  schemas:
+    UpdateWorkshopRequest:
+      type: object
+      properties:
+        name:
           type: string
           maxLength: 120
-          example: Corolla
-        year:
-          type:
-            - integer
-            - 'null'
-          minimum: 1886
-          maximum: 9999
-          example: 2020
-        chassisNumber:
-          type:
-            - string
-            - 'null'
-          maxLength: 100
-          example: 8AJZZZ12345678901
-        engineNumber:
-          type:
-            - string
-            - 'null'
-          maxLength: 100
-          example: 2ZR1234567
-        mileage:
-          type:
-            - integer
-            - 'null'
-          minimum: 0
-          example: 85000
-        vehicleType:
-          $ref: '#/components/schemas/VehicleType'
+          minLength: 0
+        phone:
+          type: string
+          pattern: "^\\s*$|^[0-9+()\\-\\s]{6,30}$"
+        email:
+          type: string
+          format: email
+          maxLength: 255
+          minLength: 0
+        address:
+          type: string
+          maxLength: 255
+          minLength: 0
         notes:
-          type:
-            - string
-            - 'null'
+          type: string
           maxLength: 1000
-          example: Realiza los servicios cada 10.000 km
-    VehicleResponse:
-      allOf:
-        - $ref: '#/components/schemas/VehicleRequest'
-        - type: object
-          required:
-            - id
-            - customerFirstName
-            - customerLastName
-          properties:
-            id:
-              type: integer
-              format: int64
-              example: 1
-            customerFirstName:
-              type: string
-              example: Juan
-            customerLastName:
-              type: string
-              example: Pérez
-            createdAt:
-              type:
-                - string
-                - 'null'
-              format: date-time
-            updatedAt:
-              type:
-                - string
-                - 'null'
-              format: date-time
-    VehicleType:
-      type: string
-      enum:
-        - CAR
-        - SUV
-        - PICKUP
-        - VAN
-        - TRUCK
-        - MOTORCYCLE
-        - OTHER
+          minLength: 0
     ErrorResponse:
       type: object
-      required:
-        - code
-        - message
       properties:
         code:
           type: string
@@ -472,3 +2248,1113 @@ components:
           type: array
           items:
             type: string
+    WorkshopResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        phone:
+          type: string
+        email:
+          type: string
+        address:
+          type: string
+        notes:
+          type: string
+        complete:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    UpdateWorkOrderRequest:
+      type: object
+      properties:
+        performedAt:
+          type: string
+          format: date
+        mileage:
+          type: integer
+          format: int32
+          minimum: 0
+        notes:
+          type: string
+          maxLength: 2000
+          minLength: 0
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/WorkOrderItemRequest"
+          minItems: 1
+      required:
+      - items
+      - performedAt
+    WorkOrderItemRequest:
+      type: object
+      properties:
+        serviceTypeId:
+          type: integer
+          format: int64
+          minimum: 0
+        supplyId:
+          type: integer
+          format: int64
+          minimum: 0
+        description:
+          type: string
+          maxLength: 500
+          minLength: 0
+        quantity:
+          type: number
+          minimum: 0.001
+        unitPrice:
+          type: number
+      required:
+      - description
+      - quantity
+      - unitPrice
+    WorkOrderItemResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        serviceTypeId:
+          type: integer
+          format: int64
+        supplyId:
+          type: integer
+          format: int64
+        description:
+          type: string
+        quantity:
+          type: number
+        unitPrice:
+          type: number
+        subtotal:
+          type: number
+    WorkOrderResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        vehicleId:
+          type: integer
+          format: int64
+        vehicleLicensePlate:
+          type: string
+        vehicleDescription:
+          type: string
+        customerId:
+          type: integer
+          format: int64
+        customerName:
+          type: string
+        customerDocumentNumber:
+          type: string
+        customerPhone:
+          type: string
+        appointmentId:
+          type: integer
+          format: int64
+        quoteId:
+          type: integer
+          format: int64
+        quoteNumber:
+          type: integer
+          format: int64
+        performedAt:
+          type: string
+          format: date
+        mileage:
+          type: integer
+          format: int32
+        status:
+          type: string
+          enum:
+          - COMPLETED
+          - CANCELLED
+        total:
+          type: number
+        notes:
+          type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/WorkOrderItemResponse"
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    UpdateVehicleRequest:
+      type: object
+      properties:
+        customerId:
+          type: integer
+          format: int64
+          minimum: 0
+        licensePlate:
+          type: string
+          maxLength: 20
+          minLength: 0
+        brand:
+          type: string
+          maxLength: 80
+          minLength: 0
+        model:
+          type: string
+          maxLength: 120
+          minLength: 0
+        year:
+          type: integer
+          format: int32
+          maximum: 9999
+          minimum: 1886
+        chassisNumber:
+          type: string
+          maxLength: 100
+          minLength: 0
+        engineNumber:
+          type: string
+          maxLength: 100
+          minLength: 0
+        mileage:
+          type: integer
+          format: int32
+          minimum: 0
+        vehicleType:
+          type: string
+          enum:
+          - CAR
+          - SUV
+          - PICKUP
+          - VAN
+          - TRUCK
+          - MOTORCYCLE
+          - OTHER
+        notes:
+          type: string
+          maxLength: 1000
+          minLength: 0
+      required:
+      - brand
+      - customerId
+      - licensePlate
+      - model
+      - vehicleType
+    VehicleResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        customerId:
+          type: integer
+          format: int64
+        customerFirstName:
+          type: string
+        customerLastName:
+          type: string
+        licensePlate:
+          type: string
+        brand:
+          type: string
+        model:
+          type: string
+        year:
+          type: integer
+          format: int32
+        chassisNumber:
+          type: string
+        engineNumber:
+          type: string
+        mileage:
+          type: integer
+          format: int32
+        vehicleType:
+          type: string
+          enum:
+          - CAR
+          - SUV
+          - PICKUP
+          - VAN
+          - TRUCK
+          - MOTORCYCLE
+          - OTHER
+        notes:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    UpdateSupplyRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 120
+          minLength: 0
+        price:
+          type: number
+          minimum: 0.0
+      required:
+      - name
+      - price
+    SupplyResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        price:
+          type: number
+        active:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    UpdateServiceTypeRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 120
+          minLength: 0
+        description:
+          type: string
+          maxLength: 500
+          minLength: 0
+        basePrice:
+          type: number
+          minimum: 0.0
+      required:
+      - basePrice
+      - name
+    ServiceTypeResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        description:
+          type: string
+        basePrice:
+          type: number
+        active:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    QuoteItemRequest:
+      type: object
+      properties:
+        serviceTypeId:
+          type: integer
+          format: int64
+          minimum: 0
+        supplyId:
+          type: integer
+          format: int64
+          minimum: 0
+        description:
+          type: string
+          maxLength: 500
+          minLength: 0
+        quantity:
+          type: number
+          minimum: 0.001
+        unitPrice:
+          type: number
+      required:
+      - description
+      - quantity
+      - unitPrice
+    UpdateQuoteRequest:
+      type: object
+      properties:
+        customerId:
+          type: integer
+          format: int64
+          minimum: 0
+        vehicleId:
+          type: integer
+          format: int64
+          minimum: 0
+        validUntil:
+          type: string
+          format: date
+        notes:
+          type: string
+          maxLength: 2000
+          minLength: 0
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/QuoteItemRequest"
+          minItems: 1
+      required:
+      - customerId
+      - items
+      - vehicleId
+    QuoteItemResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        serviceTypeId:
+          type: integer
+          format: int64
+        supplyId:
+          type: integer
+          format: int64
+        description:
+          type: string
+        quantity:
+          type: number
+        unitPrice:
+          type: number
+        subtotal:
+          type: number
+    QuoteResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        number:
+          type: integer
+          format: int64
+        customerId:
+          type: integer
+          format: int64
+        customerName:
+          type: string
+        customerDocumentNumber:
+          type: string
+        customerPhone:
+          type: string
+        vehicleId:
+          type: integer
+          format: int64
+        vehicleLicensePlate:
+          type: string
+        vehicleDescription:
+          type: string
+        validUntil:
+          type: string
+          format: date
+        status:
+          type: string
+          enum:
+          - PENDING
+          - APPROVED
+          - REJECTED
+        total:
+          type: number
+        notes:
+          type: string
+        hasWorkOrder:
+          type: boolean
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/QuoteItemResponse"
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    UpdateCustomerRequest:
+      type: object
+      properties:
+        firstName:
+          type: string
+          maxLength: 120
+          minLength: 0
+        lastName:
+          type: string
+          maxLength: 120
+          minLength: 0
+        documentNumber:
+          type: string
+          maxLength: 30
+          minLength: 0
+        phone:
+          type: string
+          minLength: 1
+          pattern: "^[0-9+()\\-\\s]{6,30}$"
+        email:
+          type: string
+          format: email
+          maxLength: 255
+          minLength: 0
+        address:
+          type: string
+          maxLength: 255
+          minLength: 0
+        notes:
+          type: string
+          maxLength: 1000
+          minLength: 0
+      required:
+      - firstName
+      - lastName
+      - phone
+    CustomerResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        firstName:
+          type: string
+        lastName:
+          type: string
+        documentNumber:
+          type: string
+        phone:
+          type: string
+        email:
+          type: string
+        address:
+          type: string
+        notes:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    UpdateAppointmentRequest:
+      type: object
+      properties:
+        scheduledAt:
+          type: string
+          format: date-time
+        notes:
+          type: string
+          maxLength: 1000
+          minLength: 0
+      required:
+      - scheduledAt
+    AppointmentResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        scheduledAt:
+          type: string
+          format: date-time
+        status:
+          type: string
+          enum:
+          - SCHEDULED
+          - COMPLETED
+          - CANCELLED
+        notes:
+          type: string
+        vehicleId:
+          type: integer
+          format: int64
+        licensePlate:
+          type: string
+        brand:
+          type: string
+        model:
+          type: string
+        customerId:
+          type: integer
+          format: int64
+        customerFirstName:
+          type: string
+        customerLastName:
+          type: string
+        customerPhone:
+          type: string
+        quoteId:
+          type: integer
+          format: int64
+        quoteNumber:
+          type: integer
+          format: int64
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    UpdateUserRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 120
+          minLength: 0
+        email:
+          type: string
+          format: email
+          maxLength: 255
+          minLength: 0
+        role:
+          type: string
+          enum:
+          - SYSTEM_ADMIN
+          - USER
+      required:
+      - email
+      - name
+      - role
+    UserResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        email:
+          type: string
+        role:
+          type: string
+          enum:
+          - SYSTEM_ADMIN
+          - USER
+        status:
+          type: string
+          enum:
+          - ENABLED
+          - DISABLED
+        mustChangePassword:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+    CreateWorkOrderRequest:
+      type: object
+      properties:
+        vehicleId:
+          type: integer
+          format: int64
+          minimum: 0
+        appointmentId:
+          type: integer
+          format: int64
+          minimum: 0
+        quoteId:
+          type: integer
+          format: int64
+          minimum: 0
+        performedAt:
+          type: string
+          format: date
+        mileage:
+          type: integer
+          format: int32
+          minimum: 0
+        notes:
+          type: string
+          maxLength: 2000
+          minLength: 0
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/WorkOrderItemRequest"
+          minItems: 1
+      required:
+      - items
+      - performedAt
+      - vehicleId
+    CreateVehicleRequest:
+      type: object
+      properties:
+        customerId:
+          type: integer
+          format: int64
+          minimum: 0
+        licensePlate:
+          type: string
+          maxLength: 20
+          minLength: 0
+        brand:
+          type: string
+          maxLength: 80
+          minLength: 0
+        model:
+          type: string
+          maxLength: 120
+          minLength: 0
+        year:
+          type: integer
+          format: int32
+          maximum: 9999
+          minimum: 1886
+        chassisNumber:
+          type: string
+          maxLength: 100
+          minLength: 0
+        engineNumber:
+          type: string
+          maxLength: 100
+          minLength: 0
+        mileage:
+          type: integer
+          format: int32
+          minimum: 0
+        vehicleType:
+          type: string
+          enum:
+          - CAR
+          - SUV
+          - PICKUP
+          - VAN
+          - TRUCK
+          - MOTORCYCLE
+          - OTHER
+        notes:
+          type: string
+          maxLength: 1000
+          minLength: 0
+      required:
+      - brand
+      - customerId
+      - licensePlate
+      - model
+      - vehicleType
+    CreateSupplyRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 120
+          minLength: 0
+        price:
+          type: number
+          minimum: 0.0
+      required:
+      - name
+      - price
+    CreateServiceTypeRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 120
+          minLength: 0
+        description:
+          type: string
+          maxLength: 500
+          minLength: 0
+        basePrice:
+          type: number
+          minimum: 0.0
+      required:
+      - basePrice
+      - name
+    CreateQuoteRequest:
+      type: object
+      properties:
+        customerId:
+          type: integer
+          format: int64
+          minimum: 0
+        vehicleId:
+          type: integer
+          format: int64
+          minimum: 0
+        validUntil:
+          type: string
+          format: date
+        notes:
+          type: string
+          maxLength: 2000
+          minLength: 0
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/QuoteItemRequest"
+          minItems: 1
+      required:
+      - customerId
+      - items
+      - vehicleId
+    CreateCustomerRequest:
+      type: object
+      properties:
+        firstName:
+          type: string
+          maxLength: 120
+          minLength: 0
+        lastName:
+          type: string
+          maxLength: 120
+          minLength: 0
+        documentNumber:
+          type: string
+          maxLength: 30
+          minLength: 0
+        phone:
+          type: string
+          minLength: 1
+          pattern: "^[0-9+()\\-\\s]{6,30}$"
+        email:
+          type: string
+          format: email
+          maxLength: 255
+          minLength: 0
+        address:
+          type: string
+          maxLength: 255
+          minLength: 0
+        notes:
+          type: string
+          maxLength: 1000
+          minLength: 0
+      required:
+      - firstName
+      - lastName
+      - phone
+    ResetPasswordRequest:
+      type: object
+      properties:
+        token:
+          type: string
+          minLength: 1
+        newPassword:
+          type: string
+          maxLength: 2147483647
+          minLength: 8
+      required:
+      - newPassword
+      - token
+    LoginRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          minLength: 1
+        password:
+          type: string
+          minLength: 1
+      required:
+      - email
+      - password
+    LoginResponse:
+      type: object
+      properties:
+        token:
+          type: string
+        tokenType:
+          type: string
+        expiresIn:
+          type: integer
+          format: int64
+        userId:
+          type: integer
+          format: int64
+        name:
+          type: string
+        role:
+          type: string
+          enum:
+          - SYSTEM_ADMIN
+          - USER
+        mustChangePassword:
+          type: boolean
+    ForgotPasswordRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          minLength: 1
+      required:
+      - email
+    ChangePasswordRequest:
+      type: object
+      properties:
+        currentPassword:
+          type: string
+          minLength: 1
+        newPassword:
+          type: string
+          maxLength: 2147483647
+          minLength: 8
+      required:
+      - currentPassword
+      - newPassword
+    CreateAppointmentRequest:
+      type: object
+      properties:
+        vehicleId:
+          type: integer
+          format: int64
+          minimum: 0
+        quoteId:
+          type: integer
+          format: int64
+          minimum: 0
+        scheduledAt:
+          type: string
+          format: date-time
+        notes:
+          type: string
+          maxLength: 1000
+          minLength: 0
+      required:
+      - scheduledAt
+      - vehicleId
+    CreateUserRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 120
+          minLength: 0
+        email:
+          type: string
+          format: email
+          maxLength: 255
+          minLength: 0
+        password:
+          type: string
+          maxLength: 2147483647
+          minLength: 8
+        role:
+          type: string
+          enum:
+          - SYSTEM_ADMIN
+          - USER
+      required:
+      - email
+      - name
+      - password
+      - role
+    UpdateWorkOrderStatusRequest:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+          - COMPLETED
+          - CANCELLED
+      required:
+      - status
+    UpdateSupplyStatusRequest:
+      type: object
+      properties:
+        active:
+          type: boolean
+      required:
+      - active
+    UpdateServiceTypeStatusRequest:
+      type: object
+      properties:
+        active:
+          type: boolean
+      required:
+      - active
+    UpdateQuoteStatusRequest:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+          - PENDING
+          - APPROVED
+          - REJECTED
+      required:
+      - status
+    UpdateUserStatusRequest:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+          - ENABLED
+          - DISABLED
+      required:
+      - status
+    WorkOrderPageResponse:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/WorkOrderSummaryResponse"
+        page:
+          type: integer
+          format: int32
+        size:
+          type: integer
+          format: int32
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+          format: int32
+    WorkOrderSummaryResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        vehicleId:
+          type: integer
+          format: int64
+        vehicleLicensePlate:
+          type: string
+        customerId:
+          type: integer
+          format: int64
+        customerName:
+          type: string
+        performedAt:
+          type: string
+          format: date
+        status:
+          type: string
+          enum:
+          - COMPLETED
+          - CANCELLED
+        total:
+          type: number
+    QuotePageResponse:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/QuoteSummaryResponse"
+        page:
+          type: integer
+          format: int32
+        size:
+          type: integer
+          format: int32
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+          format: int32
+    QuoteSummaryResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        number:
+          type: integer
+          format: int64
+        customerId:
+          type: integer
+          format: int64
+        customerName:
+          type: string
+        vehicleId:
+          type: integer
+          format: int64
+        vehicleLicensePlate:
+          type: string
+        validUntil:
+          type: string
+          format: date
+        status:
+          type: string
+          enum:
+          - PENDING
+          - APPROVED
+          - REJECTED
+        total:
+          type: number
+        createdAt:
+          type: string
+          format: date-time
+    Alerts:
+      type: object
+      properties:
+        expiredPendingQuotes:
+          type: integer
+          format: int64
+    DashboardSummaryResponse:
+      type: object
+      properties:
+        generatedAt:
+          type: string
+          format: date-time
+        metrics:
+          $ref: "#/components/schemas/Metrics"
+        alerts:
+          $ref: "#/components/schemas/Alerts"
+        todayAppointments:
+          type: array
+          items:
+            $ref: "#/components/schemas/TodayAppointment"
+    Metrics:
+      type: object
+      properties:
+        todayAppointments:
+          type: integer
+          format: int64
+        pendingQuotes:
+          type: integer
+          format: int64
+        completedWorkOrdersThisMonth:
+          type: integer
+          format: int64
+        registeredVehicles:
+          type: integer
+          format: int64
+    TodayAppointment:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        scheduledAt:
+          type: string
+          format: date-time
+        status:
+          type: string
+          enum:
+          - SCHEDULED
+          - COMPLETED
+          - CANCELLED
+        licensePlate:
+          type: string
+        vehicleDescription:
+          type: string
+        customerName:
+          type: string
+  securitySchemes:
+    bearerAuth:
+      type: http
+      name: bearerAuth
+      scheme: bearer
+      bearerFormat: JWT

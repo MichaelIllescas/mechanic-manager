@@ -1,6 +1,6 @@
 # Product Roadmap
 
-**Versión:** 1.1  
+**Versión:** 1.2  
 **Estado:** Inicial — orientado a validación
 
 ---
@@ -30,7 +30,7 @@ Tener la base suficiente para empezar a construir funcionalidades sin introducir
 - administración de usuarios de plataforma;
 - creación y edición del taller propio;
 - asociación `USER` 1:1 con `Workshop`;
-- aislamiento de datos a partir del taller del usuario autenticado;
+- aislamiento de datos a partir del usuario autenticado;
 - manejo centralizado de errores;
 - logging básico;
 - tests esenciales.
@@ -97,7 +97,7 @@ La agenda no valida solapamiento: un taller puede atender varios vehículos en e
 
 ---
 
-## Fase 3 — Catálogos, Órdenes de Trabajo e Historial
+## Fase 3 — Catálogos, Trabajos Realizados e Historial
 
 ### Objetivo
 
@@ -107,17 +107,15 @@ Administrar el trabajo realizado sobre los vehículos y cerrar el flujo principa
 
 - catálogo de servicios del taller con precio de referencia;
 - catálogo de insumos del taller con precio de referencia;
-- ingreso del vehículo;
-- creación de la orden de trabajo;
-- vínculo con presupuesto aprobado;
-- diagnóstico;
+- registro del trabajo realizado sobre un vehículo;
+- vínculo con turno y presupuesto aprobado;
 - ítems de servicios y repuestos realizados;
 - observaciones;
 - total;
-- estados;
-- finalización;
-- entrega;
-- historial técnico.
+- estados completado y cancelado;
+- generación automática al completar un turno;
+- historial técnico por vehículo y por cliente;
+- comprobante descargable.
 
 Los catálogos se construyen antes que las órdenes: los ítems de una orden los toman como origen.
 

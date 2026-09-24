@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 
 @Tag(
@@ -39,9 +40,11 @@ public interface AuthApi {
             @ApiResponse(responseCode = "401", description = "Email o contraseña incorrectos",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "403", description = "La cuenta está deshabilitada",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "429", description = "Demasiados intentos fallidos",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
-    ResponseEntity<LoginResponse> login(LoginRequest request);
+    ResponseEntity<LoginResponse> login(LoginRequest request, HttpServletRequest httpRequest);
 
     @Operation(
             summary = "Solicitar recuperación de contraseña",
@@ -59,9 +62,11 @@ public interface AuthApi {
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "Pedido registrado"),
             @ApiResponse(responseCode = "400", description = "Datos inválidos",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "429", description = "Demasiados pedidos",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
-    ResponseEntity<Void> forgotPassword(ForgotPasswordRequest request);
+    ResponseEntity<Void> forgotPassword(ForgotPasswordRequest request, HttpServletRequest httpRequest);
     
     @Operation(
             summary = "Restablecer contraseña",
@@ -75,9 +80,11 @@ public interface AuthApi {
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "Contraseña actualizada"),
             @ApiResponse(responseCode = "400", description = "Datos inválidos o enlace vencido",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "429", description = "Demasiados intentos con enlaces inválidos",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
-    ResponseEntity<Void> resetPassword(ResetPasswordRequest request);
+    ResponseEntity<Void> resetPassword(ResetPasswordRequest request, HttpServletRequest httpRequest);
     
     @Operation(
             summary = "Cambiar la propia contraseña",

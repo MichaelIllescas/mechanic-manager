@@ -9,6 +9,7 @@ import com.mechanicmanager.auth.service.AuthService;
 import com.mechanicmanager.auth.service.ChangePasswordUseCase;
 import com.mechanicmanager.auth.service.RequestPasswordResetUseCase;
 import com.mechanicmanager.auth.service.ResetPasswordUseCase;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import com.mechanicmanager.shared.security.AuthenticatedUser;
@@ -31,22 +32,31 @@ public class AuthController implements AuthApi {
     
     @Override
     @PostMapping(AuthRoutes.LOGIN)
-    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
-        return ResponseEntity.ok(authService.login(request));
+    public ResponseEntity<LoginResponse> login(
+            @Valid @RequestBody LoginRequest request,
+            HttpServletRequest httpRequest
+    ) {
+        return ResponseEntity.ok(authService.login(request, httpRequest.getRemoteAddr()));
     }
     
     @Override
     @PostMapping(AuthRoutes.FORGOT_PASSWORD)
-    public ResponseEntity<Void> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
-        requestPasswordResetUseCase.execute(request);
+    public ResponseEntity<Void> forgotPassword(
+            @Valid @RequestBody ForgotPasswordRequest request,
+            HttpServletRequest httpRequest
+    ) {
+        requestPasswordResetUseCase.execute(request, httpRequest.getRemoteAddr());
         
         return ResponseEntity.noContent().build();
     }
     
     @Override
     @PostMapping(AuthRoutes.RESET_PASSWORD)
-    public ResponseEntity<Void> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
-        resetPasswordUseCase.execute(request);
+    public ResponseEntity<Void> resetPassword(
+            @Valid @RequestBody ResetPasswordRequest request,
+            HttpServletRequest httpRequest
+    ) {
+        resetPasswordUseCase.execute(request, httpRequest.getRemoteAddr());
         
         return ResponseEntity.noContent().build();
     }

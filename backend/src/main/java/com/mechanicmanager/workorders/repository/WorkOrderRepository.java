@@ -45,6 +45,10 @@ public interface WorkOrderRepository extends
 
     Optional<WorkOrder> findByQuoteIdAndUserId(Long quoteId, Long userId);
 
+    boolean existsByAppointmentIdAndUserId(Long appointmentId, Long userId);
+
+    boolean existsByQuoteIdAndUserId(Long quoteId, Long userId);
+
     long countByUserIdAndStatusAndPerformedAtGreaterThanEqualAndPerformedAtLessThan(
             Long userId,
             WorkOrderStatus status,

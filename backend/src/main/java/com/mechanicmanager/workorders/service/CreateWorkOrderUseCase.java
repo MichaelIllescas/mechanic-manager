@@ -12,6 +12,7 @@ import com.mechanicmanager.vehicles.repository.VehicleRepository;
 import com.mechanicmanager.workorders.dto.CreateWorkOrderRequest;
 import com.mechanicmanager.workorders.dto.WorkOrderResponse;
 import com.mechanicmanager.workorders.exception.InvalidWorkOrderException;
+import com.mechanicmanager.workorders.exception.WorkOrderAlreadyExistsException;
 import com.mechanicmanager.workorders.mapper.WorkOrderMapper;
 import com.mechanicmanager.workorders.model.WorkOrder;
 import com.mechanicmanager.workorders.model.WorkOrderItem;
@@ -90,6 +91,12 @@ public class CreateWorkOrderUseCase {
             );
         }
 
+        if (workOrderRepository.existsByAppointmentIdAndUserId(appointmentId, userId)) {
+            throw new WorkOrderAlreadyExistsException(
+                    "El turno indicado ya tiene un trabajo realizado asociado"
+            );
+        }
+
         return appointment;
     }
 
@@ -106,6 +113,12 @@ public class CreateWorkOrderUseCase {
         if (!quote.getVehicle().getId().equals(vehicle.getId())) {
             throw new InvalidWorkOrderException(
                     "El presupuesto indicado no pertenece al vehículo seleccionado"
+            );
+        }
+
+        if (workOrderRepository.existsByQuoteIdAndUserId(quoteId, userId)) {
+            throw new WorkOrderAlreadyExistsException(
+                    "El presupuesto indicado ya tiene un trabajo realizado asociado"
             );
         }
 

@@ -34,9 +34,19 @@ public class CreateWorkOrderFromAppointmentUseCase {
 
     @Transactional
     public void execute(Long userId, Appointment appointment) {
+        // Un turno origina una sola orden: si ya se cargó una a mano para este
+        // turno, no se crea otra.
+        if (workOrderRepository.existsByAppointmentIdAndUserId(appointment.getId(), userId)) {
+            return;
+        }
+
+        // Un presupuesto también alimenta una sola orden: si ya se usó en otra,
+        // la de este turno nace vacía.
         Quote quote = quoteRepository
                 .findByAppointmentIdAndUserId(appointment.getId(), userId)
                 .filter(candidate -> candidate.getStatus() == QuoteStatus.APPROVED)
+                .filter(candidate -> !workOrderRepository
+                        .existsByQuoteIdAndUserId(candidate.getId(), userId))
                 .orElse(null);
 
         WorkOrder workOrder = WorkOrder.builder()

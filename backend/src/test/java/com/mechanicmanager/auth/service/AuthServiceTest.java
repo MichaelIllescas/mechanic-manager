@@ -2,7 +2,12 @@ package com.mechanicmanager.auth.service;
 
 import com.mechanicmanager.auth.dto.LoginRequest;
 import com.mechanicmanager.auth.dto.LoginResponse;
+import com.mechanicmanager.auth.exception.AccountDisabledException;
 import com.mechanicmanager.auth.exception.InvalidCredentialsException;
+import com.mechanicmanager.shared.security.AppUserDetailsService;
+import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import com.mechanicmanager.auth.exception.TooManyAttemptsException;
 import com.mechanicmanager.shared.security.AttemptLimiter;
 import com.mechanicmanager.shared.security.AuthenticatedUser;
@@ -37,13 +42,55 @@ class AuthServiceTest {
     @Mock
     private JwtService jwtService;
 
+    @Mock
+    private AppUserDetailsService userDetailsService;
+
+    @Mock
+    private PasswordEncoder passwordEncoder;
+
     private AttemptLimiter limiter;
     private AuthService service;
 
     @BeforeEach
     void setUp() {
         limiter = new AttemptLimiter(Clock.systemUTC(), 15);
-        service = new AuthService(authenticationManager, jwtService, limiter);
+        service = new AuthService(
+                authenticationManager, jwtService, limiter, userDetailsService, passwordEncoder);
+    }
+
+    private AuthenticatedUser disabledUser() {
+        return new AuthenticatedUser(
+                7L, "Ana", "ana@example.com", "hash", Role.USER, false, false);
+    }
+
+    @Test
+    void tellsTheAccountIsDisabledOnlyWhenThePasswordIsCorrect() {
+        when(authenticationManager.authenticate(any())).thenThrow(new DisabledException("off"));
+        when(userDetailsService.loadUserByUsername("ana@example.com")).thenReturn(disabledUser());
+        when(passwordEncoder.matches("correcta", "hash")).thenReturn(true);
+
+        assertThatThrownBy(() -> service.login(request("ana@example.com", "correcta"), IP))
+                .isInstanceOf(AccountDisabledException.class);
+    }
+
+    @Test
+    void treatsADisabledAccountWithWrongPasswordAsInvalidCredentials() {
+        when(authenticationManager.authenticate(any())).thenThrow(new DisabledException("off"));
+        when(userDetailsService.loadUserByUsername("ana@example.com")).thenReturn(disabledUser());
+        when(passwordEncoder.matches("mala", "hash")).thenReturn(false);
+
+        assertThatThrownBy(() -> service.login(request("ana@example.com", "mala"), IP))
+                .isInstanceOf(InvalidCredentialsException.class);
+    }
+
+    @Test
+    void treatsADisabledAccountThatVanishedAsInvalidCredentials() {
+        when(authenticationManager.authenticate(any())).thenThrow(new DisabledException("off"));
+        when(userDetailsService.loadUserByUsername("ana@example.com"))
+                .thenThrow(new UsernameNotFoundException("no existe"));
+
+        assertThatThrownBy(() -> service.login(request("ana@example.com", "x"), IP))
+                .isInstanceOf(InvalidCredentialsException.class);
     }
 
     private LoginRequest request(String email, String password) {

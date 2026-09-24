@@ -39,7 +39,7 @@ public interface AuthApi {
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "401", description = "Email o contraseña incorrectos",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "403", description = "La cuenta está deshabilitada",
+            @ApiResponse(responseCode = "403", description = "La cuenta está deshabilitada (solo se informa si la contraseña es correcta)",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "429", description = "Demasiados intentos fallidos",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))

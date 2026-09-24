@@ -6,6 +6,7 @@ import com.mechanicmanager.auth.exception.AccountDisabledException;
 import com.mechanicmanager.auth.exception.InvalidCredentialsException;
 import com.mechanicmanager.auth.exception.TooManyAttemptsException;
 import com.mechanicmanager.shared.exception.AppException;
+import com.mechanicmanager.shared.security.AppUserDetailsService;
 import com.mechanicmanager.shared.security.AttemptLimiter;
 import com.mechanicmanager.shared.security.AuthenticatedUser;
 import com.mechanicmanager.shared.security.JwtService;
@@ -15,6 +16,8 @@ import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -34,6 +37,8 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
     private final AttemptLimiter attemptLimiter;
+    private final AppUserDetailsService userDetailsService;
+    private final PasswordEncoder passwordEncoder;
 
     public LoginResponse login(LoginRequest request, String clientIp) {
         String email = request.email().trim().toLowerCase();
@@ -73,9 +78,27 @@ public class AuthService {
             return authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(email, password));
         } catch (DisabledException e) {
-            throw new AccountDisabledException();
+            throw disabledOrInvalid(email, password);
         } catch (AuthenticationException e) {
             throw new InvalidCredentialsException();
+        }
+    }
+
+    /**
+     * Spring rechaza a una cuenta deshabilitada antes de mirar la contraseña.
+     * Avisar en ese punto que está deshabilitada le confirmaría a cualquiera
+     * que el email existe, así que solo se avisa a quien demuestra conocer la
+     * contraseña; al resto se lo trata como credenciales inválidas.
+     */
+    private AppException disabledOrInvalid(String email, String password) {
+        try {
+            AuthenticatedUser user = userDetailsService.loadUserByUsername(email);
+
+            return passwordEncoder.matches(password, user.getPassword())
+                    ? new AccountDisabledException()
+                    : new InvalidCredentialsException();
+        } catch (UsernameNotFoundException e) {
+            return new InvalidCredentialsException();
         }
     }
 }

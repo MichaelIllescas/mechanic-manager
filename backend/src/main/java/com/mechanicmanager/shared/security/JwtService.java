@@ -24,8 +24,30 @@ public class JwtService {
             @Value("${security.jwt.secret}") String secret,
             @Value("${security.jwt.expiration-minutes}") long expirationMinutes
     ) {
-        this.key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret));
+        this.key = buildKey(secret);
         this.expiration = Duration.ofMinutes(expirationMinutes);
+    }
+
+    /**
+     * Sin clave la aplicación no arranca, y el mensaje dice qué hacer: el error
+     * por defecto ("key must be at least 256 bits") no menciona que falta una
+     * variable de entorno ni dónde se configura.
+     */
+    private static SecretKey buildKey(String secret) {
+        if (secret == null || secret.isBlank()) {
+            throw new IllegalStateException(
+                    "Falta JWT_SECRET. En local, copiá backend/.env.example a backend/.env y "
+                            + "completá el valor (el archivo explica cómo generarlo). "
+                            + "En un servidor, definilo como variable de entorno.");
+        }
+
+        try {
+            return Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret.trim()));
+        } catch (JwtException | IllegalArgumentException e) {
+            throw new IllegalStateException(
+                    "JWT_SECRET no es válido: tiene que ser base64 y decodificar a al menos 32 bytes. "
+                            + "Ver backend/.env.example para generarlo.", e);
+        }
     }
     
     public String generateToken(AuthenticatedUser user) {

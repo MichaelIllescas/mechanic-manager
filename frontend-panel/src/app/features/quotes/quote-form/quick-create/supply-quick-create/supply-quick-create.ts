@@ -22,7 +22,7 @@ export class SupplyQuickCreate {
   readonly saving = signal(false);
   readonly errorMessage = signal<string | null>(null);
   readonly form = this.fb.group({
-    name: ['', [Validators.required, Validators.maxLength(150)]],
+    name: ['', [Validators.required, Validators.maxLength(120)]],
     price: [null as number | null, [Validators.required, Validators.min(0)]],
   });
 

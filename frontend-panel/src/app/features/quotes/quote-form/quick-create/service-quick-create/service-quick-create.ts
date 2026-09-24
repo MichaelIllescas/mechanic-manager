@@ -26,7 +26,7 @@ export class ServiceQuickCreate {
   readonly errorMessage = signal<string | null>(null);
   readonly form = this.fb.group({
     name: ['', [Validators.required, Validators.maxLength(120)]],
-    description: ['', Validators.maxLength(1000)],
+    description: ['', Validators.maxLength(500)],
     basePrice: [null as number | null, [Validators.required, Validators.min(0)]],
   });
 

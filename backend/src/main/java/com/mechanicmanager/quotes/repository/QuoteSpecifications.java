@@ -2,6 +2,7 @@ package com.mechanicmanager.quotes.repository;
 
 import com.mechanicmanager.quotes.model.Quote;
 import com.mechanicmanager.quotes.model.QuoteStatus;
+import com.mechanicmanager.shared.search.LikePattern;
 import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
@@ -34,7 +35,7 @@ public final class QuoteSpecifications {
 
             if (search != null && !search.isBlank()) {
                 String normalizedSearch = search.trim().toLowerCase(Locale.ROOT);
-                String pattern = "%" + normalizedSearch + "%";
+                String pattern = LikePattern.contains(normalizedSearch);
 
                 Expression<String> customerFullName = criteriaBuilder.concat(
                         criteriaBuilder.concat(
@@ -47,11 +48,11 @@ public final class QuoteSpecifications {
                 List<Predicate> matches = new ArrayList<>();
                 matches.add(criteriaBuilder.like(
                         criteriaBuilder.lower(customerFullName),
-                        pattern
+                        pattern, LikePattern.ESCAPE
                 ));
                 matches.add(criteriaBuilder.like(
                         criteriaBuilder.lower(root.get("vehicle").get("licensePlate")),
-                        pattern
+                        pattern, LikePattern.ESCAPE
                 ));
 
                 parseNumber(normalizedSearch).ifPresent(number ->

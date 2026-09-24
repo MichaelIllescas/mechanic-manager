@@ -1,11 +1,10 @@
 package com.mechanicmanager.customers.repository;
 
 import com.mechanicmanager.customers.model.Customer;
+import com.mechanicmanager.shared.search.LikePattern;
 import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
-
-import java.util.Locale;
 
 public final class CustomerSpecifications {
 
@@ -17,7 +16,7 @@ public final class CustomerSpecifications {
             String search
     ) {
         return (root, query, criteriaBuilder) -> {
-            String pattern = "%" + search.toLowerCase(Locale.ROOT) + "%";
+            String pattern = LikePattern.contains(search);
 
             Predicate belongsToUser = criteriaBuilder.equal(
                     root.get("user").get("id"),
@@ -30,12 +29,12 @@ public final class CustomerSpecifications {
             );
 
             Predicate matchesSearch = criteriaBuilder.or(
-                    criteriaBuilder.like(criteriaBuilder.lower(root.get("firstName")), pattern),
-                    criteriaBuilder.like(criteriaBuilder.lower(root.get("lastName")), pattern),
-                    criteriaBuilder.like(criteriaBuilder.lower(fullName), pattern),
-                    criteriaBuilder.like(criteriaBuilder.lower(root.get("documentNumber")), pattern),
-                    criteriaBuilder.like(criteriaBuilder.lower(root.get("phone")), pattern),
-                    criteriaBuilder.like(criteriaBuilder.lower(root.get("email")), pattern)
+                    criteriaBuilder.like(criteriaBuilder.lower(root.get("firstName")), pattern, LikePattern.ESCAPE),
+                    criteriaBuilder.like(criteriaBuilder.lower(root.get("lastName")), pattern, LikePattern.ESCAPE),
+                    criteriaBuilder.like(criteriaBuilder.lower(fullName), pattern, LikePattern.ESCAPE),
+                    criteriaBuilder.like(criteriaBuilder.lower(root.get("documentNumber")), pattern, LikePattern.ESCAPE),
+                    criteriaBuilder.like(criteriaBuilder.lower(root.get("phone")), pattern, LikePattern.ESCAPE),
+                    criteriaBuilder.like(criteriaBuilder.lower(root.get("email")), pattern, LikePattern.ESCAPE)
             );
 
             return criteriaBuilder.and(belongsToUser, matchesSearch);

@@ -197,6 +197,11 @@
   margin: 0;
 }
 
+.subject__stats div {
+  min-width: 112px;
+  text-align: center;
+}
+
 .subject__stats dt {
   color: #6d7f97;
   font-size: 0.8rem;
@@ -243,6 +248,7 @@
 .entry__summary {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 12px;
   color: #07182e;
 }
@@ -321,9 +327,40 @@
     flex-direction: column;
   }
 
+  .entry__summary {
+    width: 100%;
+  }
+
+  .entry__summary strong {
+    margin-left: auto;
+  }
+
+  .entry__action {
+    flex: 1 1 140px;
+    justify-content: center;
+  }
+
   .entry__vehicle,
   .entry__meta {
     display: block;
     margin: 4px 0 0;
+  }
+}
+
+@media (max-width: 420px) {
+  .timeline {
+    padding: 16px;
+  }
+
+  .entry {
+    padding: 14px;
+  }
+
+  .entry__summary strong {
+    margin-left: 0;
+  }
+
+  .entry__action {
+    flex-basis: 100%;
   }
 }

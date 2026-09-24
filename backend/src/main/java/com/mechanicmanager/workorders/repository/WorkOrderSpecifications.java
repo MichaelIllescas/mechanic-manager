@@ -2,6 +2,7 @@ package com.mechanicmanager.workorders.repository;
 
 import com.mechanicmanager.workorders.model.WorkOrder;
 import com.mechanicmanager.workorders.model.WorkOrderStatus;
+import com.mechanicmanager.shared.search.LikePattern;
 import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
@@ -50,7 +51,7 @@ public final class WorkOrderSpecifications {
 
             if (search != null && !search.isBlank()) {
                 String normalizedSearch = search.trim().toLowerCase(Locale.ROOT);
-                String pattern = "%" + normalizedSearch + "%";
+                String pattern = LikePattern.contains(normalizedSearch);
 
                 Expression<String> customerFullName = criteriaBuilder.concat(
                         criteriaBuilder.concat(
@@ -63,11 +64,11 @@ public final class WorkOrderSpecifications {
                 List<Predicate> matches = new ArrayList<>();
                 matches.add(criteriaBuilder.like(
                         criteriaBuilder.lower(customerFullName),
-                        pattern
+                        pattern, LikePattern.ESCAPE
                 ));
                 matches.add(criteriaBuilder.like(
                         criteriaBuilder.lower(root.get("vehicle").get("licensePlate")),
-                        pattern
+                        pattern, LikePattern.ESCAPE
                 ));
 
                 filters.add(criteriaBuilder.or(matches.toArray(Predicate[]::new)));

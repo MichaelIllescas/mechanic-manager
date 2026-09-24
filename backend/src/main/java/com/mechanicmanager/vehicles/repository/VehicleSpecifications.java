@@ -1,10 +1,9 @@
 package com.mechanicmanager.vehicles.repository;
 
 import com.mechanicmanager.vehicles.model.Vehicle;
+import com.mechanicmanager.shared.search.LikePattern;
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
-
-import java.util.Locale;
 
 public final class VehicleSpecifications {
 
@@ -16,7 +15,7 @@ public final class VehicleSpecifications {
             String search
     ) {
         return (root, query, criteriaBuilder) -> {
-            String pattern = "%" + search.toLowerCase(Locale.ROOT) + "%";
+            String pattern = LikePattern.contains(search);
 
             Predicate belongsToUser = criteriaBuilder.equal(
                     root.get("user").get("id"),
@@ -25,7 +24,7 @@ public final class VehicleSpecifications {
 
             Predicate licensePlateMatches = criteriaBuilder.like(
                     criteriaBuilder.lower(root.get("licensePlate")),
-                    pattern
+                    pattern, LikePattern.ESCAPE
             );
 
             return criteriaBuilder.and(belongsToUser, licensePlateMatches);

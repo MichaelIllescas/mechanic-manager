@@ -8,6 +8,7 @@ import com.mechanicmanager.supplies.repository.SupplyRepository;
 import com.mechanicmanager.workorders.dto.WorkOrderItemRequest;
 import com.mechanicmanager.workorders.exception.InvalidWorkOrderException;
 import com.mechanicmanager.workorders.model.WorkOrderItem;
+import com.mechanicmanager.shared.validation.MoneyLimits;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -22,17 +23,25 @@ public class WorkOrderItemFactory {
     private final SupplyRepository supplyRepository;
 
     /**
-     * Crea todos los ítems y verifica que el total no quede negativo: un
-     * descuento manual mayor a lo que descuenta no es un importe válido.
+     * Crea todos los ítems y verifica que los importes sean válidos: que quepan
+     * en las columnas y que un descuento manual no deje el total negativo.
      */
     public List<WorkOrderItem> createAll(Long userId, List<WorkOrderItemRequest> requests) {
         List<WorkOrderItem> items = requests.stream()
                 .map(request -> create(userId, request))
                 .toList();
 
+        if (items.stream().map(WorkOrderItem::getSubtotal).anyMatch(MoneyLimits::exceedsMaxAmount)) {
+            throw new InvalidWorkOrderException("El importe de un ítem supera el máximo permitido");
+        }
+
         BigDecimal total = items.stream()
                 .map(WorkOrderItem::getSubtotal)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        if (MoneyLimits.exceedsMaxAmount(total)) {
+            throw new InvalidWorkOrderException("El total supera el importe máximo permitido");
+        }
 
         if (total.signum() < 0) {
             throw new InvalidWorkOrderException(

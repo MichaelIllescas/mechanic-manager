@@ -8,6 +8,7 @@ import com.mechanicmanager.servicetypes.repository.ServiceTypeRepository;
 import com.mechanicmanager.shared.exception.ResourceNotFoundException;
 import com.mechanicmanager.supplies.model.Supply;
 import com.mechanicmanager.supplies.repository.SupplyRepository;
+import com.mechanicmanager.shared.validation.MoneyLimits;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -22,17 +23,25 @@ public class QuoteItemFactory {
     private final SupplyRepository supplyRepository;
 
     /**
-     * Crea todos los ítems y verifica que el total no quede negativo: un
-     * descuento manual mayor a lo que descuenta no es un importe válido.
+     * Crea todos los ítems y verifica que los importes sean válidos: que quepan
+     * en las columnas y que un descuento manual no deje el total negativo.
      */
     public List<QuoteItem> createAll(Long userId, List<QuoteItemRequest> requests) {
         List<QuoteItem> items = requests.stream()
                 .map(request -> create(userId, request))
                 .toList();
 
+        if (items.stream().map(QuoteItem::getSubtotal).anyMatch(MoneyLimits::exceedsMaxAmount)) {
+            throw new InvalidQuoteException("El importe de un ítem supera el máximo permitido");
+        }
+
         BigDecimal total = items.stream()
                 .map(QuoteItem::getSubtotal)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        if (MoneyLimits.exceedsMaxAmount(total)) {
+            throw new InvalidQuoteException("El total supera el importe máximo permitido");
+        }
 
         if (total.signum() < 0) {
             throw new InvalidQuoteException("El descuento no puede superar el total del presupuesto");

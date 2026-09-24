@@ -79,6 +79,28 @@ class QuoteItemFactoryTest {
         assertThat(items).hasSize(2);
     }
 
+    private QuoteItemRequest big(String quantity, String unitPrice) {
+        return new QuoteItemRequest(null, null, "Item", new BigDecimal(quantity), new BigDecimal(unitPrice));
+    }
+
+    @Test
+    void rejectsAnItemWhoseSubtotalDoesNotFitTheColumn() {
+        var requests = java.util.List.of(big("999999999.999", "9999999999.99"));
+
+        assertThatThrownBy(() -> factory.createAll(7L, requests))
+                .isInstanceOf(InvalidQuoteException.class)
+                .hasMessage("El importe de un ítem supera el máximo permitido");
+    }
+
+    @Test
+    void rejectsATotalThatDoesNotFitTheColumn() {
+        var requests = java.util.List.of(big("60", "9000000000"), big("60", "9000000000"));
+
+        assertThatThrownBy(() -> factory.createAll(7L, requests))
+                .isInstanceOf(InvalidQuoteException.class)
+                .hasMessage("El total supera el importe máximo permitido");
+    }
+
     @Test
     void rejectsADiscountLargerThanTheTotal() {
         var requests = java.util.List.of(manual("Mano de obra", "1500"), manual("Descuento", "-4500"));

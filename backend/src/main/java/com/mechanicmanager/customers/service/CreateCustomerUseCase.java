@@ -5,6 +5,7 @@ import com.mechanicmanager.customers.dto.CustomerResponse;
 import com.mechanicmanager.customers.mapper.CustomerMapper;
 import com.mechanicmanager.customers.model.Customer;
 import com.mechanicmanager.customers.repository.CustomerRepository;
+import com.mechanicmanager.shared.text.Texts;
 import com.mechanicmanager.users.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -24,22 +25,18 @@ public class CreateCustomerUseCase {
                 .user(userRepository.getReferenceById(userId))
                 .firstName(request.firstName().trim())
                 .lastName(request.lastName().trim())
-                .documentNumber(normalize(request.documentNumber()))
+                .documentNumber(Texts.trimToNull(request.documentNumber()))
                 .phone(request.phone().trim())
                 .email(normalizeEmail(request.email()))
-                .address(normalize(request.address()))
-                .notes(normalize(request.notes()))
+                .address(Texts.trimToNull(request.address()))
+                .notes(Texts.trimToNull(request.notes()))
                 .build();
 
         return customerMapper.toResponse(customerRepository.save(customer));
     }
 
     private static String normalizeEmail(String value) {
-        String normalized = normalize(value);
+        String normalized = Texts.trimToNull(value);
         return normalized == null ? null : normalized.toLowerCase();
-    }
-
-    private static String normalize(String value) {
-        return value == null || value.isBlank() ? null : value.trim();
     }
 }

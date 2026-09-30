@@ -3,6 +3,7 @@ package com.mechanicmanager.vehicles.service;
 import com.mechanicmanager.customers.model.Customer;
 import com.mechanicmanager.customers.repository.CustomerRepository;
 import com.mechanicmanager.shared.exception.ResourceNotFoundException;
+import com.mechanicmanager.shared.text.Texts;
 import com.mechanicmanager.vehicles.dto.UpdateVehicleRequest;
 import com.mechanicmanager.vehicles.dto.VehicleResponse;
 import com.mechanicmanager.vehicles.exception.LicensePlateAlreadyExistsException;
@@ -62,7 +63,7 @@ public class UpdateVehicleUseCase {
         vehicle.setEngineNumber(normalizeIdentifierToNull(request.engineNumber()));
         vehicle.setMileage(request.mileage());
         vehicle.setVehicleType(request.vehicleType());
-        vehicle.setNotes(trimToNull(request.notes()));
+        vehicle.setNotes(Texts.trimToNull(request.notes()));
 
         try {
             return vehicleMapper.toResponse(vehicleRepository.saveAndFlush(vehicle));
@@ -98,9 +99,5 @@ public class UpdateVehicleUseCase {
         return value == null || value.isBlank()
                 ? null
                 : normalizeIdentifier(value);
-    }
-
-    private static String trimToNull(String value) {
-        return value == null || value.isBlank() ? null : value.trim();
     }
 }

@@ -11,6 +11,7 @@ import com.mechanicmanager.quotes.model.Quote;
 import com.mechanicmanager.quotes.model.QuoteStatus;
 import com.mechanicmanager.quotes.repository.QuoteRepository;
 import com.mechanicmanager.shared.exception.ResourceNotFoundException;
+import com.mechanicmanager.shared.text.Texts;
 import com.mechanicmanager.users.repository.UserRepository;
 import com.mechanicmanager.vehicles.model.Vehicle;
 import com.mechanicmanager.vehicles.repository.VehicleRepository;
@@ -47,7 +48,7 @@ public class CreateAppointmentUseCase {
                 .vehicle(vehicle)
                 .scheduledAt(request.scheduledAt())
                 .status(AppointmentStatus.SCHEDULED)
-                .notes(trimToNull(request.notes()))
+                .notes(Texts.trimToNull(request.notes()))
                 .build();
 
         appointment = appointmentRepository.save(appointment);
@@ -87,9 +88,5 @@ public class CreateAppointmentUseCase {
         quote.setAppointment(appointment);
         quoteRepository.save(quote);
         appointment.setQuote(quote);
-    }
-
-    private static String trimToNull(String value) {
-        return value == null || value.isBlank() ? null : value.trim();
     }
 }

@@ -1,6 +1,7 @@
 package com.mechanicmanager.workshops.service;
 
 import com.mechanicmanager.shared.exception.ResourceNotFoundException;
+import com.mechanicmanager.shared.text.Texts;
 import com.mechanicmanager.workshops.dto.UpdateWorkshopRequest;
 import com.mechanicmanager.workshops.dto.WorkshopResponse;
 import com.mechanicmanager.workshops.mapper.WorkshopMapper;
@@ -23,22 +24,14 @@ public class UpdateWorkshopUseCase {
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "El usuario no tiene un taller asociado"));
         
-        workshop.setName(normalize(request.name()));
-        workshop.setPhone(normalize(request.phone()));
-        workshop.setAddress(normalize(request.address()));
-        workshop.setNotes(normalize(request.notes()));
+        workshop.setName(Texts.trimToNull(request.name()));
+        workshop.setPhone(Texts.trimToNull(request.phone()));
+        workshop.setAddress(Texts.trimToNull(request.address()));
+        workshop.setNotes(Texts.trimToNull(request.notes()));
         
-        String email = normalize(request.email());
+        String email = Texts.trimToNull(request.email());
         workshop.setEmail(email == null ? null : email.toLowerCase());
         
         return workshopMapper.toResponse(workshopRepository.save(workshop));
-    }
-    
-    /**
-     * El front envía "" cuando el usuario vacía un campo; se guarda como null
-     * para no mezclar nulos y strings vacíos en la base.
-     */
-    private static String normalize(String value) {
-        return value == null || value.isBlank() ? null : value.trim();
     }
 }

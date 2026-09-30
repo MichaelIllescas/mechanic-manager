@@ -1,6 +1,7 @@
 package com.mechanicmanager.workorders.service;
 
 import com.mechanicmanager.shared.exception.ResourceNotFoundException;
+import com.mechanicmanager.shared.text.Texts;
 import com.mechanicmanager.workorders.dto.UpdateWorkOrderRequest;
 import com.mechanicmanager.workorders.dto.WorkOrderResponse;
 import com.mechanicmanager.workorders.mapper.WorkOrderMapper;
@@ -36,13 +37,9 @@ public class UpdateWorkOrderUseCase {
 
         workOrder.setPerformedAt(request.performedAt());
         workOrder.setMileage(request.mileage());
-        workOrder.setNotes(trimToNull(request.notes()));
+        workOrder.setNotes(Texts.trimToNull(request.notes()));
         workOrder.replaceItems(items);
 
         return workOrderMapper.toResponse(workOrderRepository.save(workOrder));
-    }
-
-    private String trimToNull(String value) {
-        return value == null || value.isBlank() ? null : value.trim();
     }
 }

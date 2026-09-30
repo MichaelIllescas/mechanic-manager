@@ -10,6 +10,7 @@ import com.mechanicmanager.quotes.model.Quote;
 import com.mechanicmanager.quotes.model.QuoteItem;
 import com.mechanicmanager.quotes.repository.QuoteRepository;
 import com.mechanicmanager.shared.exception.ResourceNotFoundException;
+import com.mechanicmanager.shared.text.Texts;
 import com.mechanicmanager.vehicles.model.Vehicle;
 import com.mechanicmanager.vehicles.repository.VehicleRepository;
 import com.mechanicmanager.workorders.repository.WorkOrderRepository;
@@ -60,7 +61,7 @@ public class UpdateQuoteUseCase {
         quote.setCustomer(customer);
         quote.setVehicle(vehicle);
         quote.setValidUntil(request.validUntil());
-        quote.setNotes(trimToNull(request.notes()));
+        quote.setNotes(Texts.trimToNull(request.notes()));
         quote.replaceItems(items);
 
         return quoteMapper.toResponse(
@@ -75,9 +76,5 @@ public class UpdateQuoteUseCase {
                     "El vehículo indicado no pertenece al cliente seleccionado"
             );
         }
-    }
-
-    private String trimToNull(String value) {
-        return value == null || value.isBlank() ? null : value.trim();
     }
 }

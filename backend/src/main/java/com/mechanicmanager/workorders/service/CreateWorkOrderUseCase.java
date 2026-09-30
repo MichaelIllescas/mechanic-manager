@@ -5,6 +5,7 @@ import com.mechanicmanager.appointments.repository.AppointmentRepository;
 import com.mechanicmanager.quotes.model.Quote;
 import com.mechanicmanager.quotes.repository.QuoteRepository;
 import com.mechanicmanager.shared.exception.ResourceNotFoundException;
+import com.mechanicmanager.shared.text.Texts;
 import com.mechanicmanager.users.model.User;
 import com.mechanicmanager.users.repository.UserRepository;
 import com.mechanicmanager.vehicles.model.Vehicle;
@@ -64,7 +65,7 @@ public class CreateWorkOrderUseCase {
                 .mileage(request.mileage())
                 .status(WorkOrderStatus.COMPLETED)
                 .total(BigDecimal.ZERO)
-                .notes(trimToNull(request.notes()))
+                .notes(Texts.trimToNull(request.notes()))
                 .build();
 
         workOrder.replaceItems(items);
@@ -121,9 +122,5 @@ public class CreateWorkOrderUseCase {
         }
 
         return quote;
-    }
-
-    private String trimToNull(String value) {
-        return value == null || value.isBlank() ? null : value.trim();
     }
 }

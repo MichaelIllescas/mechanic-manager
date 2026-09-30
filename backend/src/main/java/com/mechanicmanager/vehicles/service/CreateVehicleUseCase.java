@@ -3,6 +3,7 @@ package com.mechanicmanager.vehicles.service;
 import com.mechanicmanager.customers.model.Customer;
 import com.mechanicmanager.customers.repository.CustomerRepository;
 import com.mechanicmanager.shared.exception.ResourceNotFoundException;
+import com.mechanicmanager.shared.text.Texts;
 import com.mechanicmanager.users.repository.UserRepository;
 import com.mechanicmanager.vehicles.dto.CreateVehicleRequest;
 import com.mechanicmanager.vehicles.dto.VehicleResponse;
@@ -57,7 +58,7 @@ public class CreateVehicleUseCase {
                 .engineNumber(normalizeIdentifierToNull(request.engineNumber()))
                 .mileage(request.mileage())
                 .vehicleType(request.vehicleType())
-                .notes(trimToNull(request.notes()))
+                .notes(Texts.trimToNull(request.notes()))
                 .build();
 
         try {
@@ -94,9 +95,5 @@ public class CreateVehicleUseCase {
         return value == null || value.isBlank()
                 ? null
                 : normalizeIdentifier(value);
-    }
-
-    private static String trimToNull(String value) {
-        return value == null || value.isBlank() ? null : value.trim();
     }
 }

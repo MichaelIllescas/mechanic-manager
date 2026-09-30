@@ -6,6 +6,7 @@ import com.mechanicmanager.servicetypes.exception.ServiceTypeNameAlreadyExistsEx
 import com.mechanicmanager.servicetypes.mapper.ServiceTypeMapper;
 import com.mechanicmanager.servicetypes.model.ServiceType;
 import com.mechanicmanager.servicetypes.repository.ServiceTypeRepository;
+import com.mechanicmanager.shared.text.Texts;
 import com.mechanicmanager.users.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -30,18 +31,11 @@ public class CreateServiceTypeUseCase {
         ServiceType serviceType = ServiceType.builder()
                 .user(userRepository.getReferenceById(userId))
                 .name(name)
-                .description(trimToNull(request.description()))
+                .description(Texts.trimToNull(request.description()))
                 .basePrice(request.basePrice())
                 .active(true)
                 .build();
 
         return serviceTypeMapper.toResponse(serviceTypeRepository.save(serviceType));
-    }
-
-    private static String trimToNull(String value) {
-        if (value == null || value.isBlank()) {
-            return null;
-        }
-        return value.trim();
     }
 }

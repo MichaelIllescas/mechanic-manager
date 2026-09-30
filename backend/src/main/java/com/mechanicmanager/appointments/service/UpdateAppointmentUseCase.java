@@ -8,6 +8,7 @@ import com.mechanicmanager.appointments.model.Appointment;
 import com.mechanicmanager.appointments.model.AppointmentStatus;
 import com.mechanicmanager.appointments.repository.AppointmentRepository;
 import com.mechanicmanager.shared.exception.ResourceNotFoundException;
+import com.mechanicmanager.shared.text.Texts;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,12 +43,8 @@ public class UpdateAppointmentUseCase {
         }
 
         appointment.setScheduledAt(request.scheduledAt());
-        appointment.setNotes(trimToNull(request.notes()));
+        appointment.setNotes(Texts.trimToNull(request.notes()));
 
         return appointmentMapper.toResponse(appointmentRepository.save(appointment));
-    }
-
-    private static String trimToNull(String value) {
-        return value == null || value.isBlank() ? null : value.trim();
     }
 }

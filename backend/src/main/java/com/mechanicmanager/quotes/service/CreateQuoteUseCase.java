@@ -11,6 +11,7 @@ import com.mechanicmanager.quotes.model.QuoteItem;
 import com.mechanicmanager.quotes.model.QuoteStatus;
 import com.mechanicmanager.quotes.repository.QuoteRepository;
 import com.mechanicmanager.shared.exception.ResourceNotFoundException;
+import com.mechanicmanager.shared.text.Texts;
 import com.mechanicmanager.users.model.User;
 import com.mechanicmanager.users.repository.UserRepository;
 import com.mechanicmanager.vehicles.model.Vehicle;
@@ -64,7 +65,7 @@ public class CreateQuoteUseCase {
                 .validUntil(request.validUntil())
                 .status(QuoteStatus.PENDING)
                 .total(BigDecimal.ZERO)
-                .notes(trimToNull(request.notes()))
+                .notes(Texts.trimToNull(request.notes()))
                 .build();
 
         quote.replaceItems(items);
@@ -85,9 +86,5 @@ public class CreateQuoteUseCase {
                     "El vehículo indicado no pertenece al cliente seleccionado"
             );
         }
-    }
-
-    private String trimToNull(String value) {
-        return value == null || value.isBlank() ? null : value.trim();
     }
 }

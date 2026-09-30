@@ -6,6 +6,7 @@ import com.mechanicmanager.customers.mapper.CustomerMapper;
 import com.mechanicmanager.customers.model.Customer;
 import com.mechanicmanager.customers.repository.CustomerRepository;
 import com.mechanicmanager.shared.exception.ResourceNotFoundException;
+import com.mechanicmanager.shared.text.Texts;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,21 +26,17 @@ public class UpdateCustomerUseCase {
 
         customer.setFirstName(request.firstName().trim());
         customer.setLastName(request.lastName().trim());
-        customer.setDocumentNumber(normalize(request.documentNumber()));
+        customer.setDocumentNumber(Texts.trimToNull(request.documentNumber()));
         customer.setPhone(request.phone().trim());
         customer.setEmail(normalizeEmail(request.email()));
-        customer.setAddress(normalize(request.address()));
-        customer.setNotes(normalize(request.notes()));
+        customer.setAddress(Texts.trimToNull(request.address()));
+        customer.setNotes(Texts.trimToNull(request.notes()));
 
         return customerMapper.toResponse(customerRepository.save(customer));
     }
 
     private static String normalizeEmail(String value) {
-        String normalized = normalize(value);
+        String normalized = Texts.trimToNull(value);
         return normalized == null ? null : normalized.toLowerCase();
-    }
-
-    private static String normalize(String value) {
-        return value == null || value.isBlank() ? null : value.trim();
     }
 }

@@ -38,6 +38,8 @@ public class QuoteController implements QuoteApi {
     public ResponseEntity<QuotePageResponse> findAll(
             @RequestParam(required = false) String search,
             @RequestParam(required = false) QuoteStatus status,
+            @RequestParam(required = false) Long vehicleId,
+            @RequestParam(defaultValue = "false") boolean available,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @AuthenticationPrincipal AuthenticatedUser currentUser
@@ -46,6 +48,8 @@ public class QuoteController implements QuoteApi {
                 currentUser.id(),
                 search,
                 status,
+                vehicleId,
+                available,
                 page,
                 size
         ));

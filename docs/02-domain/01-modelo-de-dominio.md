@@ -1,6 +1,6 @@
 # Modelo de Dominio
 
-**Versión:** 1.4  
+**Versión:** 1.5  
 **Enfoque:** Modelo simple orientado al MVP
 
 ---
@@ -164,6 +164,7 @@ Atributos:
 - `id`
 - `userId`
 - `vehicleId`
+- `quoteId` opcional
 - `scheduledAt`
 - `status`
 - `notes` opcional
@@ -184,9 +185,10 @@ Reglas:
 - el turno se completa cuando el vehículo ingresa al taller; a partir de ahí el trabajo queda registrado en el trabajo realizado;
 - la agenda no valida solapamiento de horarios: un taller puede atender varios vehículos en simultáneo;
 - el motivo del turno se registra como texto libre en `notes`; el detalle estructurado del trabajo surge del presupuesto o del trabajo realizado;
-- al crearlo puede vincularse un presupuesto aprobado del mismo vehículo que todavía no tenga turno; la referencia vive en el presupuesto (`Quote.appointmentId`);
+- al crearlo puede vincularse un presupuesto *disponible* del mismo vehículo: aprobado, sin trabajo realizado y sin otro turno activo (`SCHEDULED` o `COMPLETED`); la referencia vive en el turno (`Appointment.quoteId`);
+- un turno cancelado conserva su presupuesto como historial, pero no lo bloquea: el presupuesto puede vincularse a un turno nuevo;
 - al completarse se crea automáticamente su trabajo realizado (ver `WorkOrder`);
-- al eliminarlo, el presupuesto y el trabajo vinculados se conservan sin turno.
+- al eliminarlo, el presupuesto vinculado no se modifica y el trabajo vinculado se conserva sin turno.
 
 ---
 
@@ -198,7 +200,6 @@ Atributos de `Quote`:
 - `userId`
 - `customerId`
 - `vehicleId`
-- `appointmentId` opcional
 - `number`
 - `createdAt`
 - `updatedAt`

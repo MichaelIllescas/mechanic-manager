@@ -10,7 +10,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class CustomerService {
+public class    CustomerService {
 
     private final CreateCustomerUseCase createCustomerUseCase;
     private final ListCustomersUseCase listCustomersUseCase;

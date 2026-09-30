@@ -103,6 +103,19 @@ describe('QuoteService', () => {
     request.flush(page);
   });
 
+  it('should request the quotes of a vehicle available for a new appointment', () => {
+    service.findAvailableForAppointment(30).subscribe();
+
+    const request = httpMock.expectOne(
+      (candidate) =>
+        candidate.url === `${environment.apiUrl}/quotes` &&
+        candidate.params.get('vehicleId') === '30' &&
+        candidate.params.get('available') === 'true',
+    );
+    expect(request.request.method).toBe('GET');
+    request.flush({ content: [], page: 0, size: 50, totalElements: 0, totalPages: 0 });
+  });
+
   it('should omit empty optional search filters', () => {
     service.search('   ').subscribe();
 

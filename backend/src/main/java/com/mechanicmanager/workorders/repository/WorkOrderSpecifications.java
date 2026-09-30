@@ -26,6 +26,10 @@ public final class WorkOrderSpecifications {
             LocalDate to
     ) {
         return (root, query, criteriaBuilder) -> {
+            if (!isCountQuery(query.getResultType())) {
+                root.fetch("vehicle").fetch("customer");
+            }
+
             List<Predicate> filters = new ArrayList<>();
 
             filters.add(criteriaBuilder.equal(
@@ -76,5 +80,9 @@ public final class WorkOrderSpecifications {
 
             return criteriaBuilder.and(filters.toArray(Predicate[]::new));
         };
+    }
+
+    private static boolean isCountQuery(Class<?> resultType) {
+        return Long.class.equals(resultType) || long.class.equals(resultType);
     }
 }

@@ -5,13 +5,17 @@ import com.mechanicmanager.appointments.mapper.AppointmentMapper;
 import com.mechanicmanager.appointments.model.Appointment;
 import com.mechanicmanager.appointments.model.AppointmentStatus;
 import com.mechanicmanager.appointments.repository.AppointmentRepository;
+import com.mechanicmanager.appointments.exception.InvalidAppointmentQuoteException;
 import com.mechanicmanager.customers.model.Customer;
+import com.mechanicmanager.quotes.model.Quote;
+import com.mechanicmanager.quotes.model.QuoteStatus;
 import com.mechanicmanager.quotes.repository.QuoteRepository;
 import com.mechanicmanager.shared.exception.ResourceNotFoundException;
 import com.mechanicmanager.users.model.User;
 import com.mechanicmanager.users.repository.UserRepository;
 import com.mechanicmanager.vehicles.model.Vehicle;
 import com.mechanicmanager.vehicles.repository.VehicleRepository;
+import com.mechanicmanager.workorders.repository.WorkOrderRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -45,6 +49,8 @@ class CreateAppointmentUseCaseTest {
     private UserRepository userRepository;
     @Mock
     private QuoteRepository quoteRepository;
+    @Mock
+    private WorkOrderRepository workOrderRepository;
 
     private CreateAppointmentUseCase useCase;
 
@@ -54,6 +60,7 @@ class CreateAppointmentUseCaseTest {
                 appointmentRepository,
                 vehicleRepository,
                 quoteRepository,
+                workOrderRepository,
                 userRepository,
                 new AppointmentMapper()
         );
@@ -147,6 +154,77 @@ class CreateAppointmentUseCaseTest {
         verify(appointmentRepository).save(captor.capture());
 
         assertThat(captor.getValue().getScheduledAt()).isEqualTo(past);
+    }
+
+    /**
+     * Un turno cancelado conserva el presupuesto como historial, pero no lo
+     * bloquea: se puede vincular a un turno nuevo.
+     */
+    @Test
+    void linksQuoteOnlyUsedByCancelledAppointments() {
+        User user = User.builder().id(7L).build();
+        Vehicle vehicle = vehicle(user);
+        Quote quote = approvedQuote(vehicle);
+        givenVehicleAndQuote(user, vehicle, quote);
+        when(appointmentRepository.existsByQuoteIdAndUserIdAndStatusNot(
+                15L, 7L, AppointmentStatus.CANCELLED)).thenReturn(false);
+        when(appointmentRepository.save(any(Appointment.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        var response = useCase.execute(7L, requestWithQuote());
+
+        ArgumentCaptor<Appointment> captor = ArgumentCaptor.forClass(Appointment.class);
+        verify(appointmentRepository).save(captor.capture());
+        assertThat(captor.getValue().getQuote()).isSameAs(quote);
+        assertThat(response.quoteId()).isEqualTo(15L);
+    }
+
+    @Test
+    void rejectsQuoteUsedByAnActiveAppointment() {
+        User user = User.builder().id(7L).build();
+        Vehicle vehicle = vehicle(user);
+        givenVehicleAndQuote(user, vehicle, approvedQuote(vehicle));
+        when(appointmentRepository.existsByQuoteIdAndUserIdAndStatusNot(
+                15L, 7L, AppointmentStatus.CANCELLED)).thenReturn(true);
+
+        assertThatThrownBy(() -> useCase.execute(7L, requestWithQuote()))
+                .isInstanceOf(InvalidAppointmentQuoteException.class)
+                .hasMessage("El presupuesto indicado ya está vinculado a otro turno");
+
+        verify(appointmentRepository, never()).save(any(Appointment.class));
+    }
+
+    @Test
+    void rejectsQuoteThatAlreadyHasAWorkOrder() {
+        User user = User.builder().id(7L).build();
+        Vehicle vehicle = vehicle(user);
+        givenVehicleAndQuote(user, vehicle, approvedQuote(vehicle));
+        when(workOrderRepository.existsByQuoteIdAndUserId(15L, 7L)).thenReturn(true);
+
+        assertThatThrownBy(() -> useCase.execute(7L, requestWithQuote()))
+                .isInstanceOf(InvalidAppointmentQuoteException.class)
+                .hasMessage("El presupuesto indicado ya tiene un trabajo realizado");
+
+        verify(appointmentRepository, never()).save(any(Appointment.class));
+    }
+
+    private void givenVehicleAndQuote(User user, Vehicle vehicle, Quote quote) {
+        when(vehicleRepository.findByIdAndUserId(30L, 7L)).thenReturn(Optional.of(vehicle));
+        when(userRepository.getReferenceById(7L)).thenReturn(user);
+        when(quoteRepository.findByIdAndUserId(15L, 7L)).thenReturn(Optional.of(quote));
+    }
+
+    private static Quote approvedQuote(Vehicle vehicle) {
+        return Quote.builder()
+                .id(15L)
+                .number(4L)
+                .vehicle(vehicle)
+                .status(QuoteStatus.APPROVED)
+                .build();
+    }
+
+    private static CreateAppointmentRequest requestWithQuote() {
+        return new CreateAppointmentRequest(30L, 15L, SCHEDULED_AT, null);
     }
 
     private static Vehicle vehicle(User user) {

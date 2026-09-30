@@ -26,7 +26,7 @@ public interface QuoteApi {
 
     @Operation(
             summary = "Buscar presupuestos",
-            description = "Busca por número, cliente o patente y permite filtrar por estado."
+            description = "Busca por número, cliente o patente y permite filtrar por estado, vehículo y disponibilidad para un turno."
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Página obtenida correctamente"),
@@ -40,6 +40,9 @@ public interface QuoteApi {
     ResponseEntity<QuotePageResponse> findAll(
             @Parameter(description = "Número, nombre del cliente o patente") String search,
             @Parameter(description = "Estado opcional") QuoteStatus status,
+            @Parameter(description = "Vehículo opcional") Long vehicleId,
+            @Parameter(description = "Solo los que se pueden vincular a un turno nuevo: "
+                    + "aprobados, sin trabajo realizado y sin turno activo") boolean available,
             @Parameter(description = "Página basada en cero", example = "0") int page,
             @Parameter(description = "Resultados por página, máximo 50", example = "20") int size,
             @Parameter(hidden = true) AuthenticatedUser currentUser

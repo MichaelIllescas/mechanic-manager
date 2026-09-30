@@ -1271,7 +1271,8 @@ paths:
       tags:
       - Presupuestos
       summary: Buscar presupuestos
-      description: "Busca por número, cliente o patente y permite filtrar por estado."
+      description: "Busca por número, cliente o patente y permite filtrar por estado,\
+        \ vehículo y disponibilidad para un turno."
       operationId: findAll_4
       parameters:
       - name: search
@@ -1290,6 +1291,21 @@ paths:
           - PENDING
           - APPROVED
           - REJECTED
+      - name: vehicleId
+        in: query
+        description: Vehículo opcional
+        required: false
+        schema:
+          type: integer
+          format: int64
+      - name: available
+        in: query
+        description: "Solo los que se pueden vincular a un turno nuevo: aprobados,\
+          \ sin trabajo realizado y sin turno activo"
+        required: false
+        schema:
+          type: boolean
+          default: false
       - name: page
         in: query
         description: Página basada en cero

@@ -8,8 +8,10 @@ import {
   inject,
   signal,
 } from '@angular/core';
+import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { catchError, map, of, switchMap } from 'rxjs';
 
 import { NotificationService } from '../../../core/notifications/notification-service';
 import { QuoteService } from '../../quotes/quote-service';
@@ -58,13 +60,13 @@ export class AppointmentForm implements OnInit {
   readonly vehicleResultsOpen = signal(false);
   readonly selectedVehicleLabel = signal<string | null>(null);
 
-  /** Presupuestos aprobados sin turno asignado todavía, para poder vincular uno al agendar. */
-  readonly approvedQuotes = signal<QuoteSummary[]>([]);
   readonly selectedVehicleId = signal<number | null>(null);
   readonly selectedCustomerId = signal<number | null>(null);
-  readonly availableQuotes = computed(() =>
-    this.approvedQuotes().filter((quote) => quote.vehicleId === this.selectedVehicleId()),
-  );
+  /**
+   * Presupuestos del vehículo elegido que se pueden vincular: aprobados, sin
+   * trabajo realizado y sin otro turno activo. El filtro lo resuelve el backend.
+   */
+  readonly availableQuotes = signal<QuoteSummary[]>([]);
   readonly showQuoteQuickCreate = signal(false);
   readonly showVehicleQuickCreate = signal(false);
 
@@ -88,9 +90,24 @@ export class AppointmentForm implements OnInit {
     notes: ['', [Validators.maxLength(1000)]],
   });
 
+  constructor() {
+    toObservable(this.selectedVehicleId)
+      .pipe(
+        switchMap((vehicleId) =>
+          vehicleId === null
+            ? of([])
+            : this.quoteService.findAvailableForAppointment(vehicleId).pipe(
+                map((page) => page.content),
+                catchError(() => of([])),
+              ),
+        ),
+        takeUntilDestroyed(),
+      )
+      .subscribe((quotes) => this.availableQuotes.set(quotes));
+  }
+
   ngOnInit(): void {
     this.loadVehicles();
-    this.loadApprovedQuotes();
 
     const routeId = this.route.snapshot.paramMap.get('id');
 
@@ -211,7 +228,7 @@ export class AppointmentForm implements OnInit {
 
   quoteQuickCreated(quote: Quote): void {
     this.showQuoteQuickCreate.set(false);
-    this.approvedQuotes.update((quotes) => [
+    this.availableQuotes.update((quotes) => [
       {
         id: quote.id,
         number: quote.number,
@@ -245,12 +262,6 @@ export class AppointmentForm implements OnInit {
     });
   }
 
-  private loadApprovedQuotes(): void {
-    this.quoteService.search(undefined, 'APPROVED', 0, 50).subscribe({
-      next: (page) => this.approvedQuotes.set(page.content),
-      error: () => this.approvedQuotes.set([]),
-    });
-  }
 
   private loadAppointment(appointmentId: number): void {
     this.loadingAppointment.set(true);

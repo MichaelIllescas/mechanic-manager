@@ -13,7 +13,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -67,7 +66,12 @@ public class Appointment {
     @Column(name = "notes", columnDefinition = "TEXT")
     private String notes;
 
-    @OneToOne(mappedBy = "appointment", fetch = FetchType.LAZY)
+    /**
+     * Varios turnos pueden apuntar al mismo presupuesto: los cancelados lo
+     * conservan como historial y solo uno puede estar activo.
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "quote_id")
     private Quote quote;
 
     @Generated(event = EventType.INSERT)

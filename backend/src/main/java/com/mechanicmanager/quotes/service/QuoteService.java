@@ -32,6 +32,8 @@ public class QuoteService {
             Long userId,
             String search,
             QuoteStatus status,
+            Long vehicleId,
+            boolean availableForAppointment,
             int page,
             int size
     ) {
@@ -39,6 +41,8 @@ public class QuoteService {
                 userId,
                 search,
                 status,
+                vehicleId,
+                availableForAppointment,
                 page,
                 size
         );

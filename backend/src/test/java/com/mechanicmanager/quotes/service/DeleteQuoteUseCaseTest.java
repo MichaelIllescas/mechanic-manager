@@ -1,6 +1,7 @@
 package com.mechanicmanager.quotes.service;
 
 import com.mechanicmanager.appointments.model.Appointment;
+import com.mechanicmanager.appointments.repository.AppointmentRepository;
 import com.mechanicmanager.quotes.model.Quote;
 import com.mechanicmanager.quotes.repository.QuoteRepository;
 import com.mechanicmanager.shared.exception.ResourceNotFoundException;
@@ -13,6 +14,7 @@ import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -30,27 +32,32 @@ class DeleteQuoteUseCaseTest {
     private QuoteRepository quoteRepository;
     @Mock
     private WorkOrderRepository workOrderRepository;
+    @Mock
+    private AppointmentRepository appointmentRepository;
 
     private DeleteQuoteUseCase useCase;
 
     @BeforeEach
     void setUp() {
-        useCase = new DeleteQuoteUseCase(quoteRepository, workOrderRepository);
+        useCase = new DeleteQuoteUseCase(
+                quoteRepository, workOrderRepository, appointmentRepository);
     }
 
     @Test
     void unlinksAppointmentAndWorkOrderBeforeDeletingQuote() {
-        Appointment appointment = Appointment.builder().id(50L).build();
-        Quote quote = Quote.builder().id(15L).appointment(appointment).build();
+        Quote quote = Quote.builder().id(15L).build();
+        Appointment appointment = Appointment.builder().id(50L).quote(quote).build();
         WorkOrder workOrder = WorkOrder.builder().quote(quote).build();
 
         when(quoteRepository.findByIdAndUserId(15L, 7L)).thenReturn(Optional.of(quote));
         when(workOrderRepository.findByQuoteIdAndUserId(15L, 7L))
                 .thenReturn(Optional.of(workOrder));
+        when(appointmentRepository.findAllByQuoteIdAndUserId(15L, 7L))
+                .thenReturn(List.of(appointment));
 
         useCase.execute(7L, 15L);
 
-        assertThat(quote.getAppointment()).isNull();
+        assertThat(appointment.getQuote()).isNull();
         assertThat(workOrder.getQuote()).isNull();
         InOrder order = inOrder(quoteRepository);
         order.verify(quoteRepository).flush();

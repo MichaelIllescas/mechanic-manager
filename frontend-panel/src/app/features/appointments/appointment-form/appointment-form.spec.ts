@@ -33,9 +33,7 @@ describe('AppointmentForm', () => {
 
   const vehicleService = { findAll: vi.fn().mockReturnValue(of([])) };
   const quoteService = {
-    search: vi
-      .fn()
-      .mockReturnValue(of({ content: [], page: 0, size: 50, totalElements: 0, totalPages: 0 })),
+    findAvailableForAppointment: vi.fn(),
   };
   const appointmentService = {
     findById: vi.fn(),
@@ -46,8 +44,8 @@ describe('AppointmentForm', () => {
   beforeEach(async () => {
     vehicleService.findAll.mockReset();
     vehicleService.findAll.mockReturnValue(of([]));
-    quoteService.search.mockReset();
-    quoteService.search.mockReturnValue(
+    quoteService.findAvailableForAppointment.mockReset();
+    quoteService.findAvailableForAppointment.mockReturnValue(
       of({ content: [], page: 0, size: 50, totalElements: 0, totalPages: 0 }),
     );
 
@@ -102,5 +100,12 @@ describe('AppointmentForm', () => {
     });
     expect(component.selectedVehicleLabel()).toBe('AB123CD — Toyota Corolla');
     expect(component.selectedCustomerId()).toBe(20);
+  });
+
+  it('loads the quotes available for the selected vehicle', () => {
+    component.selectVehicle(vehicle);
+    fixture.detectChanges();
+
+    expect(quoteService.findAvailableForAppointment).toHaveBeenCalledWith(30);
   });
 });

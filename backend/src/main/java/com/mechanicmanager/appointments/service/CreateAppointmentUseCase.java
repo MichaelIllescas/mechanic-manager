@@ -15,6 +15,7 @@ import com.mechanicmanager.shared.text.Texts;
 import com.mechanicmanager.users.repository.UserRepository;
 import com.mechanicmanager.vehicles.model.Vehicle;
 import com.mechanicmanager.vehicles.repository.VehicleRepository;
+import com.mechanicmanager.workorders.repository.WorkOrderRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +27,7 @@ public class CreateAppointmentUseCase {
     private final AppointmentRepository appointmentRepository;
     private final VehicleRepository vehicleRepository;
     private final QuoteRepository quoteRepository;
+    private final WorkOrderRepository workOrderRepository;
     private final UserRepository userRepository;
     private final AppointmentMapper appointmentMapper;
 
@@ -51,21 +53,19 @@ public class CreateAppointmentUseCase {
                 .notes(Texts.trimToNull(request.notes()))
                 .build();
 
-        appointment = appointmentRepository.save(appointment);
-
         if (request.quoteId() != null) {
-            linkQuote(userId, appointment, vehicle, request.quoteId());
+            appointment.setQuote(availableQuote(userId, vehicle, request.quoteId()));
         }
 
-        return appointmentMapper.toResponse(appointment);
+        return appointmentMapper.toResponse(appointmentRepository.save(appointment));
     }
 
     /**
-     * El presupuesto es quien guarda la referencia al turno (quotes.appointment_id):
-     * acá también se refleja en memoria del lado del turno para que la respuesta
-     * ya muestre el vínculo recién creado.
+     * Un presupuesto se puede vincular si está aprobado, es del vehículo, no
+     * generó un trabajo realizado y ningún turno activo lo usa. Los turnos
+     * cancelados lo conservan como historial pero no lo bloquean.
      */
-    private void linkQuote(Long userId, Appointment appointment, Vehicle vehicle, Long quoteId) {
+    private Quote availableQuote(Long userId, Vehicle vehicle, Long quoteId) {
         Quote quote = quoteRepository.findByIdAndUserId(quoteId, userId)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "No se encontró el presupuesto indicado"));
@@ -80,13 +80,17 @@ public class CreateAppointmentUseCase {
                     "El presupuesto indicado no pertenece al vehículo seleccionado");
         }
 
-        if (quote.getAppointment() != null) {
+        if (workOrderRepository.existsByQuoteIdAndUserId(quoteId, userId)) {
+            throw new InvalidAppointmentQuoteException(
+                    "El presupuesto indicado ya tiene un trabajo realizado");
+        }
+
+        if (appointmentRepository.existsByQuoteIdAndUserIdAndStatusNot(
+                quoteId, userId, AppointmentStatus.CANCELLED)) {
             throw new InvalidAppointmentQuoteException(
                     "El presupuesto indicado ya está vinculado a otro turno");
         }
 
-        quote.setAppointment(appointment);
-        quoteRepository.save(quote);
-        appointment.setQuote(quote);
+        return quote;
     }
 }

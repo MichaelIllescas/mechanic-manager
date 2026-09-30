@@ -1,5 +1,6 @@
 package com.mechanicmanager.quotes.service;
 
+import com.mechanicmanager.appointments.repository.AppointmentRepository;
 import com.mechanicmanager.quotes.model.Quote;
 import com.mechanicmanager.quotes.repository.QuoteRepository;
 import com.mechanicmanager.shared.exception.ResourceNotFoundException;
@@ -14,6 +15,7 @@ public class DeleteQuoteUseCase {
 
     private final QuoteRepository quoteRepository;
     private final WorkOrderRepository workOrderRepository;
+    private final AppointmentRepository appointmentRepository;
 
     @Transactional
     public void execute(Long userId, Long quoteId) {
@@ -23,7 +25,8 @@ public class DeleteQuoteUseCase {
 
         workOrderRepository.findByQuoteIdAndUserId(quoteId, userId)
                 .ifPresent(workOrder -> workOrder.setQuote(null));
-        quote.setAppointment(null);
+        appointmentRepository.findAllByQuoteIdAndUserId(quoteId, userId)
+                .forEach(appointment -> appointment.setQuote(null));
 
         quoteRepository.flush();
         quoteRepository.delete(quote);

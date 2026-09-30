@@ -3,8 +3,6 @@ package com.mechanicmanager.appointments.service;
 import com.mechanicmanager.appointments.model.Appointment;
 import com.mechanicmanager.appointments.model.AppointmentStatus;
 import com.mechanicmanager.appointments.repository.AppointmentRepository;
-import com.mechanicmanager.quotes.model.Quote;
-import com.mechanicmanager.quotes.repository.QuoteRepository;
 import com.mechanicmanager.shared.exception.ResourceNotFoundException;
 import com.mechanicmanager.workorders.model.WorkOrder;
 import com.mechanicmanager.workorders.repository.WorkOrderRepository;
@@ -32,8 +30,6 @@ class DeleteAppointmentUseCaseTest {
     @Mock
     private AppointmentRepository appointmentRepository;
     @Mock
-    private QuoteRepository quoteRepository;
-    @Mock
     private WorkOrderRepository workOrderRepository;
 
     private DeleteAppointmentUseCase useCase;
@@ -42,27 +38,22 @@ class DeleteAppointmentUseCaseTest {
     void setUp() {
         useCase = new DeleteAppointmentUseCase(
                 appointmentRepository,
-                quoteRepository,
                 workOrderRepository
         );
     }
 
     @Test
-    void unlinksQuoteAndWorkOrderBeforeDeletingAppointment() {
+    void unlinksWorkOrderBeforeDeletingAppointment() {
         Appointment appointment = appointmentWith(AppointmentStatus.SCHEDULED);
-        Quote quote = Quote.builder().appointment(appointment).build();
         WorkOrder workOrder = WorkOrder.builder().appointment(appointment).build();
 
         when(appointmentRepository.findByIdAndUserId(50L, 7L))
                 .thenReturn(Optional.of(appointment));
-        when(quoteRepository.findByAppointmentIdAndUserId(50L, 7L))
-                .thenReturn(Optional.of(quote));
         when(workOrderRepository.findByAppointmentIdAndUserId(50L, 7L))
                 .thenReturn(Optional.of(workOrder));
 
         useCase.execute(7L, 50L);
 
-        assertThat(quote.getAppointment()).isNull();
         assertThat(workOrder.getAppointment()).isNull();
         InOrder order = inOrder(appointmentRepository);
         order.verify(appointmentRepository).flush();
@@ -78,7 +69,6 @@ class DeleteAppointmentUseCaseTest {
                 .isInstanceOf(ResourceNotFoundException.class)
                 .hasMessage("No se encontró el turno indicado");
 
-        verify(quoteRepository, never()).findByAppointmentIdAndUserId(50L, 7L);
         verify(workOrderRepository, never()).findByAppointmentIdAndUserId(50L, 7L);
         verify(appointmentRepository, never()).delete(any(Appointment.class));
     }

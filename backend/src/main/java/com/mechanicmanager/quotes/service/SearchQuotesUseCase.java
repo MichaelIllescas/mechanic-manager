@@ -29,6 +29,8 @@ public class SearchQuotesUseCase {
             Long userId,
             String search,
             QuoteStatus status,
+            Long vehicleId,
+            boolean availableForAppointment,
             int page,
             int size
     ) {
@@ -44,7 +46,9 @@ public class SearchQuotesUseCase {
                 QuoteSpecifications.belongsToUserAndMatches(
                         userId,
                         search,
-                        status
+                        status,
+                        vehicleId,
+                        availableForAppointment
                 ),
                 pageRequest
         );

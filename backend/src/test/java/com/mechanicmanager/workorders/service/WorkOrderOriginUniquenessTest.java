@@ -71,7 +71,7 @@ class WorkOrderOriginUniquenessTest {
                 workOrderRepository, vehicleRepository, appointmentRepository, quoteRepository,
                 userRepository, workOrderItemFactory, workOrderMapper);
         fromAppointmentUseCase =
-                new CreateWorkOrderFromAppointmentUseCase(workOrderRepository, quoteRepository);
+                new CreateWorkOrderFromAppointmentUseCase(workOrderRepository);
     }
 
     private CreateWorkOrderRequest request(Long appointmentId, Long quoteId) {
@@ -124,11 +124,10 @@ class WorkOrderOriginUniquenessTest {
 
     @Test
     void completingAnAppointmentIgnoresAQuoteAlreadyUsedByAnotherWorkOrder() {
-        Appointment appointment = Appointment.builder()
-                .id(11L).vehicle(vehicle).user(User.builder().id(USER_ID).build()).build();
         Quote quote = Quote.builder().id(21L).status(QuoteStatus.APPROVED).build();
+        Appointment appointment = Appointment.builder()
+                .id(11L).vehicle(vehicle).user(User.builder().id(USER_ID).build()).quote(quote).build();
         when(workOrderRepository.existsByAppointmentIdAndUserId(11L, USER_ID)).thenReturn(false);
-        when(quoteRepository.findByAppointmentIdAndUserId(11L, USER_ID)).thenReturn(Optional.of(quote));
         when(workOrderRepository.existsByQuoteIdAndUserId(21L, USER_ID)).thenReturn(true);
 
         fromAppointmentUseCase.execute(USER_ID, appointment);

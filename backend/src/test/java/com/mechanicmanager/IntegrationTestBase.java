@@ -4,8 +4,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.test.context.ActiveProfiles;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.mysql.MySQLContainer;
 
 /**
@@ -13,17 +11,21 @@ import org.testcontainers.mysql.MySQLContainer;
  * descartable.
  *
  * <p>Todas las subclases comparten la misma configuración, así que Spring
- * reutiliza un único contexto (y un único contenedor) en toda la corrida en
- * lugar de arrancar uno por clase. Requiere Docker en ejecución.
+ * reutiliza un único contexto en toda la corrida. El contenedor se arranca una
+ * sola vez (singleton) y no con {@code @Container}: esa anotación lo detiene al
+ * terminar cada clase y el contexto cacheado quedaría apuntando a una base
+ * muerta. Testcontainers lo elimina al cerrar la JVM. Requiere Docker.
  */
 @SpringBootTest
 @AutoConfigureMockMvc
-@Testcontainers
 @ActiveProfiles("test")
 public abstract class IntegrationTestBase {
 
-	@Container
 	@ServiceConnection
 	static final MySQLContainer MYSQL = new MySQLContainer("mysql:8.4");
+
+	static {
+		MYSQL.start();
+	}
 
 }

@@ -42,6 +42,17 @@ export class QuoteService {
     return this.http.get<QuotePage>(this.apiUrl, { params });
   }
 
+  /** Presupuestos del vehículo que se pueden vincular a un turno nuevo. */
+  findAvailableForAppointment(vehicleId: number): Observable<QuotePage> {
+    const params = new HttpParams()
+      .set('vehicleId', vehicleId)
+      .set('available', true)
+      .set('page', 0)
+      .set('size', 50);
+
+    return this.http.get<QuotePage>(this.apiUrl, { params });
+  }
+
   findById(id: number): Observable<Quote> {
     return this.http.get<Quote>(`${this.apiUrl}/${id}`);
   }

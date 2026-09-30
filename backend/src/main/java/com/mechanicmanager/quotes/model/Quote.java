@@ -1,6 +1,5 @@
 package com.mechanicmanager.quotes.model;
 
-import com.mechanicmanager.appointments.model.Appointment;
 import com.mechanicmanager.customers.model.Customer;
 import com.mechanicmanager.users.model.User;
 import com.mechanicmanager.vehicles.model.Vehicle;
@@ -56,10 +55,6 @@ public class Quote {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "vehicle_id", nullable = false)
     private Vehicle vehicle;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "appointment_id")
-    private Appointment appointment;
 
     @Column(name = "number", nullable = false)
     private Long number;

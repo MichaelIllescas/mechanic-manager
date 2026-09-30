@@ -4,7 +4,6 @@ import com.mechanicmanager.appointments.model.Appointment;
 import com.mechanicmanager.quotes.model.Quote;
 import com.mechanicmanager.quotes.model.QuoteItem;
 import com.mechanicmanager.quotes.model.QuoteStatus;
-import com.mechanicmanager.quotes.repository.QuoteRepository;
 import com.mechanicmanager.workorders.model.WorkOrder;
 import com.mechanicmanager.workorders.model.WorkOrderItem;
 import com.mechanicmanager.workorders.model.WorkOrderStatus;
@@ -16,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Crea la orden de trabajo cuando un turno pasa a {@code COMPLETED}.
@@ -30,7 +30,6 @@ import java.util.List;
 public class CreateWorkOrderFromAppointmentUseCase {
 
     private final WorkOrderRepository workOrderRepository;
-    private final QuoteRepository quoteRepository;
 
     @Transactional
     public void execute(Long userId, Appointment appointment) {
@@ -42,8 +41,7 @@ public class CreateWorkOrderFromAppointmentUseCase {
 
         // Un presupuesto también alimenta una sola orden: si ya se usó en otra,
         // la de este turno nace vacía.
-        Quote quote = quoteRepository
-                .findByAppointmentIdAndUserId(appointment.getId(), userId)
+        Quote quote = Optional.ofNullable(appointment.getQuote())
                 .filter(candidate -> candidate.getStatus() == QuoteStatus.APPROVED)
                 .filter(candidate -> !workOrderRepository
                         .existsByQuoteIdAndUserId(candidate.getId(), userId))

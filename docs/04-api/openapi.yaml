@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: Mechanic Manager API
-  description: API REST del micro SaaS de gestión para talleres mecánicos.
+  description: API REST de Mechanic Manager, sistema de gestión para talleres mecánicos.
   version: 1.0.0
 servers:
 - url: /

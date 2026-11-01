@@ -2,26 +2,7 @@
   <div class="app-footer__inner">
     <p class="app-footer__brand">
       Desarrollado por
-      <a [href]="websiteUrl" target="_blank" rel="noopener noreferrer">Imperial Net</a>
+      <a [href]="authorUrl" target="_blank" rel="noopener noreferrer">{{ authorName }}</a>
     </p>
-
-    <div class="app-footer__contact" aria-label="Contacto de Imperial Net">
-      <a
-        class="app-footer__contact-link"
-        [href]="websiteUrl"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        imperial-net.com
-      </a>
-      <a
-        class="app-footer__contact-link app-footer__contact-link--whatsapp"
-        [href]="whatsappUrl"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        WhatsApp {{ whatsappLabel }}
-      </a>
-    </div>
   </div>
 </footer>

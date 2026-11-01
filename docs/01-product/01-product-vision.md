@@ -8,9 +8,9 @@
 
 ## 1. Visión
 
-Construir un micro SaaS simple para que un taller mecánico pequeño o mediano pueda administrar su operación diaria desde un único lugar, reemplazando registros en papel, planillas y datos dispersos.
+Construir una aplicación web simple para que un taller mecánico pequeño o mediano pueda administrar su operación diaria desde un único lugar, reemplazando registros en papel, planillas y datos dispersos.
 
-La primera versión se diseña para **validar la utilidad del producto con usuarios reales**, no para resolver desde el inicio todos los escenarios posibles de una plataforma SaaS madura.
+La primera versión se diseña para **validar la utilidad del producto con usuarios reales**, no para resolver desde el inicio todos los escenarios posibles de un producto maduro.
 
 El modelo inicial será deliberadamente simple:
 

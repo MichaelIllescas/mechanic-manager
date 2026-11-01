@@ -25,7 +25,7 @@ public class OpenApiConfig {
                 .info(new Info()
                         .title("Mechanic Manager API")
                         .version("1.0.0")
-                        .description("API REST del micro SaaS de gestión para talleres mecánicos."))
+                        .description("API REST de Mechanic Manager, sistema de gestión para talleres mecánicos."))
                 .addSecurityItem(new SecurityRequirement().addList(SECURITY_SCHEME_NAME))
                 .components(new Components()
                         .addSecuritySchemes(SECURITY_SCHEME_NAME, new SecurityScheme()

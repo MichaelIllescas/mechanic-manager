@@ -12,7 +12,7 @@
 	<artifactId>mechanic-manager</artifactId>
 	<version>1.0.0</version>
 	<name>Mechanic Manager</name>
-	<description>Backend del micro SaaS de gestión para talleres mecánicos</description>
+	<description>Backend de Mechanic Manager, sistema de gestión para talleres mecánicos</description>
 	<developers>
 		<developer>
 			<name>Jonathan Illescas</name>

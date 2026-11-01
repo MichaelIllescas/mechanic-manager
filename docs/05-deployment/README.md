@@ -49,7 +49,7 @@ La migración `V2` crea un `SYSTEM_ADMIN` de desarrollo (`admin@mechanicmanager.
 
 ## Configuración del frontend
 
-`ng build` genera archivos estáticos en `frontend-panel/dist/`. El build de producción reemplaza `environment.ts` por `environment.prod.ts`, que apunta a `https://apimechanicmanager.imperial-net.com/api/v1`. La URL del backend queda fijada en el momento del build.
+`ng build` genera archivos estáticos en `frontend-panel/dist/`. El build de producción reemplaza `environment.ts` por `environment.prod.ts`, donde se define la URL del backend (`apiUrl`). Esa URL queda fijada en el momento del build.
 
 El dominio desde el que se sirva el frontend tiene que estar en `CORS_ALLOWED_ORIGINS` del backend.
 

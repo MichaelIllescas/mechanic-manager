@@ -7,7 +7,6 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppFooter {
-  readonly websiteUrl = 'https://www.imperial-net.com/';
-  readonly whatsappUrl = 'https://wa.me/5491100000000';
-  readonly whatsappLabel = '+54 9 11 0000-0000';
+  readonly authorName = 'Jonathan Illescas';
+  readonly authorUrl = 'https://github.com/MichaelIllescas';
 }

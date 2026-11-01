@@ -295,8 +295,6 @@ Quedan explícitamente fuera de la primera versión:
 - integración automática con email;
 - reportes analíticos avanzados;
 - aplicación móvil nativa;
-- billing automatizado del SaaS;
-- planes comerciales automatizados;
 - ciclo de vida de la orden de trabajo (en curso, finalizada, entregada);
 - motivo de ingreso y diagnóstico estructurados.
 
